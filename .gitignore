@@ -1,0 +1,18 @@
+# Segredos (API key do OpenWeatherMap)
+.env
+.env.*
+!.env.example
+
+# Dependências
+node_modules/
+
+# Build
+dist/
+build/
+
+# Logs
+*.log
+
+# Sistema operacional
+.DS_Store
+Thumbs.db

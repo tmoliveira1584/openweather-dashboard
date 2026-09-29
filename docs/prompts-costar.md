@@ -1,0 +1,41 @@
+# Prompts CO-STAR
+
+## 2026-09-29 — Etapa: Setup
+
+- **[C] Contexto:** Estou iniciando do zero um MVP para a pós-graduação: uma aplicação web frontend que consome a API do OpenWeatherMap e exibe temperatura, umidade e previsão por cidade, com campo de busca. A pasta openweather-dashboard ainda está vazia. A stack ainda será definida na etapa de arquitetura.
+- **[O] Objetivo:** Preparar a estrutura inicial do projeto, sem escrever código da aplicação:
+  1. git init e um .gitignore que inclua .env e node_modules
+  2. CLAUDE.md curto com descrição, regras (API key só via .env, explicar decisões antes de implementar, passos pequenos) e stack "a definir"
+  3. Pasta docs/ com requisitos.md, arquitetura.md e prompts-costar.md vazios, só com título
+  4. Comando .claude/commands/costar.md que reescreve meu pedido em CO-STAR, registra em docs/prompts-costar.md com data e etapa do SDLC, e depois executa
+  5. Registre este prompt como a primeira entrada de docs/prompts-costar.md (etapa: Setup)
+- **[S] Estilo:** Didático e organizado
+- **[T] Tom:** Objetivo
+- **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
+- **[R] Resposta:** Liste os arquivos criados e explique em uma frase a função de cada um. Peça minha confirmação antes de criar os arquivos.
+
+## 2026-09-29 — Etapa: Setup
+
+- **[C] Contexto:** Estrutura inicial do MVP criada (git init, .gitignore, CLAUDE.md, docs/ e comando /costar), ainda sem nenhum commit. O CLAUDE.md não define um padrão para mensagens de commit.
+- **[O] Objetivo:** Acrescentar ao CLAUDE.md uma instrução para que todo commit siga Conventional Commits e, quando não for possível definir as variáveis da mensagem (tipo, escopo, breaking change), o assistente peça validação do usuário antes de commitar.
+- **[S] Estilo:** Didático e organizado
+- **[T] Tom:** Objetivo
+- **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
+- **[R] Resposta:** Resumo curto da regra adicionada e sugestão de mensagem para o primeiro commit.
+
+## 2026-09-29 — Etapa: Setup
+
+- **[C] Contexto:** MVP da pós-graduação em fase de setup. Já existem Git, .gitignore, CLAUDE.md (com Conventional Commits), docs/ e o comando /costar. Stack, licença e autoria ainda não foram definidas, e não há código da aplicação.
+- **[O] Objetivo:** Criar um README.md com base no que já foi definido, marcando o que ainda não foi decidido, contendo no mínimo:
+  1. Título e breve descrição
+  2. Instruções detalhadas de configuração do ambiente e execução local
+  3. Exemplos de uso da aplicação
+  4. Lista de tecnologias utilizadas
+  5. Limitações e próximos passos (o que foi implementado e o que poderia evoluir)
+  6. Créditos e licença
+  7. Release
+  8. Outras seções consideradas padrão em um README
+- **[S] Estilo:** Didático e organizado
+- **[T] Tom:** Objetivo
+- **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
+- **[R] Resposta:** Arquivo README.md criado na raiz e resumo do conteúdo de cada seção, com as pendências a preencher.
