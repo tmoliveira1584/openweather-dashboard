@@ -82,7 +82,7 @@ A pasta do código-fonte (por exemplo, `src/`): ⚠️ A definir junto com a sta
 ### 1. Clonar o repositório
 
 ```bash
-git clone <url-do-repositorio>   # ⚠️ A definir: o repositório remoto ainda não foi criado
+git clone https://github.com/tmoliveira1584/openweather-dashboard.git
 cd openweather-dashboard
 ```
 

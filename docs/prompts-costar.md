@@ -63,3 +63,32 @@
 - **[T] Tom:** Objetivo
 - **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
 - **[R] Resposta:** Confirmação do push, branch padrão no GitHub e estado de sincronização entre local e remoto.
+
+## 2026-09-30 — Etapa: Setup
+
+- **[C] Contexto:** O commit `0caa502` (registro dos prompts do primeiro commit e da sincronização) foi feito localmente e a branch `main` está um commit à frente de `origin/main`.
+- **[O] Objetivo:** Enviar o commit ao GitHub com `git push` e confirmar que local e remoto ficaram sincronizados.
+- **[S] Estilo:** Didático e organizado
+- **[T] Tom:** Objetivo
+- **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
+- **[R] Resposta:** Confirmação do push e do estado de sincronização, com as pendências que ainda estão em aberto.
+
+## 2026-09-30 — Etapa: Documentação
+
+- **[C] Contexto:** O repositório remoto já existe no GitHub, mas o passo "Clonar o repositório" do README ainda mostra `<url-do-repositorio>` marcado como "⚠️ A definir".
+- **[O] Objetivo:** Trocar o marcador do comando `git clone` no README pelo endereço real https://github.com/tmoliveira1584/openweather-dashboard.git e remover o aviso de pendência.
+- **[S] Estilo:** Didático e organizado
+- **[T] Tom:** Objetivo
+- **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
+- **[R] Resposta:** Confirmação da alteração no README.
+
+## 2026-09-30 — Etapa: Setup
+
+- **[C] Contexto:** Há alterações locais no README (endereço do repositório) e em docs/prompts-costar.md (novos registros). O CLAUDE.md exige Conventional Commits. Ficou decidido manter `.claude/commands/` versionado.
+- **[O] Objetivo:**
+  1. Fazer um commit com as alterações do README e de docs/prompts-costar.md, seguindo Conventional Commits
+  2. Enviar o commit ao GitHub com `git push`
+- **[S] Estilo:** Didático e organizado
+- **[T] Tom:** Objetivo
+- **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
+- **[R] Resposta:** Mensagem e hash do commit, confirmação do push e estado de sincronização entre local e remoto.
