@@ -39,3 +39,27 @@
 - **[T] Tom:** Objetivo
 - **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
 - **[R] Resposta:** Arquivo README.md criado na raiz e resumo do conteúdo de cada seção, com as pendências a preencher.
+
+## 2026-09-29 — Etapa: Setup
+
+- **[C] Contexto:** Estrutura inicial do MVP pronta (.gitignore, CLAUDE.md, README.md, docs/ e comando /costar), ainda sem nenhum commit. O CLAUDE.md exige Conventional Commits e o Git local não tem autor configurado.
+- **[O] Objetivo:**
+  1. Configurar o autor do Git somente neste repositório (Thiago Martins de Oliveira, oliveira.thiago@discente.ufg.br)
+  2. Fazer o primeiro commit com todos os arquivos, usando a descrição "criação da estrutura inicial do projeto" adaptada ao padrão Conventional Commits
+  3. Pedir validação do usuário para a mensagem, já que a descrição original não tem tipo nem está no imperativo
+- **[S] Estilo:** Didático e organizado
+- **[T] Tom:** Objetivo
+- **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
+- **[R] Resposta:** Mensagem de commit validada (`chore: criar estrutura inicial do projeto`), hash do commit e autor registrado.
+
+## 2026-09-29 — Etapa: Setup
+
+- **[C] Contexto:** O primeiro commit existe localmente na branch `master`. O repositório remoto https://github.com/tmoliveira1584/openweather-dashboard foi criado vazio no GitHub.
+- **[O] Objetivo:**
+  1. Verificar se o repositório remoto está vazio, para evitar conflito de histórico
+  2. Renomear a branch principal de `master` para `main` (padrão do GitHub), após validação do usuário
+  3. Adicionar o remoto `origin` e enviar a branch `main`, deixando-a ligada a `origin/main`
+- **[S] Estilo:** Didático e organizado
+- **[T] Tom:** Objetivo
+- **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
+- **[R] Resposta:** Confirmação do push, branch padrão no GitHub e estado de sincronização entre local e remoto.
