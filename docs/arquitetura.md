@@ -6,7 +6,7 @@ Define **como** o produto especificado em [spec.md](spec.md) é construído: sta
 
 - **Precedência:** [constitution.md](constitution.md) > [spec.md](spec.md) > este documento > print de referência. Se algo aqui contrariar o spec ou a constitution, corrija este documento.
 - **Print de referência** ([referencia/referencia_visual.png](referencia/referencia_visual.png)): define layout, proporções e cores. Textos, idioma, formatos de número, hora e unidade seguem o spec. O print está em inglês, com hora em AM/PM e "E" para leste, e nada disso vale.
-- **Para gerar código:** leia as seções 3 (decisões), 5 (estrutura e regras de dependência), 6 (contratos), 7 (detalhes) e 8 (convenções) e implemente **uma fatia por vez** da seção 10, cumprindo a definição de pronto da seção 9.4.
+- **Para gerar código:** leia as seções 3 (decisões), 5 (estrutura e regras de dependência), 6 (contratos), 7 (detalhes) e 8 (convenções) e implemente **uma fatia por vez** da seção 10, seguindo as tarefas de [tasks.md](tasks.md) e cumprindo a definição de pronto da seção 9.4.
 - **Mudanças:** um contrato (seção 6) só muda se este documento for atualizado antes do código. Uma dependência nova só entra com um ADR novo na seção 3.
 
 ## Sumário
@@ -42,7 +42,7 @@ Define **como** o produto especificado em [spec.md](spec.md) é construído: sta
 | Testes | pytest 9.1.1 e pytest-playwright 0.9.0 (Playwright 1.63.0) usando o **Google Chrome instalado** |
 | Qualidade de código | ruff 0.16.10 (lint e formatação do Python) |
 | Armazenamento | Nenhum: sem banco de dados, arquivos ou cache no servidor. O cache fica só na memória do navegador (ADR-005) |
-| Plataforma alvo | Duas versões mais recentes de Chrome, Edge, Firefox e Safari (RNF-006) |
+| Plataforma alvo | Duas versões mais recentes de Chrome, Edge, Firefox e Safari (RNF-006). Os testes são feitos só no Chrome (limitação L-01, seção 13) |
 | Endereço local | `http://127.0.0.1:8000` (só a própria máquina) |
 | Metas de desempenho | RNF-001 (3 s), RNF-002 (200 ms), RNF-013 e RNF-026 (100 ms) |
 | Restrições | Sem instalar software no sistema. Chave só no `.env` (P-001, P-002). Cota de 1.000 consultas por dia na One Call 3.0 |
@@ -901,13 +901,14 @@ Os testes de ponta a ponta sobem o backend numa thread (fixture `live_server` no
 3. Nenhum guardrail da seção 8.4 foi violado, e `git grep` pelo valor da chave não encontra nada.
 4. Contratos alterados foram atualizados **antes** neste documento.
 5. A aplicação sobe com `uvicorn` e a fatia foi conferida visualmente contra o print, quando houver interface.
-6. Commit em Conventional Commits, com os IDs no corpo.
+6. As tarefas concluídas estão marcadas em [tasks.md](tasks.md), com "Onde paramos" e "Progresso" atualizados.
+7. Commit em Conventional Commits, com os IDs no corpo. A marcação do item 6 entra no mesmo commit do código.
 
 ---
 
 ## 10. Plano de implementação em fatias
 
-Cada fatia é pequena, verificável e depende só das anteriores. O detalhamento em tarefas fica para um `docs/tasks.md` futuro.
+Cada fatia é pequena, verificável e depende só das anteriores. As tarefas de cada fatia, a fatia em que cada ID é fechado e o ponto de retomada entre sessões ficam em [tasks.md](tasks.md). A coluna "IDs principais" abaixo é só um resumo.
 
 | # | Fatia | Entregas | IDs principais |
 |---|---|---|---|
@@ -917,22 +918,25 @@ Cada fatia é pequena, verificável e depende só das anteriores. O detalhamento
 | 3 | View model | `schemas/provider.py`, `schemas/view.py`, `view_model.py` com fixtures | Seção 6.3, P-013, CA-013, CA-014 |
 | 4 | Cliente e rotas | `OpenWeatherClient`, `routes.py`, tratadores de erro, `Cache-Control` | RF-004, RF-006, RF-013, RN-012, RN-059, seção 6.4, RNF-004 |
 | 5 | Estrutura da tela | `index.html`, `tokens.css`, `styles.css` com conteúdo estático, comparados com o print | P-024, RNF-011, RNF-015, RNF-021 |
-| 6 | Estado, serviços e cabeçalho | `state.js`, `actions.js`, `services/*`, `ui/header.js`, `messages.js` | Feature 1 inteira (RF-001 a RF-015), RF-053 a RF-058 |
+| 6a | Estado, cache e chamadas ao backend | `state.js`, `actions.js` (`selectCity`, `retry`), `services/api.js`, `services/cache.js`, `messages.js`, `ui/dom.js` | RF-004, RF-005, RF-013, RN-010 a RN-012, CA-008 |
+| 6b | Cabeçalho, busca e seletor de escala | `ui/header.js`, `actions.js` (`search`, `closeSearch`, `setScale`) | RF-006 a RF-012, RF-015, RF-053, RF-054, CA-004 a CA-007, CA-044 |
+| 6c | Localização inicial e cidade padrão | `services/location.js`, `actions.js` (`start`), aviso de localização | RF-001 a RF-003, RN-001 a RN-003, CA-001 a CA-003 |
 | 7 | Condições atuais | `ui/current.js` e ilustrações SVG | Feature 2 (RF-016 a RF-023) |
 | 8 | Previsão diária | `ui/day-tabs.js`, `logic/time-window.js` (dias) | Feature 3 (RF-024 a RF-032) |
 | 9 | Hora a hora | `ui/hourly.js`, `logic/chart-math.js`, `hourlyAltText` | Feature 4 (RF-033 a RF-038) |
 | 10 | Por minuto | `ui/minutely.js`, `minuteWindow`, `minuteMarks`, `minuteSummary` | Feature 5 (RF-039 a RF-045) |
 | 11 | Mapa | `ui/map.js` | Feature 6 (RF-046 a RF-052) |
-| 12 | Robustez e acessibilidade | RF-014 (retorno à página), concorrência, revisão de teclado e de 360 px | Categorias 7 e 8, P-023, P-024 |
+| 12 | Robustez, desempenho e acessibilidade | RF-014 (retorno à página), concorrência, tempos de resposta, privacidade, revisão de teclado e de 360 px | Categorias 7 e 8, RNF-001, RNF-002, RNF-022, RNF-026, P-023, P-024 |
 | 13 | Fechamento | CAs restantes de ponta a ponta, fumaça com o provedor real, README e release `v0.1.0` | Todos os CA |
 
 **Modelo de pedido para cada fatia** (use com `/costar`):
 
 ```
-Implementar a fatia <N> de docs/arquitetura.md (seção 10): <nome>.
-IDs: <lista>. Arquivos: <lista da seção 5.1>.
+Implementar a tarefa <T-N.x> da fatia <N> de docs/tasks.md: <nome>.
+IDs: <lista da tarefa>. Arquivos: <lista da seção 5.1>.
 Escreva primeiro os testes dos IDs, depois o código. Siga os contratos (seção 6),
 as decisões de detalhe (seção 7) e os guardrails (seção 8.4).
+Marque a tarefa e atualize "Onde paramos" em docs/tasks.md no mesmo commit.
 Cumpra a definição de pronto (seção 9.4) e proponha a mensagem de commit.
 ```
 
@@ -997,6 +1001,7 @@ Configuração do `pyproject.toml` (criada na fatia 0):
 | Termos de uso do CARTO | Bloqueio das tiles do mapa base | Uso acadêmico leve, com atribuição. Plano B: OpenStreetMap padrão (troca de uma URL em `ui/map.js`) |
 | Cache de tiles de terceiros no navegador | Fica no disco uma região visitada (escala regional), fora do controle da aplicação | `/api` usa `no-store`. As tiles do CARTO seguem os cabeçalhos do CARTO, que mostram a região e não a posição exata. Limitação aceita |
 | Leaflet copiado não recebe atualização automática | Correções de segurança manuais | Versão e SHA-256 registrados em `static/vendor/README.md` |
+| **L-01:** testes feitos só no Chrome. Edge, Firefox e Safari não são testados, nem em computador nem em celular | O RNF-006 não é verificado fora do Chrome. Diferenças de comportamento nesses navegadores podem passar despercebidas | Limitação aceita no MVP ([tasks.md](tasks.md), L-01). O código usa só APIs padrão do navegador (ES2022, `fetch`, geolocalização) e o Leaflet, que é compatível com os quatro navegadores |
 | Atualizações automáticas do Chrome | Testes de ponta a ponta podem mudar de comportamento | O Playwright 1.63 suporta o canal estável. Se quebrar, atualizar o `pytest-playwright` com um ADR |
 | Mudança de versão do Python ou de pacotes | Instalação diferente entre máquinas | Todas as versões fixadas (seção 1). `conda env update --prune` |
 | Previsão por minuto ausente em muitas cidades | Painel "indisponível" | Comportamento previsto no spec (RF-045) |

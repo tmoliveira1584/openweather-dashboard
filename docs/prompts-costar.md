@@ -239,3 +239,36 @@
 - **[T] Tom:** Objetivo
 - **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
 - **[R] Resposta:** Informe o hash do commit e os arquivos incluídos, confirme o push e mostre o estado de sincronização.
+
+## 2026-10-04 — Etapa: Implementação
+
+- **[C] Contexto:** Concluí os requisitos (product brief, constitution e spec) e a arquitetura, e estou entrando na fase de implementação. A seção 10 de `docs/arquitetura.md` define 14 fatias, mas cita os IDs por faixa e deixa o detalhamento em tarefas para um `docs/tasks.md` futuro. Quero que qualquer sessão futura de geração de código saiba exatamente de onde continuar. Os testes vão rodar só no Google Chrome instalado: não vou testar em outros navegadores.
+- **[O] Objetivo:**
+  1. Avalie todos os documentos do projeto e aponte o que falta para que o plano de implementação cubra 100% dos requisitos
+  2. Crie o `docs/tasks.md`, versionado no Git (fora do `.gitignore`, porque é um artefato do processo), com:
+     - tarefas em checkbox por fatia, pequenas o bastante para caber numa sessão, terminando cada fatia na definição de pronto
+     - um bloco "Onde paramos", com a fatia atual, a próxima tarefa e o último commit
+     - uma tabela de progresso por fatia
+     - a regra de marcar a tarefa no mesmo commit do código que a conclui
+  3. Divida a fatia 6 em 6a (estado, cache e chamadas ao backend), 6b (cabeçalho, busca e seletor de escala) e 6c (localização inicial e cidade padrão)
+  4. Atribua cada um dos 217 IDs (RF, RN, RNF e CA do spec, mais P-001 a P-027) a uma única fatia, a que o fecha, e confira por script que nenhum fica de fora ou repetido
+  5. Registre como limitação L-01 que os testes são feitos só no Chrome, no `docs/tasks.md`, na arquitetura e no README, mantendo o RNF-006 no spec como meta
+  6. Faça o CLAUDE.md, a arquitetura (seções 1, 9.4, 10 e 13), o README e o `docs/requisitos.md` apontarem para o `docs/tasks.md`
+- **[S] Estilo:** Técnico e organizado
+- **[T] Tom:** Objetivo
+- **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
+- **[R] Resposta:** Resuma o trabalho: arquivos criados e alterados, estrutura do `docs/tasks.md` e decisões registradas. Proponha a mensagem de commit e aguarde a minha validação antes de commitar.
+
+## 2026-10-04 — Etapa: Implementação
+
+- **[C] Contexto:** Há alterações locais ainda não commitadas do planejamento da implementação:
+  - Novo: `docs/tasks.md`
+  - Alterados: CLAUDE.md, README, `docs/arquitetura.md`, `docs/requisitos.md` e `docs/prompts-costar.md`
+  - A branch `main` local está sincronizada com `origin/main`. O CLAUDE.md exige Conventional Commits.
+- **[O] Objetivo:**
+  1. Faça um único commit com essas alterações, usando a mensagem `docs(tasks): planejar implementação em tarefas por fatia`, com um corpo que resuma o tasks.md e a limitação L-01 e cite o P-027
+  2. Envie o commit ao GitHub com `git push` e confirme a sincronização entre local e remoto
+- **[S] Estilo:** Técnico e organizado
+- **[T] Tom:** Objetivo
+- **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
+- **[R] Resposta:** Informe o hash do commit e os arquivos incluídos, confirme o push e mostre o estado de sincronização.

@@ -4,7 +4,7 @@ Dashboard web de página única que consome a API do [OpenWeatherMap](https://op
 
 MVP acadêmico da pós-graduação, desenvolvido com apoio de IA Generativa em todas as etapas do SDLC.
 
-> **Status:** 🚧 Requisitos ([docs/requisitos.md](docs/requisitos.md)) e arquitetura ([docs/arquitetura.md](docs/arquitetura.md)) definidos. O código da aplicação ainda não foi escrito, então os comandos abaixo passam a funcionar a partir da fatia 0 de implementação.
+> **Status:** 🚧 Requisitos ([docs/requisitos.md](docs/requisitos.md)), arquitetura ([docs/arquitetura.md](docs/arquitetura.md)) e plano de tarefas ([docs/tasks.md](docs/tasks.md)) definidos. O código da aplicação ainda não foi escrito, então os comandos abaixo passam a funcionar a partir da fatia 0 de implementação.
 >
 > Neste README, **⚠️ A definir** marca o que ainda não foi decidido.
 
@@ -71,6 +71,7 @@ openweather-dashboard/
 │   ├── constitution.md      # Princípios permanentes (P-xxx)
 │   ├── spec.md              # Especificação por feature (RF, RN, RNF, CA)
 │   ├── arquitetura.md       # Stack, decisões (ADR), contratos, convenções, testes e fatias
+│   ├── tasks.md             # Tarefas por fatia, ponto de retomada e progresso da implementação
 │   ├── prompts-costar.md    # Histórico de prompts por etapa do SDLC
 │   └── referencia/
 │       └── referencia_visual.png  # Print de referência visual do layout
@@ -184,6 +185,7 @@ O projeto mostra como a IA Generativa pode ajudar em cada etapa do SDLC:
   - [constitution](docs/constitution.md): os princípios permanentes
   - [spec](docs/spec.md): requisitos em notação EARS e critérios de aceite Dado/Quando/Então
 - **[Arquitetura](docs/arquitetura.md):** decisões registradas (ADR), contratos, convenções, guardrails, estratégia de testes e plano de implementação em fatias, para que o código gerado pela IA seja correto e replicável.
+- **[Tarefas](docs/tasks.md):** cada fatia quebrada em tarefas com checkbox, a fatia em que cada um dos 217 IDs (RF, RN, RNF, CA e princípios) é fechado e o bloco "Onde paramos", que diz a cada nova sessão de onde continuar. Cada tarefa é marcada no mesmo commit do código que a conclui.
 
 ## Como contribuir
 
@@ -205,6 +207,7 @@ O projeto mostra como a IA Generativa pode ajudar em cada etapa do SDLC:
 - **Limites do plano gratuito** do OpenWeatherMap: a One Call API 3.0 tem 1.000 chamadas gratuitas por dia. O cache de 10 minutos por cidade reduz o consumo.
 - **One Call API 3.0:** o fornecedor recomenda a [One Call API 4.0](https://openweathermap.org/api/one-call-4) para novas integrações. A 3.0 foi escolhida por simplicidade, porque exige uma única chamada por cidade.
 - **Previsão por minuto:** não está disponível para todas as localidades.
+- **Testado só no Google Chrome:** os testes automatizados rodam só no Chrome instalado. Edge, Firefox e Safari não são testados, nem em computador nem em celular (limitação L-01 de [docs/tasks.md](docs/tasks.md)).
 - **Escopo reduzido:** sem favoritos, histórico de buscas, detalhes dos alertas ou preferências lembradas entre visitas.
 
 ### Próximos passos no MVP
@@ -212,7 +215,8 @@ O projeto mostra como a IA Generativa pode ajudar em cada etapa do SDLC:
 - [x] Levantar os requisitos em [docs/requisitos.md](docs/requisitos.md)
 - [x] Definir a stack, a arquitetura e o provedor de mapa base em [docs/arquitetura.md](docs/arquitetura.md)
 - [x] Criar o `.env.example` e atualizar as instruções de execução
-- [ ] Implementar as 7 features de [docs/spec.md](docs/spec.md), seguindo as fatias da seção 10 de [docs/arquitetura.md](docs/arquitetura.md)
+- [x] Planejar a implementação em tarefas por fatia em [docs/tasks.md](docs/tasks.md)
+- [ ] Implementar as 7 features de [docs/spec.md](docs/spec.md), seguindo as tarefas de [docs/tasks.md](docs/tasks.md)
 - [ ] Tratar os erros e casos de borda descritos no spec (cidade inexistente, localização negada, falha de rede, chave inválida etc.)
 - [ ] Escrever testes e publicar a primeira release
 

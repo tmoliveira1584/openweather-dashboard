@@ -17,6 +17,7 @@ de chuva da cidade do usuário (localização do navegador) ou de uma cidade bus
 - Trabalhe em passos pequenos e verificáveis, um de cada vez.
 - Siga os princípios de `docs/constitution.md` e implemente conforme `docs/spec.md`, citando os IDs (RF, RN, RNF, CA).
 - Implemente uma fatia por vez de `docs/arquitetura.md` (seção 10), respeitando contratos, guardrails (seção 8.4) e a definição de pronto (seção 9.4).
+- Em toda sessão de implementação, comece por `docs/tasks.md` ("Onde paramos") e continue da próxima tarefa não marcada. Marque a tarefa (`[x]`) e atualize "Onde paramos" no mesmo commit do código.
 
 ## Commits
 - Todo commit segue [Conventional Commits](https://www.conventionalcommits.org/pt-br/): `<tipo>(<escopo opcional>): <descrição>`.
@@ -30,5 +31,6 @@ de chuva da cidade do usuário (localização do navegador) ou de uma cidade bus
 - `docs/constitution.md`: princípios permanentes (P-xxx), prevalecem sobre o spec
 - `docs/spec.md`: especificação por feature (RF, RN, RNF, CA)
 - `docs/arquitetura.md`: stack, decisões (ADR), contratos, convenções, testes e fatias de implementação
+- `docs/tasks.md`: tarefas por fatia, ponto de retomada entre sessões e fatia em que cada ID é fechado
 - `docs/referencia/referencia_visual.png`: print de referência visual (o spec prevalece em textos e formatos)
 - `docs/prompts-costar.md`: histórico de prompts CO-STAR (use `/costar`)
