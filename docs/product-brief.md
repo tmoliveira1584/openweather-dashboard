@@ -39,7 +39,7 @@ Todos os dados vêm do provedor **OpenWeatherMap**.
 | Usuário | Pessoa (ator principal) | Abre a página, autoriza ou nega a localização, busca cidades, escolhe dias, alterna unidades e navega no mapa. Não precisa de cadastro. |
 | Navegador | Sistema (ator de apoio) | Pede ao usuário permissão para a localização e, se ele autorizar, informa as coordenadas do dispositivo. |
 | OpenWeatherMap | Sistema externo (ator de apoio) | Fornece os dados meteorológicos, a busca de cidades por nome ou por coordenadas, os ícones e a camada de precipitação do mapa. |
-| Provedor de mapa base | Sistema externo (ator de apoio) | Fornece o mapa geográfico sobre o qual ficam a camada de precipitação e o marcador. É escolhido na etapa de arquitetura. |
+| Provedor de mapa base | Sistema externo (ator de apoio) | Fornece o mapa geográfico sobre o qual ficam a camada de precipitação e o marcador. Definido em [arquitetura.md](arquitetura.md) (ADR-006). |
 
 ## 4. Fluxo de uso
 

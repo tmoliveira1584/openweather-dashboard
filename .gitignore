@@ -3,12 +3,15 @@
 .env.*
 !.env.example
 
-# Dependências
-node_modules/
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.ruff_cache/
 
-# Build
-dist/
-build/
+# Playwright (traces, vídeos e capturas de testes que falharam)
+test-results/
 
 # Logs
 *.log

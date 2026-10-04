@@ -63,7 +63,7 @@ Itens do roteiro genérico de sistemas transacionais não se aplicam a este prod
 | Nome por coordenadas (geocodificação reversa) | `https://api.openweathermap.org/geo/1.0/reverse?lat={lat}&lon={lon}&limit=1&appid={API_KEY}` |
 | Ícones de condição | `https://openweathermap.org/img/wn/{icon}@2x.png` |
 | Camada de precipitação do mapa | `https://tile.openweathermap.org/map/precipitation_new/{z}/{x}/{y}.png?appid={API_KEY}` |
-| Mapa base | A definir na etapa de arquitetura |
+| Mapa base | Definido em [arquitetura.md](arquitetura.md) (ADR-006) |
 
 `{API_KEY}` é um marcador. A chave real fica só na configuração de ambiente (P-001, P-002).
 
@@ -724,7 +724,7 @@ O usuário quer ver onde está chovendo ao redor da cidade, para entender se a c
 |---|---|---|---|
 | Usuário | Pessoa que consulta o dashboard | Ver o mapa com o marcador e a camada de chuva; aproximar, afastar e arrastar o mapa | Escolher uma cidade clicando no mapa; trocar a camada; animar a evolução da chuva |
 | OpenWeatherMap | Provedor da camada de precipitação | Fornecer a imagem da precipitação atual por área do mapa | — |
-| Provedor de mapa base | Provedor do mapa geográfico, a definir na arquitetura | Fornecer o mapa base | Ser exibido sem a atribuição exigida (P-019) |
+| Provedor de mapa base | Provedor do mapa geográfico, definido em [arquitetura.md](arquitetura.md) (ADR-006) | Fornecer o mapa base | Ser exibido sem a atribuição exigida (P-019) |
 
 ### Escopo
 
@@ -800,7 +800,7 @@ O usuário quer ver onde está chovendo ao redor da cidade, para entender se a c
 
 **Dependências**
 - Camada de precipitação do OpenWeatherMap.
-- Provedor de mapa base, a definir na arquitetura, com licença compatível com uso acadêmico.
+- Provedor de mapa base, definido em [arquitetura.md](arquitetura.md) (ADR-006), com licença compatível com uso acadêmico.
 - Chave de API válida (para a camada de precipitação).
 
 **Premissas**

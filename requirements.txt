@@ -1,0 +1,26 @@
+# Dependências de execução do backend (Python 3.13.5).
+# Versões exatas, conferidas com `pip install --dry-run` em 2026-10-04.
+# Justificativas em docs/arquitetura.md (seção 1 e ADRs).
+# Nenhuma dependência nova entra sem um ADR novo em docs/arquitetura.md.
+
+# --- Diretas ---
+fastapi==0.142.2          # framework web: rotas /api, validação e arquivos estáticos
+uvicorn==0.54.0           # servidor ASGI que executa o FastAPI
+httpx==0.28.1             # cliente HTTP assíncrono para o OpenWeatherMap
+python-dotenv==1.2.4      # leitura do .env (uvicorn --env-file)
+
+# --- Indiretas (fixadas para replicação) ---
+annotated-doc==0.0.5
+annotated-types==0.8.0
+anyio==4.15.1
+certifi==2026.7.22
+click==8.5.0
+h11==0.16.0
+httpcore==1.0.9
+idna==3.20
+opentelemetry-api==1.45.0
+pydantic==2.13.5
+pydantic_core==2.46.5
+starlette==1.7.0
+typing-inspection==0.4.4
+typing_extensions==4.16.0

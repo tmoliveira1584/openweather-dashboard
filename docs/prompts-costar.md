@@ -120,3 +120,53 @@
 - **[T] Tom:** Objetivo
 - **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
 - **[R] Resposta:** Mensagem de commit proposta para validação; depois de aprovada, hash do commit, confirmação do push e estado de sincronização.
+
+## 2026-10-04 — Etapa: Arquitetura
+
+- **[C] Contexto:** A etapa de requisitos foi concluída e commitada (`a63e0c3`): product brief, constitution (P-001 a P-027) e spec com 7 features (RF-001 a RF-058, RN-001 a RN-059, RNF-001 a RNF-029, CA-001 a CA-044). `docs/arquitetura.md` tem só o título, e o provedor de mapa base continua pendente. O autor não tem experiência com arquitetura de software: o foco é aprender a usar IA no SDLC, não se tornar arquiteto. A aplicação vai rodar só localmente, sem instalar nenhum software novo. O ambiente já tem Node.js 22 com npm 10, Git, VS Code e Google Chrome. O Python não está instalado.
+- **[O] Objetivo:**
+  1. Propor uma arquitetura eficiente, simples de entender e de implementar, que rode localmente apenas com o que já está instalado
+  2. Explicar brevemente cada componente, por que foi escolhido e quais alternativas foram descartadas
+  3. Garantir que a proposta cubra todo o escopo dos documentos (7 features do spec e princípios da constitution), com uma matriz de cobertura
+  4. Definir o provedor de mapa base
+  5. Registrar este prompt em `docs/prompts-costar.md`
+  6. Não escrever ainda o `docs/arquitetura.md`
+- **[S] Estilo:** Didático e organizado
+- **[T] Tom:** Objetivo
+- **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
+- **[R] Resposta:** Proposta de arquitetura na conversa: visão geral em diagrama, componentes com função e justificativa, alternativas descartadas, estrutura de pastas, estratégia de testes, matriz de cobertura do escopo, riscos e pontos para o usuário validar antes de registrar em `docs/arquitetura.md`.
+
+## 2026-10-04 — Etapa: Arquitetura
+
+- **[C] Contexto:** A arquitetura foi discutida e fechada na conversa. Backend em Python 3.13 (ambiente conda do Anaconda já instalado) com FastAPI, Uvicorn, httpx e python-dotenv, no padrão BFF: proxy com a chave só no servidor, regras de negócio e textos prontos nas duas escalas. Frontend em HTML, CSS e JavaScript puro, sem build, com Leaflet 1.9.4 copiado para o projeto, mapa base CARTO Voyager e gráficos em SVG próprio. Cache no navegador (P-007). Testes com pytest e pytest-playwright usando o Chrome instalado. Identificadores em inglês, interface e comentários em pt-BR. O print `docs/referencia/referencia_visual.png` é referência visual, e o spec prevalece em textos e formatos. Hoje `docs/arquitetura.md` tem só o título, e o README e o CLAUDE.md ainda mostram a stack como "a definir".
+- **[O] Objetivo:**
+  1. Escrever `docs/arquitetura.md` com a arquitetura definida, incluindo as seções que garantem replicação (versões, decisões registradas, guardrails, relógio injetável), geração correta sem lacunas (contratos, modelo de dados, view model, estado, regras de dependência, mensagens e erros, decisões de detalhe, tokens visuais) e geração eficiente (fatias de implementação, definição de pronto, estratégia de testes, convenções, guia rápido)
+  2. Registrar as versões exatas em `requirements.txt`, `requirements-dev.txt` e `environment.yml`, conferidas contra o Python 3.13
+  3. Varrer o projeto (CLAUDE.md, README, docs/, .gitignore, .claude/) e atualizar o que deixou de ser verdade
+  4. Registrar este prompt
+- **[S] Estilo:** Técnico e organizado
+- **[T] Tom:** Objetivo
+- **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
+- **[R] Resposta:** Resumo de tudo o que foi criado e alterado, com o motivo de cada mudança, para validação antes do commit.
+
+## 2026-10-04 — Etapa: Arquitetura
+
+- **[C] Contexto:** O `docs/arquitetura.md` já foi escrito. A seção 2.2 traz um diagrama de sequência que cobre só a troca de cidade. Na conversa foi criado um diagrama de sequência Mermaid mais completo, que descreve o fluxo da aplicação como concebido: a página é entregue pelo FastAPI, os blocos se inscrevem no estado, a localização é pedida com prazo de 10 s (com geocodificação reversa ou a cidade padrão), o cache é consultado, o backend chama o OpenWeatherMap com a chave e devolve o view model, respostas antigas são descartadas, os blocos são desenhados, as tiles do mapa são carregadas, e o usuário interage (escala, aba, busca, retorno à página).
+- **[O] Objetivo:**
+  1. Substituir o diagrama da seção 2.2 de `docs/arquitetura.md` pelo diagrama de sequência completo, para manter uma única fonte do fluxo técnico
+  2. Acrescentar uma legenda de leitura e a regra de que o diagrama muda junto com contratos e fluxos
+- **[S] Estilo:** Técnico e organizado
+- **[T] Tom:** Objetivo
+- **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
+- **[R] Resposta:** Confirmação da troca da seção 2.2, com o novo título e a legenda.
+
+## 2026-10-04 — Etapa: Arquitetura
+
+- **[C] Contexto:** A etapa de arquitetura foi concluída e validada pelo usuário. Ainda não foram commitados: `docs/arquitetura.md` (com o diagrama de sequência completo), `requirements.txt`, `requirements-dev.txt`, `environment.yml`, `.env.example`, o print `docs/referencia/referencia_visual.png`, as atualizações de CLAUDE.md, README, `.gitignore`, `docs/spec.md`, `docs/product-brief.md` e `docs/requisitos.md`, e os registros de prompt. A mensagem de commit `docs(arquitetura): definir arquitetura, stack e versões do MVP` já foi aprovada pelo usuário. A branch `main` local está sincronizada com `origin/main`.
+- **[O] Objetivo:**
+  1. Fazer um único commit com todas as alterações da etapa de arquitetura, usando a mensagem aprovada
+  2. Enviar o commit ao GitHub com `git push` e confirmar a sincronização entre local e remoto
+- **[S] Estilo:** Técnico e organizado
+- **[T] Tom:** Objetivo
+- **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
+- **[R] Resposta:** Hash do commit, lista de arquivos incluídos, confirmação do push e estado de sincronização.

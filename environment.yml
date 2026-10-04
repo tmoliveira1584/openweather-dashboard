@@ -1,0 +1,12 @@
+# Ambiente conda do projeto: o conda fornece só o Python; os pacotes vêm do pip.
+# Criar:      conda env create -f environment.yml
+# Atualizar:  conda env update -f environment.yml --prune
+# Ativar:     conda activate openweather-dashboard
+name: openweather-dashboard
+channels:
+  - conda-forge
+dependencies:
+  - python=3.13.5=*_cp313   # build padrão (com GIL); exclui as variantes cp313t
+  - pip=26.2.1
+  - pip:
+      - -r requirements-dev.txt

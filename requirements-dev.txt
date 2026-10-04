@@ -1,0 +1,26 @@
+# Dependências de desenvolvimento e testes. Inclui as de execução.
+# Versões exatas, conferidas com `pip install --dry-run` em 2026-10-04.
+# Justificativas em docs/arquitetura.md (seção 1 e ADRs).
+
+-r requirements.txt
+
+# --- Diretas ---
+pytest==9.1.1             # testes de unidade, de API e de ponta a ponta
+pytest-playwright==0.9.0  # testes de ponta a ponta no Chrome instalado (--browser-channel chrome)
+ruff==0.16.10             # lint e formatação do código Python
+
+# --- Indiretas (fixadas para replicação) ---
+charset-normalizer==3.5.2
+colorama==0.4.6
+greenlet==3.5.6
+iniconfig==2.3.0
+packaging==26.3
+playwright==1.63.0
+pluggy==1.6.0
+pyee==13.0.1
+Pygments==2.21.0
+pytest-base-url==2.1.0
+python-slugify==8.0.4
+requests==2.34.2
+text-unidecode==1.3
+urllib3==2.8.0

@@ -29,6 +29,6 @@
 | Unidades | °C com m/s ou °F com mph, convertidos sem nova consulta |
 | Cache | Uma consulta por cidade a cada 10 minutos, só em memória |
 
-A stack tecnológica não faz parte desta etapa. Ela será definida em [arquitetura.md](arquitetura.md).
+A stack tecnológica não faz parte desta etapa. Ela está definida em [arquitetura.md](arquitetura.md).
 
 O histórico dos prompts desta etapa está em [prompts-costar.md](prompts-costar.md).

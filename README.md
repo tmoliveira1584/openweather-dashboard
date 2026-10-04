@@ -4,7 +4,7 @@ Dashboard web de página única que consome a API do [OpenWeatherMap](https://op
 
 MVP acadêmico da pós-graduação, desenvolvido com apoio de IA Generativa em todas as etapas do SDLC.
 
-> **Status:** 🚧 Requisitos especificados ([docs/requisitos.md](docs/requisitos.md)). A arquitetura ainda será definida, e o código da aplicação ainda não foi escrito.
+> **Status:** 🚧 Requisitos ([docs/requisitos.md](docs/requisitos.md)) e arquitetura ([docs/arquitetura.md](docs/arquitetura.md)) definidos. O código da aplicação ainda não foi escrito, então os comandos abaixo passam a funcionar a partir da fatia 0 de implementação.
 >
 > Neste README, **⚠️ A definir** marca o que ainda não foi decidido.
 
@@ -43,16 +43,18 @@ Escopo do MVP, especificado em [docs/spec.md](docs/spec.md):
 | Camada | Tecnologia | Status |
 |---|---|---|
 | Fonte de dados | [OpenWeatherMap](https://openweathermap.org/api): One Call API 3.0, Geocoding API e camada de precipitação | ✅ Definido |
-| Mapa base | ⚠️ A definir | Etapa de arquitetura |
+| Backend | [Python](https://www.python.org/) 3.13.5 + [FastAPI](https://fastapi.tiangolo.com/) 0.142.2 + [Uvicorn](https://www.uvicorn.org/) 0.54.0 + [httpx](https://www.python-httpx.org/) 0.28.1 | ✅ Definido |
+| Frontend | HTML, CSS e JavaScript puro (módulos ES), sem framework e sem build | ✅ Definido |
+| Mapa | [Leaflet](https://leafletjs.com/) 1.9.4 + mapa base [CARTO Voyager](https://carto.com/basemaps) (dados © [OpenStreetMap](https://www.openstreetmap.org/copyright)) | ✅ Definido |
+| Gráficos | SVG próprio, sem biblioteca | ✅ Definido |
+| Testes | [pytest](https://docs.pytest.org/) 9.1.1 + [pytest-playwright](https://playwright.dev/python/) 0.9.0 (Chrome instalado) | ✅ Definido |
+| Qualidade de código | [Ruff](https://docs.astral.sh/ruff/) 0.16.10 | ✅ Definido |
+| Ambiente | [Anaconda](https://www.anaconda.com/) / conda (canal conda-forge) + pip | ✅ Definido |
 | Versionamento | Git + [Conventional Commits](https://www.conventionalcommits.org/pt-br/) | ✅ Definido |
 | Assistente de desenvolvimento | [Claude Code](https://claude.com/claude-code) + prompts CO-STAR | ✅ Definido |
-| Linguagem / framework frontend | ⚠️ A definir | Etapa de arquitetura |
-| Build / bundler | ⚠️ A definir | Etapa de arquitetura |
-| Estilização | ⚠️ A definir | Etapa de arquitetura |
-| Testes | ⚠️ A definir | Etapa de arquitetura |
-| Hospedagem / deploy | ⚠️ A definir | Etapa de deploy |
+| Hospedagem / deploy | Não se aplica: o MVP roda só localmente, em `127.0.0.1` | ✅ Definido |
 
-As decisões e justificativas vão ficar em [docs/arquitetura.md](docs/arquitetura.md).
+As versões exatas de todas as dependências estão em [requirements.txt](requirements.txt), [requirements-dev.txt](requirements-dev.txt) e [environment.yml](environment.yml). As decisões e justificativas estão em [docs/arquitetura.md](docs/arquitetura.md).
 
 ## Estrutura do projeto
 
@@ -68,21 +70,28 @@ openweather-dashboard/
 │   ├── product-brief.md     # Visão do produto, atores, fluxo de uso e glossário geral
 │   ├── constitution.md      # Princípios permanentes (P-xxx)
 │   ├── spec.md              # Especificação por feature (RF, RN, RNF, CA)
-│   ├── arquitetura.md       # Stack e decisões de arquitetura
-│   └── prompts-costar.md    # Histórico de prompts por etapa do SDLC
-├── .gitignore               # Deixa .env, node_modules e artefatos de build fora do Git
+│   ├── arquitetura.md       # Stack, decisões (ADR), contratos, convenções, testes e fatias
+│   ├── prompts-costar.md    # Histórico de prompts por etapa do SDLC
+│   └── referencia/
+│       └── referencia_visual.png  # Print de referência visual do layout
+├── .env.example             # Modelo do .env (sem a chave real)
+├── .gitignore               # Deixa .env, caches do Python e resultados de teste fora do Git
+├── environment.yml          # Ambiente conda: Python 3.13.5 + pip
+├── requirements.txt         # Dependências de execução, com versões exatas
+├── requirements-dev.txt     # Dependências de teste e qualidade, com versões exatas
 ├── CLAUDE.md                # Contexto e regras para o Claude Code
 └── README.md                # Este arquivo
 ```
 
-A pasta do código-fonte (por exemplo, `src/`): ⚠️ A definir junto com a stack.
+O código vai ficar em `app/` (backend Python), `static/` (frontend) e `tests/`, conforme a seção 5 de [docs/arquitetura.md](docs/arquitetura.md).
 
 ## Pré-requisitos
 
 - [Git](https://git-scm.com/)
 - Uma conta gratuita no [OpenWeatherMap](https://home.openweathermap.org/users/sign_up) com uma **API key**
 - A assinatura **"One Call by Call"** ativa na conta, exigida pela [One Call API 3.0](https://openweathermap.org/api/one-call-3). Ela inclui 1.000 chamadas gratuitas por dia, e as chamadas acima disso são cobradas
-- Runtime e gerenciador de pacotes (por exemplo, Node.js + npm): ⚠️ A definir junto com a stack
+- [Anaconda](https://www.anaconda.com/download) ou Miniconda (para o ambiente com Python 3.13.5). Sem conda, serve o [Python 3.13](https://www.python.org/downloads/) com `venv`
+- [Google Chrome](https://www.google.com/chrome/), usado pelos testes de ponta a ponta
 
 ## Configuração do ambiente e execução local
 
@@ -101,34 +110,46 @@ cd openweather-dashboard
 
 ### 3. Configurar as variáveis de ambiente
 
-A API key fica **somente** no arquivo `.env`, que o Git ignora. Nunca coloque a chave no código, em commits ou em prompts.
+A API key fica **somente** no arquivo `.env`, que o Git ignora. Nunca coloque a chave no código, em commits ou em prompts. Ela é lida pelo servidor Python e **nunca é enviada ao navegador**.
 
 ```bash
-cp .env.example .env    # ⚠️ O .env.example será criado quando a stack for definida
+copy .env.example .env    # Anaconda Prompt / cmd. No Git Bash: cp .env.example .env
 ```
+
+Depois, edite o `.env` e preencha a chave.
 
 | Variável | Descrição | Exemplo |
 |---|---|---|
-| ⚠️ A definir (o prefixo depende da stack, por exemplo `VITE_`) | API key do OpenWeatherMap | `sua_chave_aqui` |
+| `OPENWEATHER_API_KEY` | API key do OpenWeatherMap | `sua_chave_aqui` |
 
-### 4. Instalar as dependências
+### 4. Criar o ambiente e instalar as dependências
+
+No **Anaconda Prompt** (ou no PowerShell depois de rodar `conda init powershell` uma vez):
 
 ```bash
-# ⚠️ A definir junto com a stack (por exemplo, npm install)
+conda env create -f environment.yml     # cria o ambiente openweather-dashboard (uma vez)
+conda activate openweather-dashboard
 ```
+
+Sem conda: `python -m venv .venv`, ative o ambiente e rode `pip install -r requirements-dev.txt`.
+
+Depois de mudar os requirements: `conda env update -f environment.yml --prune`.
 
 ### 5. Rodar localmente
 
 ```bash
-# ⚠️ A definir junto com a stack (por exemplo, npm run dev)
+uvicorn app.main:app --host 127.0.0.1 --port 8000 --env-file .env --no-access-log --reload
 ```
 
-Depois, abra o endereço mostrado no terminal (⚠️ a porta será definida junto com a stack).
+Depois, abra <http://127.0.0.1:8000>. A documentação automática da API fica em <http://127.0.0.1:8000/docs>.
 
 ### 6. Rodar os testes
 
 ```bash
-# ⚠️ A definir junto com a stack
+pytest -m "not e2e"                       # unidade e API (rápidos, sem internet)
+pytest -m e2e                             # ponta a ponta no Chrome instalado
+pytest -m live                            # fumaça com o provedor real (usa a cota)
+ruff check . && ruff format --check .     # lint e formatação
 ```
 
 ## Exemplos de uso
@@ -141,7 +162,7 @@ Depois, abra o endereço mostrado no terminal (⚠️ a porta será definida jun
 4. Clique em uma aba de dia para ver o resumo daquele dia, ou alterne entre **°C** e **°F** no cabeçalho.
 5. Se a cidade não existir ou o serviço falhar, a aplicação mostra uma mensagem explicando o que fazer.
 
-Endpoints do OpenWeatherMap usados (detalhes em [docs/spec.md](docs/spec.md)):
+O navegador chama só as rotas do servidor local (`/api/weather`, `/api/geo/search`, `/api/geo/reverse` e `/api/tiles/precipitation/...`, detalhadas na seção 6 de [docs/arquitetura.md](docs/arquitetura.md)). O servidor acrescenta a chave e chama os endpoints do OpenWeatherMap abaixo (detalhes em [docs/spec.md](docs/spec.md)):
 
 | Dado | Endpoint |
 |---|---|
@@ -162,6 +183,7 @@ O projeto mostra como a IA Generativa pode ajudar em cada etapa do SDLC:
   - [product brief](docs/product-brief.md): a visão do produto
   - [constitution](docs/constitution.md): os princípios permanentes
   - [spec](docs/spec.md): requisitos em notação EARS e critérios de aceite Dado/Quando/Então
+- **[Arquitetura](docs/arquitetura.md):** decisões registradas (ADR), contratos, convenções, guardrails, estratégia de testes e plano de implementação em fatias, para que o código gerado pela IA seja correto e replicável.
 
 ## Como contribuir
 
@@ -178,8 +200,8 @@ O projeto mostra como a IA Generativa pode ajudar em cada etapa do SDLC:
 
 ### Limitações conhecidas
 
-- **Projeto em requisitos:** nenhuma funcionalidade foi implementada ainda.
-- **Exposição da API key:** numa aplicação só frontend, a chave vai junto no código entregue ao navegador e pode ser vista por qualquer usuário. O `.env` apenas a mantém fora do Git. Para um MVP acadêmico isso é aceitável, mas não para produção.
+- **Projeto em arquitetura:** nenhuma funcionalidade foi implementada ainda.
+- **Execução só local:** o servidor atende apenas em `127.0.0.1`. Não há deploy.
 - **Limites do plano gratuito** do OpenWeatherMap: a One Call API 3.0 tem 1.000 chamadas gratuitas por dia. O cache de 10 minutos por cidade reduz o consumo.
 - **One Call API 3.0:** o fornecedor recomenda a [One Call API 4.0](https://openweathermap.org/api/one-call-4) para novas integrações. A 3.0 foi escolhida por simplicidade, porque exige uma única chamada por cidade.
 - **Previsão por minuto:** não está disponível para todas as localidades.
@@ -188,15 +210,15 @@ O projeto mostra como a IA Generativa pode ajudar em cada etapa do SDLC:
 ### Próximos passos no MVP
 
 - [x] Levantar os requisitos em [docs/requisitos.md](docs/requisitos.md)
-- [ ] Definir a stack, a arquitetura e o provedor de mapa base em [docs/arquitetura.md](docs/arquitetura.md)
-- [ ] Criar o `.env.example` e atualizar as instruções de execução
-- [ ] Implementar as 7 features de [docs/spec.md](docs/spec.md)
+- [x] Definir a stack, a arquitetura e o provedor de mapa base em [docs/arquitetura.md](docs/arquitetura.md)
+- [x] Criar o `.env.example` e atualizar as instruções de execução
+- [ ] Implementar as 7 features de [docs/spec.md](docs/spec.md), seguindo as fatias da seção 10 de [docs/arquitetura.md](docs/arquitetura.md)
 - [ ] Tratar os erros e casos de borda descritos no spec (cidade inexistente, localização negada, falha de rede, chave inválida etc.)
 - [ ] Escrever testes e publicar a primeira release
 
 ### Evoluções possíveis
 
-- Backend ou função serverless intermediária (proxy) para esconder a API key
+- Deploy em nuvem (o proxy local já mantém a API key fora do navegador)
 - Migração para a One Call API 4.0
 - Cidades favoritas, histórico de buscas e preferências lembradas entre visitas
 - Detalhes dos alertas meteorológicos
@@ -212,6 +234,7 @@ As versões seguem [Versionamento Semântico](https://semver.org/lang/pt-BR/) (`
 |---|---|---|---|
 | *Não lançada* | 2026-09-29 | Setup | Estrutura inicial: Git, `.gitignore`, `CLAUDE.md`, `docs/`, comando `/costar` e README |
 | *Não lançada* | 2026-10-03 | Requisitos | Product brief, constitution e spec do MVP |
+| *Não lançada* | 2026-10-04 | Arquitetura | Documento de arquitetura, manifestos de dependências com versões exatas, `.env.example` e print de referência |
 | `v0.1.0` (prevista) | ⚠️ A definir | Implementação | Primeira versão funcional do MVP, conforme [docs/spec.md](docs/spec.md) |
 
 ## Créditos
@@ -219,4 +242,5 @@ As versões seguem [Versionamento Semântico](https://semver.org/lang/pt-BR/) (`
 - **Autor:** Thiago Martins de Oliveira
 - **Instituição / disciplina:** Universidade Federal de Goiás / Especialização em Engenharia de Software: Automação e Inovação com IA Generativa
 - **Dados meteorológicos:** [OpenWeatherMap](https://openweathermap.org/), usados conforme os [termos de serviço](https://openweather.co.uk/storage/app/media/Terms/Openweather_terms_and_conditions_of_sale.pdf) e a licença de dados ([CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)) do provedor
+- **Mapa:** [Leaflet](https://leafletjs.com/) (licença BSD-2-Clause) e mapa base © [OpenStreetMap contributors](https://www.openstreetmap.org/copyright) © [CARTO](https://carto.com/attributions)
 - **Assistência de desenvolvimento:** [Claude Code](https://claude.com/claude-code) (Anthropic)
