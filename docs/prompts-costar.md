@@ -73,7 +73,7 @@
 - **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
 - **[R] Resposta:** Confirmação do push e do estado de sincronização, com as pendências que ainda estão em aberto.
 
-## 2026-09-30 — Etapa: Documentação
+## 2026-09-30 — Etapa: Setup
 
 - **[C] Contexto:** O repositório remoto já existe no GitHub, mas o passo "Clonar o repositório" do README ainda mostra `<url-do-repositorio>` marcado como "⚠️ A definir".
 - **[O] Objetivo:** Trocar o marcador do comando `git clone` no README pelo endereço real https://github.com/tmoliveira1584/openweather-dashboard.git e remover o aviso de pendência.
@@ -92,3 +92,31 @@
 - **[T] Tom:** Objetivo
 - **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
 - **[R] Resposta:** Mensagem e hash do commit, confirmação do push e estado de sincronização entre local e remoto.
+
+## 2026-10-03 — Etapa: Requisitos
+
+- **[C] Contexto:** MVP acadêmico em fase de requisitos. É uma página única que reproduz o layout de um print de referência e consome a OpenWeatherMap One Call API 3.0 (clima atual, previsão por minuto, por hora, por dia e alertas), a Geocoding API (busca direta e reversa), o serviço de ícones e a camada de precipitação do mapa. A 3.0 foi escolhida em vez da 4.0 por simplicidade: uma única chamada por cidade, sem paginação e com melhor aproveitamento da cota gratuita. O fornecedor recomenda a 4.0 para novas integrações, o que fica registrado como risco. A cidade inicial vem da localização do navegador; se a permissão for negada, o recurso não existir ou não houver resposta em 10 s, usa Uberlândia (lat -18.9186, lon -48.2772) e mostra um aviso. Interface toda em pt-BR, com horário em 24h. Mapeamento tela → dados: header (título, alternância °C/°F, cidade atual, busca); abas Today + 7 dias, como a API entrega (`daily[].temp.max`, ícone); card principal (`current.temp`, descrição, `feels_like`, `dt`, contagem de `alerts`, imagem por grupo de condição); 6 cards (vento com direção em rosa de 8 pontos, umidade, visibilidade, pressão, índice UV, ponto de orvalho); previsão por hora (curva de temperatura das próximas 24 h, cards com ícone, `pop` e temperatura, etiquetas de `rain.1h`); previsão por minuto (barras de `minutely[].precipitation` com marcos Agora, +15, +30, +45 e +60 min e legenda de 5 faixas); mapa com marcador da cidade, camada de chuva e mapa base com atribuição. Regras gerais: horário local da cidade; visibilidade em km; °C/°F convertido localmente, sem nova chamada, com o vento acompanhando (m/s ↔ mph); no máximo uma chamada por cidade a cada 10 min (cache em memória); aba Today mostra `current` e as demais mostram o resumo de `daily` (máxima/mínima, descrição, sensação, data; visibilidade "—"), enquanto as previsões por hora e por minuto continuam no momento atual; cores das barras de precipitação: 0 cinza, (0; 0,5] verde, (0,5; 2,5] verde-escuro, (2,5; 7,5] amarelo, > 7,5 vermelho. O badge de alertas mostra só a contagem. A stack será definida na etapa de arquitetura. Hoje `docs/requisitos.md` contém só o título.
+- **[O] Objetivo:**
+  1. Criar `docs/product-brief.md` com: explicação do produto, razão de existir, atores, diagrama Mermaid do fluxo de uso, glossário geral e disclaimer de finalidade didática.
+  2. Criar `docs/constitution.md` com princípios permanentes e transversais (P-001, P-002…), cada um em uma linha, no imperativo, no formato SEMPRE/NUNCA e sem justificativa longa.
+  3. Criar `docs/spec.md` com uma seção por feature, sem código de feature: Localização inicial e busca de cidade; Condições atuais; Previsão diária; Previsão hora a hora; Previsão por minuto; Mapa de precipitação; Alternância de unidades. Cada feature contém: Problema; Atores (Ator, Descrição, O que pode fazer, O que não pode fazer); Escopo (incluso / não incluso); Histórias de usuário ("Como <ator>, quero <ação>, para <resultado>"); Requisitos funcionais em notação EARS; Regras de negócio (a lógica por trás dos RFs); Comportamento em erro e casos de borda (Cenário, Comportamento esperado, Mensagem ao usuário); Requisitos não-funcionais (ID, Categoria, Requisito); Dependências e premissas; Critérios de aceite em Given/When/Then (3 a 8 por feature); Glossário específico. RF, RN, RNF e CA numerados em sequência no documento inteiro.
+  4. Montar a tabela de erros com um roteiro próprio do produto (só leitura, sem login, dependente de API externa): entrada inválida; localização do navegador; credencial e cota; serviço externo indisponível, lento ou sem conexão; resposta incompleta; valores-limite; ações repetidas e concorrentes; cache e tempo; recursos visuais; volume e tela. Não encaixar à força cenários que não se aplicam.
+  5. Não incluir nenhum detalhe de stack tecnológica.
+  6. Transformar `docs/requisitos.md` em índice dos três artefatos.
+  7. Varrer todo o diretório do projeto (CLAUDE.md, README, docs/, .claude/, .gitignore) e atualizar o que deixar de ser verdade com estas decisões.
+- **[S] Estilo:** Técnico e organizado
+- **[T] Tom:** Objetivo
+- **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
+- **[R] Resposta:** Os três artefatos em Markdown, o índice em `docs/requisitos.md`, a lista de arquivos alterados na varredura com o motivo de cada mudança e um resumo de quantidades (features, RF, RN, RNF, CA, princípios).
+
+## 2026-10-04 — Etapa: Requisitos
+
+- **[C] Contexto:** A etapa de requisitos foi concluída. Os artefatos novos (`docs/product-brief.md`, `docs/constitution.md` e `docs/spec.md`, com glossário consolidado) e as alterações em `docs/requisitos.md` (agora índice), CLAUDE.md, README e `docs/prompts-costar.md` ainda não foram commitados. A branch `main` local está sincronizada com `origin/main` (https://github.com/tmoliveira1584/openweather-dashboard). O CLAUDE.md exige Conventional Commits.
+- **[O] Objetivo:**
+  1. Propor a mensagem de commit seguindo Conventional Commits e aguardar a validação do usuário antes de commitar
+  2. Depois da validação, fazer um único commit com todas as alterações da etapa de requisitos
+  3. Enviar o commit ao GitHub com `git push` e confirmar a sincronização entre local e remoto
+- **[S] Estilo:** Técnico e organizado
+- **[T] Tom:** Objetivo
+- **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
+- **[R] Resposta:** Mensagem de commit proposta para validação; depois de aprovada, hash do commit, confirmação do push e estado de sincronização.
