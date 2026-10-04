@@ -14,7 +14,13 @@ Valores padrão, usados quando o pedido não indicar outro:
 
 Siga estes passos, na ordem:
 
-1. **Reescreva o pedido em CO-STAR**, usando o contexto do projeto (CLAUDE.md e docs/):
+1. **Reescreva o pedido em CO-STAR**, usando o contexto do projeto (CLAUDE.md e docs/).
+   O prompt é meu, não seu: complete o que eu não detalhei, mas escreva como se eu tivesse escrito.
+   - Use a primeira pessoa no contexto ("Estou…", "Decidi…", "Na minha máquina…") e ordens diretas
+     no objetivo e na resposta ("Crie…", "Proponha…", "Aguarde a minha validação…", "Confirme…").
+   - Escreva um pedido natural e independente, não um relato da conversa: em vez de "Pedi na conversa
+     um diagrama…", escreva "Crie um diagrama…"; em vez de "Já aprovei a mensagem X", escreva "Use a mensagem X".
+   - Nunca use "o usuário", "o autor", "validado pelo usuário" ou construções do seu ponto de vista.
    - **[C] Contexto:** situação atual do projeto relevante para o pedido
    - **[O] Objetivo:** o que deve ser feito, em itens claros e verificáveis
    - **[S] Estilo:** como a resposta deve ser estruturada
