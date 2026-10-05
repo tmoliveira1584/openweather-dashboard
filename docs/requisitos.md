@@ -22,9 +22,9 @@
 
 | Decisão | Escolha |
 |---|---|
-| API de clima | One Call API 3.0: uma consulta por cidade e sem paginação. O fornecedor recomenda a 4.0 para novas integrações, o que fica registrado como risco no spec |
+| API de clima | One Call API 4.0: uma consulta de clima por cidade, feita com 5 chamadas (dados atuais, por minuto, 2 páginas por hora e diária), mais 1 por alerta. A 3.0, escolhida no início, foi descontinuada e não aceita novas assinaturas (ADR-013 da arquitetura) |
 | Cidade inicial | Localização do navegador. Se não estiver disponível em 10 s, Uberlândia, BR |
-| Dias de previsão | Os que a API entrega: "Hoje" + 7 |
+| Dias de previsão | "Hoje" + 7. A API entrega até 10 dias por página, e o produto usa os 8 primeiros a partir de hoje |
 | Idioma | Interface toda em português do Brasil, com horário em 24 horas |
 | Unidades | °C com m/s ou °F com mph, convertidos sem nova consulta |
 | Cache | Uma consulta por cidade a cada 10 minutos, só em memória |

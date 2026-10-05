@@ -272,3 +272,49 @@
 - **[T] Tom:** Objetivo
 - **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
 - **[R] Resposta:** Informe o hash do commit e os arquivos incluídos, confirme o push e mostre o estado de sincronização.
+
+## 2026-10-05 — Etapa: Implementação
+
+- **[C] Contexto:**
+  - Concluí o setup, os requisitos, a arquitetura e o planejamento. Agora vou começar a implementação do MVP pela fatia 0 (Setup) de `docs/tasks.md`. O bloco "Onde paramos" mostra a fatia 0 ainda não iniciada, com a próxima tarefa T-0.1 e 0 de 217 IDs fechados.
+  - A fatia 0 vai da tarefa T-0.1 até a T-0.9. Ela segue as seções 1, 5.1, 7.6, 9.1, 9.2 e 11 de `docs/arquitetura.md` e fecha o P-002.
+  - Por enquanto o repositório só tem a documentação, o `environment.yml`, o `requirements.txt`, o `requirements-dev.txt` e o `.env.example`. Ainda não existe código nem `.env`.
+  - A T-0.8 precisa do `.env` com a minha chave e da assinatura "One Call by Call" ativa. Ela gasta cerca de 6 consultas da cota.
+- **[O] Objetivo:**
+  1. Leia o CLAUDE.md, o bloco "Onde paramos" e as seções da arquitetura citadas na fatia 0
+  2. Implemente as tarefas T-0.1 a T-0.8 na ordem, uma de cada vez. Antes de cada uma, explique o que vai fazer, por quê e quais alternativas existem, e espere a minha confirmação
+  3. Escreva os testes primeiro e o código depois. Os testes seguem o padrão `test_<id>_<comportamento>` da seção 9.3, como o teste de configuração da T-0.3 (P-002)
+  4. Antes da T-0.8, confirme que o `.env` existe, sem ler nem exibir a chave. Se ele não existir, pare e me avise. Nunca escreva a chave em código, fixtures, logs ou commits (P-001), e confira isso com `git grep`
+  5. Na T-0.9, cumpra a definição de pronto da seção 9.4: rode `pytest -m "not e2e"`, `pytest -m e2e` e o ruff, confira os guardrails da seção 8.4 e verifique que a aplicação sobe com `uvicorn`
+  6. Marque T-0.1 a T-0.9 com `[x]` e atualize "Onde paramos" e "Progresso" em `docs/tasks.md`, no mesmo commit do código
+  7. Proponha a mensagem de commit, com o P-002 no corpo. Sugestão: `build: configurar ambiente, app mínimo e fixtures reais`. Espere a minha validação antes de commitar e antes de enviar ao GitHub
+- **[S] Estilo:** Didático e organizado, uma tarefa por vez
+- **[T] Tom:** Objetivo
+- **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
+- **[R] Resposta:** Para cada tarefa, apresente a decisão antes de codificar. Depois, liste os arquivos criados, os comandos executados e o resultado dos testes. No fim da fatia, mostre o checklist da definição de pronto, os IDs fechados e a mensagem de commit proposta.
+
+## 2026-10-05 — Etapa: Arquitetura
+
+- **[C] Contexto:**
+  - Estou na T-0.8 da fatia 0, a captura das fixtures reais. As tarefas T-0.1 a T-0.7 estão concluídas e ainda sem commit.
+  - Todo o projeto foi especificado para a One Call API 3.0, mas ela foi descontinuada pelo fornecedor e não aparece mais para novas assinaturas. Assinei o plano "One Call by Call" da One Call API 4.0, que é um produto separado, e minha chave recebe 401 na 3.0.
+  - A arquitetura já registrava a 3.0 como descontinuada, mas a tratava como "risco aceito" sem verificar se ainda era possível assiná-la.
+  - A 4.0 separa os dados em endpoints próprios (atual, por minuto, por hora, diária e detalhe de alerta). Ela também pagina as previsões, devolve os alertas como IDs e traz a chave dentro dos links `next`/`prev`.
+- **[O] Objetivo:**
+  1. Leia a documentação oficial da One Call API 4.0 e o guia de migração da 3.0 para a 4.0
+  2. Migre o projeto para a 4.0, varrendo todas as fases afetadas pela decisão errada: spec, arquitetura, `requisitos.md`, README, CLAUDE.md, `.env.example` e `tasks.md`
+  3. Registre a decisão num ADR novo, explicando o contexto, a decisão, as consequências e as alternativas descartadas. A decisão deve cobrir:
+     - as chamadas por consulta de clima e a paginação;
+     - a política de falha parcial;
+     - a contagem de alertas;
+     - o tratamento dos links com a chave;
+     - o impacto na cota.
+  4. Ajuste no spec as regras que dependiam do formato da 3.0, como consulta única, alertas por dia, visibilidade da previsão diária, minutos da próxima hora e limite de dias. Mantenha os IDs existentes
+  5. Reescreva as tarefas afetadas em todas as fatias e registre a decisão na tabela "Decisões e limitações" do `tasks.md`, sem mudar as tarefas já concluídas
+  6. Atualize o README das fixtures e o teste de guarda para as capturas da 4.0, sem guardar a chave nem os links de paginação
+  7. Não abra nem altere o `.env`, nem o histórico de prompts
+  8. Liste os pontos que a documentação da 4.0 não esclarece, para conferir na captura da T-0.8
+- **[S] Estilo:** Técnico e organizado
+- **[T] Tom:** Objetivo
+- **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
+- **[R] Resposta:** Resuma o desenho adotado para a 4.0 e o que mudou em cada documento. Destaque as mudanças no spec que dependem da minha validação e o que ficou de fora. Liste os pontos a conferir na T-0.8 e aguarde a minha confirmação antes de rodar a captura.

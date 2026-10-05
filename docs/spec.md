@@ -58,7 +58,10 @@ Itens do roteiro genérico de sistemas transacionais não se aplicam a este prod
 
 | Serviço | Endereço |
 |---|---|
-| Dados do clima (One Call API 3.0) | `https://api.openweathermap.org/data/3.0/onecall?lat={lat}&lon={lon}&units=metric&lang=pt_br&appid={API_KEY}` |
+| Dados atuais (One Call API 4.0) | `https://api.openweathermap.org/data/4.0/onecall/current?lat={lat}&lon={lon}&units=metric&lang=pt_br&appid={API_KEY}` |
+| Previsão por minuto (One Call API 4.0) | `https://api.openweathermap.org/data/4.0/onecall/timeline/1min?lat={lat}&lon={lon}&units=metric&lang=pt_br&appid={API_KEY}` (até 60 minutos) |
+| Previsão por hora (One Call API 4.0) | `https://api.openweathermap.org/data/4.0/onecall/timeline/1h?lat={lat}&lon={lon}&start={início}&units=metric&lang=pt_br&appid={API_KEY}` (até 20 horas por página) |
+| Previsão diária (One Call API 4.0) | `https://api.openweathermap.org/data/4.0/onecall/timeline/1day?lat={lat}&lon={lon}&units=metric&lang=pt_br&appid={API_KEY}` (até 10 dias por página) |
 | Busca de cidade (geocodificação direta) | `https://api.openweathermap.org/geo/1.0/direct?q={cidade}&limit=5&appid={API_KEY}` |
 | Nome por coordenadas (geocodificação reversa) | `https://api.openweathermap.org/geo/1.0/reverse?lat={lat}&lon={lon}&limit=1&appid={API_KEY}` |
 | Ícones de condição | `https://openweathermap.org/img/wn/{icon}@2x.png` |
@@ -66,6 +69,8 @@ Itens do roteiro genérico de sistemas transacionais não se aplicam a este prod
 | Mapa base | Definido em [arquitetura.md](arquitetura.md) (ADR-006) |
 
 `{API_KEY}` é um marcador. A chave real fica só na configuração de ambiente (P-001, P-002).
+
+A One Call API 3.0, usada na primeira versão deste spec, foi descontinuada pelo fornecedor e não aceita novas assinaturas. Por isso os dados do clima vêm da One Call API 4.0, que separa os dados atuais e cada previsão em endereços próprios. A forma de combinar essas chamadas está em [arquitetura.md](arquitetura.md) (ADR-013).
 
 ---
 
@@ -86,6 +91,7 @@ Termos usados ao longo deste spec, em ordem alfabética. A coluna **Features** i
 | Chave de cache | Identificador dos dados guardados: as coordenadas arredondadas a 2 casas decimais. | 1 |
 | Cidades homônimas | Cidades diferentes com o mesmo nome, diferenciadas pelo estado e pelo país. | 1 |
 | Código de condição | Número que o provedor usa para classificar o tempo (ex.: 501 = chuva moderada). | 2 |
+| Consulta de clima | Obtenção, de uma só vez, de todos os dados meteorológicos de uma cidade: atuais, por minuto, por hora e diários. Com o provedor atual, envolve 5 chamadas, mais 1 por alerta da cidade, e cada uma conta na cota. | 1, 7 |
 | Conversão local | Cálculo feito sobre dados já recebidos, sem nova consulta ao provedor. | 7 |
 | Curva de temperatura | Linha que mostra a variação da temperatura ao longo da janela. | 4 |
 | Escala ativa | Escala de temperatura escolhida no momento (°C ou °F), que também define a unidade do vento. | 2, 4, 5, 7 |
@@ -118,7 +124,7 @@ Termos usados ao longo deste spec, em ordem alfabética. A coluna **Features** i
 | Umidade relativa | Percentual de vapor d'água no ar em relação ao máximo possível naquela temperatura. | 2 |
 | Validade do cache | Tempo em que dados guardados podem ser reaproveitados sem nova consulta (10 minutos). | 1 |
 | Valor original | Valor exatamente como veio do provedor, antes de qualquer conversão ou arredondamento. | 7 |
-| Vigência do alerta | Intervalo entre o início e o fim de um alerta meteorológico. | 3 |
+| Vigência do alerta | Intervalo entre o início e o fim de um alerta meteorológico. | 2, 3 |
 | Visibilidade | Distância máxima em que objetos podem ser vistos com nitidez. | 2, 3, 7 |
 | Volume de chuva | Quantidade de chuva prevista para a hora, em milímetros por hora (mm/h). | 4, 7 |
 
@@ -148,7 +154,7 @@ O usuário quer ver o clima de onde está sem configurar nada e quer consultar q
 - Lista de até 5 cidades com nome, estado e país.
 - Seleção direta quando a busca devolve uma única cidade.
 - Cidade selecionada exibida no cabeçalho.
-- Uma consulta de dados meteorológicos por cidade, com cache de 10 minutos.
+- Uma consulta de clima por cidade, com cache de 10 minutos.
 - Nova consulta ao voltar à página com dados vencidos.
 - Mensagens de erro com a opção "Tentar novamente".
 
@@ -174,7 +180,7 @@ O usuário quer ver o clima de onde está sem configurar nada e quer consultar q
 | RF-001 | QUANDO a página for aberta, O SISTEMA DEVE pedir ao navegador a localização do dispositivo. |
 | RF-002 | QUANDO o navegador informar as coordenadas, O SISTEMA DEVE torná-las a cidade selecionada e obter o nome da cidade por geocodificação reversa. |
 | RF-003 | SE a localização for negada, estiver indisponível ou não for informada no prazo, ENTÃO O SISTEMA DEVE selecionar a cidade padrão e exibir o aviso de localização. |
-| RF-004 | QUANDO uma cidade for selecionada, O SISTEMA DEVE obter os dados meteorológicos dela em uma única consulta ao provedor, exceto se houver dados válidos no cache. |
+| RF-004 | QUANDO uma cidade for selecionada, O SISTEMA DEVE obter os dados meteorológicos dela em uma única consulta de clima, exceto se houver dados válidos no cache. |
 | RF-005 | ENQUANTO os dados da cidade selecionada estiverem sendo obtidos, O SISTEMA DEVE exibir um indicador de carregamento nos blocos de dados. |
 | RF-006 | QUANDO o usuário confirmar a busca com um termo válido, pela tecla Enter ou pelo ícone de lupa, O SISTEMA DEVE consultar a geocodificação direta e exibir a lista de cidades encontradas. |
 | RF-007 | QUANDO a busca devolver uma única cidade, O SISTEMA DEVE selecioná-la sem exibir a lista. |
@@ -228,6 +234,7 @@ O usuário quer ver o clima de onde está sem configurar nada e quer consultar q
 | (4) Provedor lento: mais de 3 s sem resposta | O indicador de carregamento continua, com texto adicional. | "Ainda carregando…" |
 | (4) Provedor lento: mais de 15 s sem resposta | A consulta é considerada falha (RN-012). Estado de erro com "Tentar novamente". | "O serviço de clima demorou para responder." |
 | (4) Sem conexão com a internet | Estado de erro com "Tentar novamente". | "Sem conexão com a internet. Verifique sua rede e tente novamente." |
+| (4) Uma das chamadas da consulta de clima falha (acesso recusado, limite excedido, provedor fora do ar, lento ou sem conexão) | A consulta inteira é tratada como falha, com a mensagem do tipo de falha e "Tentar novamente". Nada vai para o cache (RN-011). | Conforme o tipo de falha, nas mensagens acima |
 | (4) Geocodificação direta falha durante a busca | A lista não abre. A cidade selecionada continua na tela. | "Não foi possível buscar cidades agora. Tente novamente." |
 | (7) Duplo Enter ou duplo clique na lupa | Uma única busca é feita (RF-015). | Nenhuma |
 | (7) Vários cliques em "Tentar novamente" | Uma única consulta fica em andamento (RF-015). | Nenhuma |
@@ -246,7 +253,7 @@ O usuário quer ver o clima de onde está sem configurar nada e quer consultar q
 |---|---|---|
 | RNF-001 | Desempenho | Com o provedor respondendo normalmente, todos os blocos de dados ficam visíveis em até 3 s depois que a cidade é definida. |
 | RNF-002 | Desempenho | Dados servidos do cache aparecem em até 200 ms, sem indicador de carregamento visível. |
-| RNF-003 | Custo e cota | No máximo 1 consulta de clima por cidade a cada 10 minutos por página aberta, e 1 consulta de geocodificação por busca confirmada (P-010). |
+| RNF-003 | Custo e cota | No máximo 1 consulta de clima (5 chamadas ao provedor, mais 1 por alerta) por cidade a cada 10 minutos por página aberta, e 1 consulta de geocodificação por busca confirmada (P-010). |
 | RNF-004 | Segurança | A chave de API não aparece em nenhum arquivo versionado nem em mensagens exibidas ao usuário (P-001, P-002). |
 | RNF-005 | Privacidade | As coordenadas do usuário não são registradas em log nem guardadas no dispositivo depois que a página é fechada (P-006, P-007). |
 | RNF-006 | Compatibilidade | O produto funciona nas duas versões mais recentes de Chrome, Edge, Firefox e Safari, em computador e celular. |
@@ -257,13 +264,13 @@ O usuário quer ver o clima de onde está sem configurar nada e quer consultar q
 
 **Dependências**
 - Geocoding API do OpenWeatherMap (direta e reversa).
-- One Call API 3.0 do OpenWeatherMap, com a assinatura "One Call by Call" ativa.
+- One Call API 4.0 do OpenWeatherMap, com a assinatura "One Call by Call" ativa.
 - Chave de API válida, configurada no ambiente.
 - Recurso de localização do navegador.
 
 **Premissas**
-- A One Call API 3.0 continuará disponível durante o projeto. O fornecedor recomenda a 4.0 para novas integrações. Se a 3.0 for desligada, todas as features param de receber dados (risco aceito para o MVP).
-- A cota gratuita de 1.000 consultas por dia é suficiente para o uso acadêmico.
+- A One Call API 4.0 continuará disponível durante o projeto. A 3.0 foi descontinuada e não aceita novas assinaturas, por isso não é usada.
+- A cota gratuita de 1.000 chamadas por dia é suficiente para o uso acadêmico. Cada consulta de clima usa 5 chamadas, mais 1 por alerta da cidade, o que permite cerca de 200 consultas por dia em cidades sem alertas, já contando o cache de 10 minutos.
 - A página será servida em contexto seguro (HTTPS ou endereço local). Os navegadores exigem isso para liberar a localização.
 - O provedor informa o nome em português para cidades brasileiras.
 - Coordenadas arredondadas a 2 casas decimais representam a mesma cidade para fins de cache.
@@ -336,7 +343,7 @@ O usuário quer entender rapidamente como está o tempo agora: temperatura, apar
 | RN-015 | Hora local = horário UTC da medição + deslocamento de fuso da cidade informado pelo provedor. O formato é HH:MM em 24 horas (ex.: "08:18") (P-015). |
 | RN-016 | A descrição é o texto em português fornecido pelo provedor, com a primeira letra maiúscula (ex.: "Nublado"). A sensação térmica aparece como "Sensação de 20°". |
 | RN-017 | O grupo de condição sai do código de condição do provedor: 200–299 Tempestade; 300–399 e 500–599 Chuva; 600–699 Neve; 700–799 Névoa; 800 Céu limpo; 801–804 Nublado. Um código fora dessas faixas usa uma imagem neutra. |
-| RN-018 | O selo mostra "1 alerta" ou "N alertas", em que N é o número de alertas na resposta. A falta da lista de alertas equivale a 0. Acima de 99, mostra "99+ alertas". |
+| RN-018 | O selo mostra "1 alerta" ou "N alertas", em que N é o número de alertas distintos na resposta, incluindo os que ainda vão começar. A falta da lista de alertas equivale a 0. Acima de 99, mostra "99+ alertas". |
 | RN-019 | Vento: a velocidade é arredondada ao inteiro, na unidade da escala ativa. A direção usa a rosa de 8 pontos, com setores de 45°: N [337,5°; 22,5°), NE [22,5°; 67,5°), L [67,5°; 112,5°), SE [112,5°; 157,5°), S [157,5°; 202,5°), SO [202,5°; 247,5°), O [247,5°; 292,5°), NO [292,5°; 337,5°). Exemplo: "4 m/s L". "Calmo" vale quando a velocidade original é menor que 0,5 m/s, em qualquer escala. |
 | RN-020 | Umidade: percentual inteiro (ex.: "94%"). |
 | RN-021 | Visibilidade: metros ÷ 1.000, exibida em km com até 1 casa decimal e sem casa decimal quando o valor é inteiro (10.000 m → "10 km"; 2.500 m → "2,5 km"). O provedor limita esse valor a 10 km. |
@@ -379,7 +386,7 @@ O usuário quer entender rapidamente como está o tempo agora: temperatura, apar
 ### Dependências e premissas
 
 **Dependências**
-- One Call API 3.0: medições atuais, descrição, código de condição e alertas.
+- Dados atuais da One Call API 4.0: medições, descrição, código de condição e identificação dos alertas vigentes e futuros.
 - Serviço de ícones do OpenWeatherMap.
 - Conjunto de imagens ilustrativas, uma por grupo de condição mais uma neutra, com licença que permita o uso.
 
@@ -440,7 +447,7 @@ O usuário quer planejar os próximos dias vendo a temperatura máxima e o tempo
 | RF-024 | O SISTEMA DEVE exibir uma aba para cada dia da previsão diária, começando por hoje, com o rótulo do dia, a temperatura máxima e o ícone da condição. |
 | RF-025 | O SISTEMA DEVE iniciar com a aba "Hoje" selecionada e destacar a aba selecionada. |
 | RF-026 | QUANDO o usuário selecionar uma aba diferente de "Hoje", O SISTEMA DEVE exibir no card principal a temperatura máxima, a temperatura mínima, a descrição, a sensação térmica diurna e a data do dia. |
-| RF-027 | QUANDO o usuário selecionar uma aba diferente de "Hoje", O SISTEMA DEVE exibir nos seis cards os valores previstos para o dia, com "—" em Visibilidade. |
+| RF-027 | QUANDO o usuário selecionar uma aba diferente de "Hoje", O SISTEMA DEVE exibir nos seis cards os valores previstos para o dia. |
 | RF-028 | QUANDO o usuário selecionar a aba "Hoje", O SISTEMA DEVE voltar a exibir as condições atuais no card principal e nos seis cards. |
 | RF-029 | ENQUANTO uma aba diferente de "Hoje" estiver selecionada, O SISTEMA DEVE manter a previsão hora a hora e a previsão por minuto referentes ao momento atual. |
 | RF-030 | ENQUANTO uma aba diferente de "Hoje" estiver selecionada, O SISTEMA DEVE contar no selo apenas os alertas cuja vigência alcança aquele dia. |
@@ -452,11 +459,11 @@ O usuário quer planejar os próximos dias vendo a temperatura máxima e o tempo
 | ID | Regra |
 |---|---|
 | RN-026 | "Hoje" é o dia da previsão cuja data, no fuso da cidade, é igual à data atual da cidade. Dias anteriores a ela são descartados. As demais abas seguem em ordem cronológica. |
-| RN-027 | A quantidade de abas é o número de dias entregues pelo provedor a partir de hoje: até 8, ou seja, "Hoje" mais 7. |
+| RN-027 | A quantidade de abas é o número de dias entregues pelo provedor a partir de hoje, limitado a 8: "Hoje" mais 7. Dias além do oitavo são ignorados. |
 | RN-028 | Rótulos: "Hoje" para o dia atual e, para os demais, o dia da semana abreviado em português: Dom, Seg, Ter, Qua, Qui, Sex, Sáb. |
 | RN-029 | A temperatura da aba é a máxima do dia, arredondada (RN-014). |
 | RN-030 | No card principal, para um dia diferente de "Hoje": temperatura principal = máxima; linha secundária = "Mín. X°"; sensação = sensação térmica diurna; no lugar da hora, a data no formato "Seg, 05/10". |
-| RN-031 | Nos seis cards, para um dia diferente de "Hoje": vento, umidade, pressão, índice UV e ponto de orvalho previstos para o dia, nos formatos de RN-019 a RN-024. Visibilidade mostra "—" porque a previsão diária não traz esse dado. |
+| RN-031 | Nos seis cards, para um dia diferente de "Hoje": vento, umidade, visibilidade, pressão, índice UV e ponto de orvalho previstos para o dia, nos formatos de RN-019 a RN-024. Um valor que a previsão do dia não traga mostra "—" (P-013). |
 | RN-032 | Um alerta alcança um dia quando o intervalo entre o início e o fim do alerta se sobrepõe, por um tempo maior que zero, ao período de 00:00 a 24:00 desse dia, no fuso da cidade. Um alerta sem início ou sem fim conta em todos os dias. |
 | RN-033 | A imagem ilustrativa de um dia diferente de "Hoje" é a do grupo da condição prevista para o dia (RN-017). |
 
@@ -466,7 +473,8 @@ O usuário quer planejar os próximos dias vendo a temperatura máxima e o tempo
 |---|---|---|
 | (5) Provedor entrega menos de 8 dias | Só os dias recebidos viram abas. | Nenhuma |
 | (5) Resposta sem previsão diária | A faixa de abas mostra só a mensagem. O card principal e os cards continuam com as condições atuais. | "Previsão diária indisponível." |
-| (5) Valor de um dia ausente (ex.: ponto de orvalho) | O card correspondente mostra "—" (P-013). | Nenhuma |
+| (5) Valor de um dia ausente (ex.: ponto de orvalho ou visibilidade) | O card correspondente mostra "—" (P-013). | Nenhuma |
+| (5) Alerta sem início ou sem fim informados | Conta em todos os dias (RN-032). | Nenhuma |
 | (6) Alerta que termina às 00:00 de um dia | Conta só no dia anterior, porque a interseção com o dia seguinte tem duração zero (RN-032). | Nenhuma |
 | (7) Clique repetido na aba já selecionada | Nada muda. Nenhuma consulta. | Nenhuma |
 | (7) Troca rápida entre várias abas | A tela mostra sempre a última aba escolhida, sem consulta ao provedor (P-011). | Nenhuma |
@@ -487,18 +495,19 @@ O usuário quer planejar os próximos dias vendo a temperatura máxima e o tempo
 ### Dependências e premissas
 
 **Dependências**
-- One Call API 3.0: previsão diária de 8 dias e alertas com início e fim.
+- Previsão diária da One Call API 4.0: até 10 dias por página, dos quais o produto usa até 8.
+- Detalhe de cada alerta da One Call API 4.0, com o início e o fim da vigência. A previsão diária não informa os alertas de cada dia.
 - Serviço de ícones do OpenWeatherMap.
 
 **Premissas**
-- A data de cada dia da previsão, somada ao deslocamento de fuso da cidade, identifica corretamente o dia local.
-- O primeiro dia da previsão é o dia atual da cidade ou, perto da meia-noite, o dia anterior.
-- A previsão diária traz vento, umidade, pressão, índice UV e ponto de orvalho.
+- Cada dia da previsão informa a data que ele representa.
+- O primeiro dia da previsão pode ser anterior ao dia atual da cidade. Nesse caso, ele é descartado (RN-026).
+- A previsão diária traz vento, umidade, pressão, índice UV e ponto de orvalho. A visibilidade pode faltar.
 
 ### Critérios de aceite
 
 1. **CA-016** — **Dado** que o provedor entregou 8 dias, **Quando** o dashboard é exibido, **Então** aparecem a aba "Hoje" e mais 7 abas, cada uma com o dia da semana abreviado, a máxima e o ícone.
-2. **CA-017** — **Dado** que a aba "Hoje" está selecionada, **Quando** o usuário seleciona "Qui", com máxima de 35,2 °C e mínima de 21,4 °C, **Então** o card principal mostra "35°", "Mín. 21°", a descrição e a data do dia, e o card Visibilidade mostra "—".
+2. **CA-017** — **Dado** que a aba "Hoje" está selecionada, **Quando** o usuário seleciona "Qui", com máxima de 35,2 °C e mínima de 21,4 °C, **Então** o card principal mostra "35°", "Mín. 21°", a descrição e a data do dia, e, se a previsão do dia não trouxer visibilidade, o card Visibilidade mostra "—".
 3. **CA-018** — **Dado** que a aba "Qui" está selecionada, **Quando** o usuário seleciona "Hoje", **Então** o card principal e os cards voltam a mostrar as condições atuais.
 4. **CA-019** — **Dado** que a aba "Qui" está selecionada e são 08:18 na cidade, **Quando** o usuário olha a previsão hora a hora, **Então** ela continua começando em "08:00".
 5. **CA-020** — **Dado** que a aba "Sex" está selecionada, **Quando** o usuário escolhe outra cidade, **Então** a aba "Hoje" fica selecionada.
@@ -517,7 +526,7 @@ O usuário quer saber como a temperatura e a chance de chuva vão variar nas pr�
 | Ator | Descrição | O que pode fazer | O que não pode fazer |
 |---|---|---|---|
 | Usuário | Pessoa que consulta o dashboard | Ver a curva e os cards das próximas 24 horas; rolar os cards; ver o valor de um ponto da curva | Escolher outra janela de horas; ver horas além das 24 seguintes; ver vento ou umidade por hora |
-| OpenWeatherMap | Provedor da previsão hora a hora | Fornecer a previsão das próximas 48 horas | — |
+| OpenWeatherMap | Provedor da previsão hora a hora | Fornecer a previsão por hora a partir da hora atual, em páginas de até 20 horas | — |
 
 ### Escopo
 
@@ -591,7 +600,7 @@ O usuário quer saber como a temperatura e a chance de chuva vão variar nas pr�
 ### Dependências e premissas
 
 **Dependências**
-- One Call API 3.0: previsão hora a hora de 48 horas, com temperatura, chance de precipitação, volume de chuva e ícone.
+- Previsão por hora da One Call API 4.0, com temperatura, chance de precipitação, volume de chuva e ícone. O produto pede 2 páginas a partir da hora atual (até 40 horas), o que cobre a janela de 24 horas mesmo com dados em cache.
 - Serviço de ícones do OpenWeatherMap.
 
 **Premissas**
@@ -626,7 +635,7 @@ O usuário que vai sair agora quer saber se vai chover na próxima hora e com qu
 
 **Incluso**
 - Painel "Previsão por minuto — precipitação", sobreposto ao mapa.
-- Uma barra por minuto, do momento atual até 60 minutos à frente.
+- Uma barra por minuto da próxima hora, a partir do primeiro minuto disponível.
 - Cores por faixa de intensidade.
 - Marcos "Agora", "15 min", "30 min", "45 min" e "60 min", com horário local.
 - Legenda com as 5 faixas.
@@ -648,7 +657,7 @@ O usuário que vai sair agora quer saber se vai chover na próxima hora e com qu
 
 | ID | Requisito (EARS) |
 |---|---|
-| RF-039 | O SISTEMA DEVE exibir uma barra para cada minuto da previsão, do momento atual até 60 minutos à frente. |
+| RF-039 | O SISTEMA DEVE exibir uma barra para cada minuto da previsão da próxima hora, a partir do primeiro minuto que ainda não passou. |
 | RF-040 | O SISTEMA DEVE colorir cada barra conforme a faixa de intensidade de precipitação do minuto. |
 | RF-041 | O SISTEMA DEVE exibir marcos com rótulo e horário local em "Agora", "15 min", "30 min", "45 min" e "60 min". |
 | RF-042 | O SISTEMA DEVE exibir uma legenda com as cinco faixas de intensidade e suas cores. |
@@ -662,11 +671,11 @@ O usuário que vai sair agora quer saber se vai chover na próxima hora e com qu
 |---|---|
 | RN-041 | Faixas de intensidade (p, em mm/h), com o limite superior incluído na faixa: p = 0 → cinza, "0 mm/h"; 0 < p ≤ 0,5 → verde, "até 0,5 mm/h"; 0,5 < p ≤ 2,5 → verde-escuro, "0,5 a 2,5 mm/h"; 2,5 < p ≤ 7,5 → amarelo, "2,5 a 7,5 mm/h"; p > 7,5 → vermelho, "acima de 7,5 mm/h". Os textos entre aspas são os da legenda. |
 | RN-042 | A altura da barra é proporcional à intensidade, com teto visual em 10 mm/h: valores maiores ocupam a altura máxima. Intensidade 0 tem uma altura mínima visível. |
-| RN-043 | Os marcos correspondem aos minutos 0, 15, 30, 45 e 60 a partir do minuto atual, cada um com o horário HH:MM no fuso da cidade (RN-015). O minuto 0 tem o rótulo "Agora". |
+| RN-043 | Os marcos correspondem aos minutos 0, 15, 30, 45 e 60 a partir do primeiro minuto da janela, cada um com o horário HH:MM no fuso da cidade (RN-015). O minuto 0 tem o rótulo "Agora". Cada marco fica no início do seu minuto, e o de 60 min fica no fim da última barra. |
 | RN-044 | Resumo: sem chuva em nenhum minuto → "Sem chuva prevista na próxima hora."; chuva só a partir de um minuto futuro → "Chuva prevista a partir de HH:MM."; chuva agora que para antes do fim → "Chuva agora, parando por volta de HH:MM."; chuva em todos os minutos → "Chuva durante toda a próxima hora.". "Chuva" quer dizer intensidade maior que 0. |
 | RN-045 | O valor exibido no cursor ou no foco tem o formato "HH:MM — X,XX mm/h". |
 | RN-046 | A intensidade é sempre exibida em mm/h, qualquer que seja a escala ativa (feature 7). |
-| RN-047 | Minutos que já passaram são descartados, e os marcos sem dados correspondentes não aparecem. Um valor negativo ou não numérico conta como ausente: a barra não é desenhada e o cursor mostra "—". |
+| RN-047 | Minutos que já passaram são descartados. O marco de k minutos só aparece quando há pelo menos k barras depois do descarte (o de "Agora", com pelo menos 1). Um valor negativo ou não numérico conta como ausente: a barra não é desenhada e o cursor mostra "—". |
 
 ### Comportamento em erro e casos de borda
 
@@ -678,7 +687,7 @@ O usuário que vai sair agora quer saber se vai chover na próxima hora e com qu
 | (6) Todos os minutos com intensidade 0 | Todas as barras ficam cinza, com a altura mínima. | "Sem chuva prevista na próxima hora." |
 | (6) Intensidade exatamente 0,5, 2,5 ou 7,5 | Cores verde, verde-escuro e amarelo, respectivamente (RN-041). | Nenhuma |
 | (6) Intensidade acima de 10 mm/h | A barra fica vermelha, com a altura máxima. O cursor mostra o valor real (RN-042). | Nenhuma |
-| (8) Dados em cache com alguns minutos | Começa no minuto atual, com menos de 61 barras. Os marcos sem dados não aparecem (RN-047). | Nenhuma |
+| (8) Dados em cache com alguns minutos | Começa no primeiro minuto que ainda não passou, com menos de 60 barras. Os marcos sem barras suficientes não aparecem (RN-047). | Nenhuma |
 | (8) Fuso da cidade diferente do fuso do usuário | Os horários dos marcos aparecem no fuso da cidade (P-015). | Nenhuma |
 | (7) Usuário alterna °C/°F | O painel não muda (RN-046). | Nenhuma |
 | (10) Tela com menos de 600 px | O painel aparece abaixo do mapa, não sobreposto. As barras ficam mais finas, sem rolagem horizontal. | Nenhuma |
@@ -694,18 +703,18 @@ O usuário que vai sair agora quer saber se vai chover na próxima hora e com qu
 ### Dependências e premissas
 
 **Dependências**
-- One Call API 3.0: previsão por minuto da próxima hora.
+- Previsão por minuto da One Call API 4.0: até 60 minutos, a partir do minuto seguinte ao da consulta.
 
 **Premissas**
 - A intensidade vem em mm/h.
-- O primeiro item da previsão por minuto corresponde ao minuto atual da consulta.
-- A falta da previsão por minuto na resposta indica localidade sem cobertura, não falha.
+- O primeiro item da previsão por minuto é o minuto seguinte ao da consulta.
+- Quando o provedor não tem a previsão por minuto da localidade (resposta sem dados ou "não encontrado"), trata-se de falta de cobertura, não de falha.
 
 ### Critérios de aceite
 
 1. **CA-027** — **Dado** minutos com intensidades 0; 0,3; 1,0; 5,0 e 8,0, **Quando** o painel é exibido, **Então** as barras desses minutos ficam cinza, verde, verde-escuro, amarelo e vermelho, e a legenda mostra as 5 faixas.
 2. **CA-028** — **Dado** minutos com intensidade exatamente 0,5; 2,5 e 7,5, **Quando** o painel é exibido, **Então** as barras ficam verde, verde-escuro e amarelo.
-3. **CA-029** — **Dado** que são 08:18 na cidade, **Quando** o painel é exibido, **Então** os marcos são "Agora 08:18", "15 min 08:33", "30 min 08:48", "45 min 09:03" e "60 min 09:18".
+3. **CA-029** — **Dado** que a previsão por minuto começa às 08:18 no horário da cidade, **Quando** o painel é exibido, **Então** os marcos são "Agora 08:18", "15 min 08:33", "30 min 08:48", "45 min 09:03" e "60 min 09:18".
 4. **CA-030** — **Dado** que todas as intensidades são 0, **Quando** o painel é exibido, **Então** todas as barras ficam cinza e o resumo é "Sem chuva prevista na próxima hora.".
 5. **CA-031** — **Dado** chuva só a partir das 08:38, **Quando** o painel é exibido, **Então** o resumo é "Chuva prevista a partir de 08:38.".
 6. **CA-032** — **Dado** que o provedor não enviou a previsão por minuto, **Quando** o dashboard é exibido, **Então** o painel mostra "Previsão por minuto indisponível para esta localidade." e o mapa continua visível.

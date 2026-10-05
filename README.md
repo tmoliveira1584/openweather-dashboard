@@ -42,7 +42,7 @@ Escopo do MVP, especificado em [docs/spec.md](docs/spec.md):
 
 | Camada | Tecnologia | Status |
 |---|---|---|
-| Fonte de dados | [OpenWeatherMap](https://openweathermap.org/api): One Call API 3.0, Geocoding API e camada de precipitação | ✅ Definido |
+| Fonte de dados | [OpenWeatherMap](https://openweathermap.org/api): One Call API 4.0, Geocoding API e camada de precipitação | ✅ Definido |
 | Backend | [Python](https://www.python.org/) 3.13.5 + [FastAPI](https://fastapi.tiangolo.com/) 0.142.2 + [Uvicorn](https://www.uvicorn.org/) 0.54.0 + [httpx](https://www.python-httpx.org/) 0.28.1 | ✅ Definido |
 | Frontend | HTML, CSS e JavaScript puro (módulos ES), sem framework e sem build | ✅ Definido |
 | Mapa | [Leaflet](https://leafletjs.com/) 1.9.4 + mapa base [CARTO Voyager](https://carto.com/basemaps) (dados © [OpenStreetMap](https://www.openstreetmap.org/copyright)) | ✅ Definido |
@@ -90,7 +90,7 @@ O código vai ficar em `app/` (backend Python), `static/` (frontend) e `tests/`,
 
 - [Git](https://git-scm.com/)
 - Uma conta gratuita no [OpenWeatherMap](https://home.openweathermap.org/users/sign_up) com uma **API key**
-- A assinatura **"One Call by Call"** ativa na conta, exigida pela [One Call API 3.0](https://openweathermap.org/api/one-call-3). Ela inclui 1.000 chamadas gratuitas por dia, e as chamadas acima disso são cobradas
+- A assinatura **"One Call by Call"** da [One Call API 4.0](https://openweathermap.org/api/one-call-4) ativa na conta. Ela inclui 1.000 chamadas gratuitas por dia, e as chamadas acima disso são cobradas. Para não haver cobrança, configure o limite diário de chamadas em 1.000 na aba "Billing plans" da conta. A liberação de uma assinatura nova pode levar algum tempo
 - [Anaconda](https://www.anaconda.com/download) ou Miniconda (para o ambiente com Python 3.13.5). Sem conda, serve o [Python 3.13](https://www.python.org/downloads/) com `venv`
 - [Google Chrome](https://www.google.com/chrome/), usado pelos testes de ponta a ponta
 
@@ -167,7 +167,11 @@ O navegador chama só as rotas do servidor local (`/api/weather`, `/api/geo/sear
 
 | Dado | Endpoint |
 |---|---|
-| Clima atual e previsões (One Call API 3.0) | `GET https://api.openweathermap.org/data/3.0/onecall?lat={lat}&lon={lon}&units=metric&lang=pt_br&appid={API_KEY}` |
+| Clima atual (One Call API 4.0) | `GET https://api.openweathermap.org/data/4.0/onecall/current?lat={lat}&lon={lon}&units=metric&lang=pt_br&appid={API_KEY}` |
+| Previsão por minuto | `GET https://api.openweathermap.org/data/4.0/onecall/timeline/1min?lat={lat}&lon={lon}&units=metric&lang=pt_br&appid={API_KEY}` |
+| Previsão por hora (2 páginas de 20 horas) | `GET https://api.openweathermap.org/data/4.0/onecall/timeline/1h?lat={lat}&lon={lon}&start={início}&units=metric&lang=pt_br&appid={API_KEY}` |
+| Previsão diária | `GET https://api.openweathermap.org/data/4.0/onecall/timeline/1day?lat={lat}&lon={lon}&units=metric&lang=pt_br&appid={API_KEY}` |
+| Vigência de cada alerta | `GET https://api.openweathermap.org/data/4.0/onecall/alert/{id}?appid={API_KEY}` |
 | Busca de cidade (geocodificação direta) | `GET https://api.openweathermap.org/geo/1.0/direct?q={cidade}&limit=5&appid={API_KEY}` |
 | Nome da cidade por coordenadas (geocodificação reversa) | `GET https://api.openweathermap.org/geo/1.0/reverse?lat={lat}&lon={lon}&limit=1&appid={API_KEY}` |
 | Ícones | `https://openweathermap.org/img/wn/{icon}@2x.png` |
@@ -185,7 +189,7 @@ O projeto mostra como a IA Generativa pode ajudar em cada etapa do SDLC:
   - [constitution](docs/constitution.md): os princípios permanentes
   - [spec](docs/spec.md): requisitos em notação EARS e critérios de aceite Dado/Quando/Então
 - **[Arquitetura](docs/arquitetura.md):** decisões registradas (ADR), contratos, convenções, guardrails, estratégia de testes e plano de implementação em fatias, para que o código gerado pela IA seja correto e replicável.
-- **[Tarefas](docs/tasks.md):** cada fatia quebrada em tarefas com checkbox, a fatia em que cada um dos 217 IDs (RF, RN, RNF, CA e princípios) é fechado e o bloco "Onde paramos", que diz a cada nova sessão de onde continuar. Cada tarefa é marcada no mesmo commit do código que a conclui.
+- **[Tarefas](docs/tasks.md):** cada fatia quebrada em tarefas com checkbox, a fatia em que cada um dos 217 IDs (RF, RN, RNF, CA e princípios) é fechado e o bloco "Onde paramos", que diz a cada nova sessão de onde continuar. Cada tarefa é marcada assim que é concluída, e a fatia inteira vai para um único commit, junto com o código.
 
 ## Como contribuir
 
@@ -204,8 +208,8 @@ O projeto mostra como a IA Generativa pode ajudar em cada etapa do SDLC:
 
 - **Projeto em arquitetura:** nenhuma funcionalidade foi implementada ainda.
 - **Execução só local:** o servidor atende apenas em `127.0.0.1`. Não há deploy.
-- **Limites do plano gratuito** do OpenWeatherMap: a One Call API 3.0 tem 1.000 chamadas gratuitas por dia. O cache de 10 minutos por cidade reduz o consumo.
-- **One Call API 3.0:** o fornecedor recomenda a [One Call API 4.0](https://openweathermap.org/api/one-call-4) para novas integrações. A 3.0 foi escolhida por simplicidade, porque exige uma única chamada por cidade.
+- **Limites do plano gratuito** do OpenWeatherMap: a One Call API 4.0 tem 1.000 chamadas gratuitas por dia, e cada consulta de clima usa 5 (dados atuais, por minuto, 2 páginas por hora e diária), mais 1 por alerta da cidade. O cache de 10 minutos por cidade reduz o consumo.
+- **One Call API 4.0:** a 3.0, escolhida no início do projeto, foi descontinuada pelo fornecedor e não aceita novas assinaturas. O projeto usa a 4.0, lançada em junho de 2026 (decisão D-09 em [docs/tasks.md](docs/tasks.md) e ADR-013 em [docs/arquitetura.md](docs/arquitetura.md)).
 - **Previsão por minuto:** não está disponível para todas as localidades.
 - **Testado só no Google Chrome:** os testes automatizados rodam só no Chrome instalado. Edge, Firefox e Safari não são testados, nem em computador nem em celular (limitação L-01 de [docs/tasks.md](docs/tasks.md)).
 - **Escopo reduzido:** sem favoritos, histórico de buscas, detalhes dos alertas ou preferências lembradas entre visitas.
@@ -223,7 +227,6 @@ O projeto mostra como a IA Generativa pode ajudar em cada etapa do SDLC:
 ### Evoluções possíveis
 
 - Deploy em nuvem (o proxy local já mantém a API key fora do navegador)
-- Migração para a One Call API 4.0
 - Cidades favoritas, histórico de buscas e preferências lembradas entre visitas
 - Detalhes dos alertas meteorológicos
 - PWA com suporte offline

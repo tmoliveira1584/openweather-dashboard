@@ -45,7 +45,7 @@ Define **como** o produto especificado em [spec.md](spec.md) é construído: sta
 | Plataforma alvo | Duas versões mais recentes de Chrome, Edge, Firefox e Safari (RNF-006). Os testes são feitos só no Chrome (limitação L-01, seção 13) |
 | Endereço local | `http://127.0.0.1:8000` (só a própria máquina) |
 | Metas de desempenho | RNF-001 (3 s), RNF-002 (200 ms), RNF-013 e RNF-026 (100 ms) |
-| Restrições | Sem instalar software no sistema. Chave só no `.env` (P-001, P-002). Cota de 1.000 consultas por dia na One Call 3.0 |
+| Restrições | Sem instalar software no sistema. Chave só no `.env` (P-001, P-002). Cota de 1.000 chamadas por dia na One Call 4.0, com 5 chamadas por consulta de clima, mais 1 por alerta (ADR-013) |
 
 **Onde as versões ficam registradas** (fonte da verdade, nessa ordem):
 
@@ -82,7 +82,7 @@ flowchart LR
         STA["StaticFiles<br/>entrega static/"]
     end
 
-    OWM[("OpenWeatherMap<br/>One Call 3.0 · Geocoding · tiles")]
+    OWM[("OpenWeatherMap<br/>One Call 4.0 · Geocoding · tiles")]
     CARTO[("CARTO Voyager<br/>mapa base")]
     ICO[("Ícones OWM")]
 
@@ -164,18 +164,22 @@ sequenceDiagram
         Note over ACT: depois de 3 s sem resposta, status slow ("Ainda carregando…")
         API->>BE: GET /api/weather?lat&lon
         BE->>BE: valida parâmetros (se inválido, 400 invalid_request)
-        BE->>CL: onecall(lat, lon)
-        CL->>OWM: data/3.0/onecall + appid, units=metric, lang=pt_br
-        alt provedor responde em até 15 s
-            OWM-->>CL: JSON bruto
-            CL-->>BE: dados
+        BE->>CL: weather(lat, lon)
+        CL->>OWM: 5 chamadas em paralelo à data/4.0/onecall (current, 1min, 1h ×2, 1day) + appid, units=metric, lang=pt_br
+        alt todas respondem em até 15 s, sem erro (404 numa previsão = bloco sem cobertura)
+            OWM-->>CL: JSON de cada endpoint
+            opt há IDs de alerta
+                CL->>OWM: alert/{id} para cada ID distinto, em paralelo + appid
+                OWM-->>CL: início e fim de cada alerta
+            end
+            CL-->>BE: pacote combinado (merge_onecall)
             BE->>DOM: normaliza (schemas) e aplica as regras de negócio
             DOM-->>BE: view model com textos pt-BR nas duas escalas
             BE-->>API: 200 WeatherView (Cache-Control no-store)
             API-->>ACT: ok + view model
             ACT->>ACT: descarta se selectionId mudou (P-012)
             ACT->>CA: set (só respostas de sucesso)
-        else chave inválida, cota, provedor fora ou 15 s sem resposta
+        else qualquer chamada com chave inválida, cota, provedor fora ou 15 s sem resposta
             CL-->>BE: ProviderError(código)
             BE-->>API: 502 ou 504 com o código do erro
             API-->>ACT: falha + código
@@ -223,7 +227,7 @@ sequenceDiagram
 - **Localização:** o navegador pede permissão. Se o usuário autorizar, o backend descobre o nome da cidade. Se não, entra Uberlândia com o aviso.
 - **Carregamento:**
   - Primeiro, o cache do navegador é consultado.
-  - Se não houver dados válidos, a chamada passa pelo backend, que acrescenta a chave, chama o OpenWeatherMap e devolve o view model.
+  - Se não houver dados válidos, a chamada passa pelo backend, que acrescenta a chave, faz as 5 chamadas da One Call 4.0 em paralelo e devolve o view model (ADR-013).
   - Uma resposta que chega depois de o usuário trocar de cidade é descartada.
 - **Desenho:** cada bloco recorta os dados pelo relógio e desenha. O mapa base vem direto do CARTO, e a camada de chuva passa pelo backend por causa da chave.
 - **Interações:** trocar de escala ou de aba não consulta nada. Uma busca refaz o carregamento. Voltar à aba do navegador depois de mais de 10 min atualiza os dados.
@@ -282,7 +286,7 @@ Cada decisão registra o contexto, a escolha e as alternativas descartadas. Uma 
 
 ### ADR-007 — Gráficos em SVG próprio
 - **Decisão:** a curva por hora e as barras por minuto são SVG gerados pelos módulos `ui/hourly.js` e `ui/minutely.js`. A curva usa **interpolação cúbica monotônica** (Fritsch–Carlson), que é suave como no print e nunca passa da mínima ou da máxima reais (RN-039).
-- **Por quê:** são poucos elementos (24 pontos, até 61 barras), e as regras do spec ficam simples sem biblioteca: etiquetas agrupadas (RN-038), linha reta com temperaturas iguais (RN-039), teto de 10 mm/h (RN-042), foco pelo teclado (RNF-017, RNF-020) e texto alternativo (RNF-016).
+- **Por quê:** são poucos elementos (24 pontos, até 60 barras), e as regras do spec ficam simples sem biblioteca: etiquetas agrupadas (RN-038), linha reta com temperaturas iguais (RN-039), teto de 10 mm/h (RN-042), foco pelo teclado (RNF-017, RNF-020) e texto alternativo (RNF-016).
 - **Alternativa descartada:** Chart.js ou Plotly (dependência a mais e contornos para cada regra).
 
 ### ADR-008 — Ambiente conda com pacotes do pip e versões exatas
@@ -311,18 +315,48 @@ Cada decisão registra o contexto, a escolha e as alternativas descartadas. Uma 
 - **Decisão:** 7 ilustrações SVG próprias em `static/img/conditions/`: `thunderstorm`, `rain`, `snow`, `mist`, `clear`, `clouds` e `neutral` (RN-017). Ficam sob uma camada escura que garante o contraste do texto branco (RNF-009). Sem fotos e sem imagem de fundo da página.
 - **Por quê:** dispensa pesquisar licença de imagens de terceiros (dependência da feature 2) e mantém o contraste sob controle.
 
+### ADR-013 — One Call API 4.0, com 5 chamadas em paralelo por consulta de clima
+- **Contexto:** a One Call API 3.0, escolhida na primeira versão desta arquitetura, foi descontinuada pelo fornecedor e não aparece mais para novas assinaturas. Em 2026-10-05, uma chave com a assinatura "One Call by Call" só da 4.0 recebeu 401 na URL da 3.0. A 3.0 tinha sido mantida como "risco aceito" sem verificar se ainda era possível assiná-la, o que tornaria o projeto impossível de reproduzir por quem começasse do zero.
+- **Decisão:**
+  - A consulta de clima (`GET /api/weather`) faz **5 chamadas em paralelo** (`asyncio.gather`) à One Call 4.0, todas com `lat`, `lon`, `units=metric`, `lang=pt_br` e `appid`:
+    - `onecall/current`: dados atuais (1 registro);
+    - `onecall/timeline/1min`: por minuto (até 60 registros);
+    - `onecall/timeline/1h`, **2 páginas**: `start` = hora UTC cheia atual e `start` + 20 h (até 20 registros cada, até 40 horas no total);
+    - `onecall/timeline/1day`: diária (até 10 registros; o produto usa até 8).
+  - O cliente combina as respostas num **pacote** com a forma da seção 6.2 (`merge_onecall`, função pura). Assim, o domínio e o view model não dependem da paginação nem dos endereços do provedor.
+  - **Política de falha:** a consulta é uma unidade. Qualquer chamada com 401/403, 429, outro erro, JSON inválido, tempo esgotado ou falha de rede faz a consulta inteira falhar com o código da seção 6.4, e nada vai para o cache (RN-011). Um **404 numa previsão** (por minuto, por hora ou diária) é falta de cobertura: o bloco vira `null` e aparece como "indisponível" (RF-038, RF-045). Um 404 nos dados atuais é `provider_unavailable`.
+  - **Alertas:**
+    - O selo de "Hoje" conta os IDs distintos de `current.alerts` (RN-018). A lista inclui alertas que ainda vão começar, como a lista da 3.0.
+    - A previsão diária **não** traz alertas (conferido nas capturas da T-0.8). Para o selo de cada dia (RN-032), o cliente faz uma **segunda rodada**, em paralelo, com `onecall/alert/{id}` para cada ID distinto encontrado em `current`, `timeline/1min` e `timeline/1h`, com o ID codificado na URL. Do detalhe, usa só `start` e `end`. O texto dos alertas continua fora do escopo (feature 2).
+    - Um 404 no detalhe gera um alerta sem vigência, que conta em todos os dias (RN-032). Os demais erros seguem a política de falha.
+  - **Data de cada dia:** a 4.0 marca cada dia com `dt` às 00:00 UTC da data que ele representa, o mesmo valor para qualquer cidade (conferido nas capturas). A data do dia é a data UTC do `dt`, **sem** somar o fuso. Somar o fuso levaria Uberlândia para o dia anterior.
+  - **Primeiro minuto:** a previsão por minuto começa no minuto seguinte ao da consulta (conferido nas capturas). O recorte pelo relógio continua no frontend (RN-047).
+  - **Links de paginação:** os campos `next` e `prev` das respostas trazem a URL **com a chave**. Eles nunca são seguidos, registrados em log, repassados ao navegador nem gravados nas fixtures. A segunda página por hora é pedida pelo próprio cliente, com `start`.
+  - **Relógio:** o `start` da previsão por hora sai de um relógio injetado no `OpenWeatherClient` (padrão `time.time`), para que os testes o controlem. O domínio continua sem relógio.
+- **Consequências:**
+  - Cada consulta de clima custa 5 chamadas, mais 1 por alerta, na cota de 1.000 por dia: cerca de 200 consultas por dia em cidades sem alertas. O cache de 10 minutos (RN-010) continua sendo a principal economia.
+  - O tempo total da consulta é o da chamada mais lenta de cada rodada, com 15 s de limite em cada chamada (RN-012). Com alertas, há duas rodadas.
+  - As fixtures reais passam a ser uma por endpoint e por cidade (seção 9.2).
+- **Alternativas descartadas:**
+  - Pedir ao suporte acesso à 3.0: depende do fornecedor e mantém o projeto numa versão descontinuada.
+  - Seguir os links `next` do provedor: trazem a chave e põem nas mãos de um serviço externo a URL que o backend chama.
+  - Chamadas em sequência: somariam os tempos e ameaçariam o RNF-001.
+  - Contar os alertas de cada dia pelos IDs dos registros por hora: dispensa chamadas extras, mas só cobre as próximas 40 horas, e os dias seguintes nunca mostrariam selo.
+  - Mostrar o selo só na aba "Hoje": dispensa chamadas extras, mas corta o RF-030.
+  - Previsão de 15 em 15 minutos: não é usada por nenhuma feature.
+
 ---
 
 ## 4. Conformidade com a constitution
 
 | Princípio | Mecanismo na arquitetura |
 |---|---|
-| P-001 | Chave só no `.env`. Ela não aparece em respostas nem em logs: o Uvicorn roda sem log de acesso e os loggers `httpx` e `httpcore` ficam em `WARNING`, porque em `INFO` registram a URL com o `appid` (seção 7.6) |
+| P-001 | Chave só no `.env`. Ela não aparece em respostas nem em logs: o Uvicorn roda sem log de acesso e os loggers `httpx` e `httpcore` ficam em `WARNING`, porque em `INFO` registram a URL com o `appid` (seção 7.6). Os links `next`/`prev` da One Call 4.0, que trazem a chave, nunca são seguidos nem repassados (ADR-013) |
 | P-002 | `app/config.py` lê `OPENWEATHER_API_KEY` do ambiente e falha ao iniciar se ela não existir |
 | P-003 | Dados externos entram na tela só por `textContent` ou atributos. `innerHTML` com dados externos é proibido (seção 8.4) |
 | P-004 | O backend devolve só códigos de erro (seção 6.4). O frontend os traduz por `messages.js`. Corpo e detalhes do provedor nunca são repassados |
 | P-005 | Localização só por `navigator.geolocation` (`services/location.js`) |
-| P-006 | Log próprio registra método, caminho sem query e status. Coordenadas nunca vão para o log |
+| P-006 | Log próprio registra método, modelo da rota (ou caminho sem query) e status. Coordenadas nunca vão para o log, nem as do caminho das tiles |
 | P-007 | Nada em `localStorage`, `sessionStorage`, IndexedDB ou cookies. Sem cache no servidor (ADR-005). Respostas de `/api` com `Cache-Control: no-store` |
 | P-008 | As coordenadas vão só para `/api/weather`, `/api/geo/reverse` e as tiles do mapa (arredondadas a 2 casas no `/api/weather`) |
 | P-009 | A busca não depende da localização e está ativa desde o carregamento |
@@ -361,7 +395,7 @@ openweather-dashboard/
 │   ├── api/
 │   │   └── routes.py                 # /api/weather, /api/geo/search, /api/geo/reverse, /api/tiles/...
 │   ├── clients/
-│   │   └── openweather.py            # OpenWeatherClient: URLs, appid, tempo limite, ProviderError
+│   │   └── openweather.py            # OpenWeatherClient: URLs, appid, tempo limite, 5 chamadas da One Call 4.0, merge_onecall, ProviderError
 │   ├── schemas/
 │   │   ├── provider.py               # Pydantic: subconjunto das respostas do OpenWeatherMap (entrada)
 │   │   └── view.py                   # Pydantic: view model e respostas de /api (saída = contrato com o frontend)
@@ -406,7 +440,7 @@ openweather-dashboard/
 │           └── dom.js                # utilitários: el(), setText(), estados de bloco
 ├── tests/
 │   ├── conftest.py                   # fixtures: carregar JSON, app com cliente simulado, servidor para e2e
-│   ├── fixtures/                     # respostas reais anonimizadas + variantes (seção 9.2)
+│   ├── fixtures/                     # respostas reais por endpoint + pacotes variantes (seção 9.2)
 │   ├── unit/                         # pytest: app/domain
 │   ├── api/                          # pytest + TestClient + httpx.MockTransport
 │   └── e2e/                          # pytest-playwright no Chrome
@@ -423,7 +457,7 @@ openweather-dashboard/
 | Camada | Pode usar | Não pode |
 |---|---|---|
 | `app/domain/` | Biblioteca padrão e `app/schemas/` | FastAPI, httpx, I/O, `datetime.now()`, variáveis de ambiente |
-| `app/clients/` | httpx, `app/config.py` | FastAPI, `app/domain/` |
+| `app/clients/` | httpx, `asyncio`, `app/config.py`, relógio injetado (só para o `start` da previsão por hora) | FastAPI, `app/domain/` |
 | `app/api/` | FastAPI, `app/clients/`, `app/domain/`, `app/schemas/` | Regra de negócio própria |
 | `static/js/logic/` | Nada além de JavaScript puro | DOM, `fetch`, `Date.now()` (recebe `nowSec` por parâmetro) |
 | `static/js/services/` | `fetch`, `navigator.geolocation`, `messages.js` | DOM |
@@ -443,12 +477,13 @@ Todas as rotas `/api` respondem com `Cache-Control: no-store`. Os parâmetros s�
 | Rota | Parâmetros e validação | Chamada ao provedor | Resposta de sucesso |
 |---|---|---|---|
 | `GET /` e arquivos | — | — | Arquivos de `static/` (`index.html` em `/`) |
-| `GET /api/weather` | `lat` float em [-90, 90]; `lon` float em [-180, 180] | `GET https://api.openweathermap.org/data/3.0/onecall?lat&lon&units=metric&lang=pt_br&appid` (RN-059) | `200` + `WeatherView` (6.3) |
+| `GET /api/weather` | `lat` float em [-90, 90]; `lon` float em [-180, 180] | 5 chamadas em paralelo a `https://api.openweathermap.org/data/4.0/onecall/`: `current`, `timeline/1min`, `timeline/1h` (2 páginas, com `start`) e `timeline/1day`, todas com `lat&lon&units=metric&lang=pt_br&appid` (RN-059). Depois, `alert/{id}?appid` para cada ID de alerta distinto (ADR-013) | `200` + `WeatherView` (6.3) |
 | `GET /api/geo/search` | `q` string; depois de remover espaços das pontas, de 2 a 100 caracteres (RN-004) | `GET https://api.openweathermap.org/geo/1.0/direct?q&limit=5&appid` | `200` + `CitySearchResult` (6.3) |
 | `GET /api/geo/reverse` | `lat`, `lon` como em `/api/weather` | `GET https://api.openweathermap.org/geo/1.0/reverse?lat&lon&limit=1&appid` | `200` + `ReverseResult` (6.3) |
 | `GET /api/tiles/precipitation/{z}/{x}/{y}.png` | `z` inteiro em [0, 18]; `x` e `y` inteiros em [0, 2^z − 1] | `GET https://tile.openweathermap.org/map/precipitation_new/{z}/{x}/{y}.png?appid` | `200`, `image/png`, bytes repassados |
 
-- **Tempo limite:** 15 s por chamada ao provedor (RN-012), aplicado no `httpx.AsyncClient`.
+- **Tempo limite:** 15 s por chamada ao provedor (RN-012), aplicado no `httpx.AsyncClient`. As 5 chamadas do `/api/weather` correm em paralelo, e o detalhe dos alertas corre numa segunda rodada também em paralelo.
+- **Falha parcial:** o `/api/weather` segue a política de falha do ADR-013. Qualquer erro numa das chamadas derruba a consulta inteira, e um 404 numa previsão vira bloco `null`.
 - **Cliente HTTP:** um único `httpx.AsyncClient`, criado no `lifespan` do FastAPI e fechado no encerramento.
 - **Documentação automática:** `/docs` (Swagger) e `/openapi.json` ficam ativos. Só existem localmente.
 
@@ -456,7 +491,25 @@ Todas as rotas `/api` respondem com `Cache-Control: no-store`. Os parâmetros s�
 
 Modelados em `app/schemas/provider.py`, com **todos os campos opcionais** e campos extras ignorados (`extra="ignore"`). Um campo ausente ou fora do formato vira `None` e é tratado pelas regras, nunca causa erro 500 (cenários de categoria 5 do spec).
 
-**One Call 3.0** (`units=metric`, `lang=pt_br`):
+**One Call 4.0** (`units=metric`, `lang=pt_br`). Cada endpoint devolve `lat`, `lon`, `timezone`, `timezone_offset` e uma lista `data`. O cliente combina as respostas num **pacote** (`merge_onecall`), que é a entrada do view model:
+
+```json
+{
+  "timezone_offset": -10800,
+  "current": { "...": "data[0] de onecall/current" },
+  "minutely": [ "... data de timeline/1min" ],
+  "hourly": [ "... data das 2 páginas de timeline/1h, sem repetir dt" ],
+  "daily": [ "... data de timeline/1day" ],
+  "alerts": [ { "id": "urn:oid:...", "start": 1791190500, "end": 1791255540 } ]
+}
+```
+
+- `timezone_offset` vem da resposta de `current`.
+- `minutely`, `hourly` ou `daily` ficam **ausentes** do pacote quando o endpoint responde 404 ou devolve `data` vazia.
+- Os campos `next` e `prev` são descartados (trazem a chave).
+- `alerts` traz o detalhe de cada ID distinto encontrado em `current`, `minutely` e `hourly`. Um ID cujo detalhe respondeu 404 entra só com `id`. Sem IDs, `alerts` fica ausente.
+
+Campos usados:
 
 | Campo | Unidade | Usado em |
 |---|---|---|
@@ -469,10 +522,12 @@ Modelados em `app/schemas/provider.py`, com **todos os campos opcionais** e camp
 | `current.visibility` | m (máx. 10.000) | Visibilidade (RN-021) |
 | `current.wind_speed`, `current.wind_deg` | m/s, graus | Vento (RN-019) |
 | `current.weather[0].id`, `.description`, `.icon` | código, texto, código do ícone | Grupo de condição, descrição, ícone (RN-016, RN-017) |
+| `current.alerts` | lista de IDs (texto) | Selo de alertas do momento atual (RN-018) |
 | `minutely[].dt`, `minutely[].precipitation` | Unix UTC, mm/h | Previsão por minuto (RN-041 a RN-047) |
 | `hourly[].dt`, `.temp`, `.pop`, `.rain.1h`, `.weather[0].icon`, `.weather[0].description` | Unix, °C, fração 0–1, mm/h, código, texto | Previsão hora a hora (RN-034 a RN-040) |
-| `daily[].dt`, `.temp.max`, `.temp.min`, `.feels_like.day`, `.humidity`, `.pressure`, `.dew_point`, `.uvi`, `.wind_speed`, `.wind_deg`, `.weather[0]` | como acima | Abas e resumo do dia (RN-026 a RN-033) |
-| `alerts[].start`, `alerts[].end` | Unix UTC | Selo de alertas (RN-018, RN-032). Os demais campos de alerta são ignorados |
+| `daily[].dt` | Unix UTC, sempre 00:00 UTC da data do dia | Data do dia (RN-026, RN-028, RN-030) |
+| `daily[].temp.max`, `.temp.min`, `.feels_like.day`, `.humidity`, `.visibility`, `.pressure`, `.dew_point`, `.uvi`, `.wind_speed`, `.wind_deg`, `.weather[0]` | como acima | Abas e resumo do dia (RN-027 a RN-033). `visibility` não veio nas capturas e mostra "—" (RN-031) |
+| `alerts[].id`, `alerts[].start`, `alerts[].end` | texto, Unix UTC | Selo de alertas por dia (RN-032). Os demais campos do detalhe são ignorados |
 
 **Geocoding** (direta e reversa): `name`, `local_names.pt`, `state`, `country`, `lat`, `lon`.
 
@@ -483,7 +538,8 @@ Modeladas em `app/schemas/view.py`. As chaves JSON são em `snake_case`, iguais 
 **Convenções do view model:**
 - `Scaled` = objeto `{"c": str, "f": str}` com o texto pronto nas duas escalas.
 - Texto de um valor ausente = `"—"` (P-013). Número ausente = `null`.
-- Bloco inteiro ausente na resposta do provedor (`daily`, `hourly` ou `minutely`) = `null`, o que leva o frontend a mostrar "indisponível". Lista vazia vinda do provedor também vira `null`.
+- Bloco ausente no pacote (`daily`, `hourly` ou `minutely`, por 404 ou lista vazia do endpoint) = `null`, o que leva o frontend a mostrar "indisponível". Lista vazia no pacote também vira `null`.
+- `daily` traz no máximo os 8 primeiros dias a partir do primeiro dia recebido. O recorte de "Hoje" continua no frontend (RN-026, RN-027).
 - `alerts_label` = `null` quando não há alertas, e o selo fica oculto (RF-019).
 
 **`WeatherView`** — exemplo com Uberlândia às 08:18 locais:
@@ -562,11 +618,12 @@ Modeladas em `app/schemas/view.py`. As chaves JSON são em `snake_case`, iguais 
 | Campo | Regra |
 |---|---|
 | `time_label`, `hour_label` | `HH:MM` e `HH:00` no fuso da cidade (RN-015, RN-035) |
-| `daily[].local_date` | Data local `AAAA-MM-DD` de `dt + timezone_offset`. Usada pelo frontend para achar "Hoje" (RN-026) |
+| `daily[].local_date` | Data `AAAA-MM-DD` do `dt` **em UTC, sem somar o fuso**, porque a 4.0 marca cada dia às 00:00 UTC da data que ele representa (ADR-013). Usada pelo frontend para achar "Hoje" (RN-026). `weekday_label` e `date_label` do dia usam essa mesma data, ou seja, as funções de `time.py` recebem `offset = 0` para `daily` |
 | `daily[].weekday_label` | Dom, Seg, Ter, Qua, Qui, Sex ou Sáb (RN-028). O rótulo "Hoje" é decidido pelo frontend |
 | `daily[].date_label` | `"Seg, 05/10"` (RN-030) |
-| `daily[].alerts_label` | Contagem dos alertas que alcançam o dia (RN-032), no formato de RN-018 |
-| `current.alerts_label` | Contagem de todos os alertas (RN-018) |
+| `daily[].alerts_label` | Contagem dos alertas do pacote cuja vigência alcança o dia (RN-032), no formato de RN-018 |
+| `current.alerts_label` | Contagem dos IDs distintos em `current.alerts` (RN-018) |
+| `daily[].indicators.visibility` | RN-021 quando o dia traz `visibility`. `"—"` quando não traz (RN-031) |
 | `hourly[].weekday_label` | Dia da semana abreviado só na hora `00:00` local. Nas demais, `null` (RN-035) |
 | `hourly[].temp_value` | Números sem arredondar, nas duas escalas. Servem **só** para posicionar a curva |
 | `hourly[].pop` | RN-036. `"—"` se ausente |
@@ -610,8 +667,11 @@ Formato único: `{"error": "<código>"}`. Detalhes técnicos e respostas do prov
 | Provedor respondeu 401 ou 403 (chave inválida ou sem assinatura) | 502 | `provider_unauthorized` |
 | Provedor respondeu 429 | 502 | `provider_rate_limited` |
 | Provedor respondeu outro erro (4xx ou 5xx) ou resposta não é JSON válido | 502 | `provider_unavailable` |
+| Provedor respondeu 404 numa previsão (`timeline/1min`, `1h` ou `1day`) | — | Não é erro: o bloco vira `null` (ADR-013) |
 | Passaram 15 s sem resposta (`httpx.TimeoutException`) | 504 | `provider_timeout` |
 | Falha de DNS ou de conexão (`httpx.ConnectError`), indício de falta de internet | 502 | `network_unavailable` |
+
+Quando várias das 5 chamadas do `/api/weather` falham, prevalece o primeiro código nesta ordem: `provider_unauthorized`, `provider_rate_limited`, `provider_timeout`, `network_unavailable`, `provider_unavailable`. A ordem dá ao usuário a causa mais acionável.
 
 A tradução de cada código para a mensagem do spec fica na seção 7.3.
 
@@ -656,11 +716,11 @@ Assinaturas mínimas. A implementação pode ter funções auxiliares privadas a
 | `domain/units.py` | `celsius_to_fahrenheit(c: float) -> float`; `ms_to_mph(v: float) -> float` |
 | `domain/time.py` | `local_datetime(ts: int, offset: int) -> datetime`; `time_label(ts, offset) -> str`; `hour_label(ts, offset) -> str`; `weekday_label(ts, offset) -> str`; `date_label(ts, offset) -> str`; `local_date(ts, offset) -> str` |
 | `domain/conditions.py` | `condition_group(code: int \| None) -> ConditionGroup`; `wind_direction(deg: float \| None) -> str \| None`; `wind_label(speed_ms: float \| None, deg: float \| None) -> Scaled` |
-| `domain/alerts.py` | `alerts_label(count: int) -> str \| None`; `count_alerts_on_day(alerts: list[Alert], local_date: str, offset: int) -> int` |
+| `domain/alerts.py` | `alerts_label(count: int) -> str \| None`; `count_alert_ids(ids: list[str] \| None) -> int` (IDs distintos e não vazios; lista ausente = 0); `count_alerts_on_day(alerts: list[Alert], local_date: str, offset: int) -> int` (RN-032) |
 | `domain/precipitation.py` | `pop_label(pop: float \| None) -> str`; `rain_label(mm: float \| None) -> str \| None`; `intensity_band(p: float \| None) -> Band \| None`; `minute_tooltip(ts, offset, p) -> str` |
 | `domain/places.py` | `city_option(raw: GeoResult) -> CityOption` |
-| `domain/view_model.py` | `build_weather_view(raw: OneCallResponse) -> WeatherView`; `build_search_result(raw: list[GeoResult]) -> CitySearchResult` |
-| `clients/openweather.py` | `class OpenWeatherClient` com `async onecall(lat, lon) -> dict`, `async geocode(q) -> list[dict]`, `async reverse(lat, lon) -> list[dict]`, `async tile(z, x, y) -> bytes`. Levanta `ProviderError(code)` com os códigos de 6.4 |
+| `domain/view_model.py` | `build_weather_view(raw: OneCallBundle) -> WeatherView`; `build_search_result(raw: list[GeoResult]) -> CitySearchResult` |
+| `clients/openweather.py` | `class OpenWeatherClient(http, api_key, clock=time.time)` com `async weather(lat, lon) -> dict` (as 5 chamadas do ADR-013 e o detalhe dos alertas, devolvendo o pacote), `async geocode(q) -> list[dict]`, `async reverse(lat, lon) -> list[dict]`, `async tile(z, x, y) -> bytes`. Levanta `ProviderError(code)` com os códigos de 6.4. Função pura `merge_onecall(current, minutely, hourly_pages, daily, alerts) -> dict`, em que cada argumento é a resposta do endpoint ou `None` (404), e `alerts` é a lista de detalhes |
 | `main.py` | `create_app(client: OpenWeatherClient \| None = None) -> FastAPI`. Os testes injetam um cliente com `httpx.MockTransport` |
 
 `Scale = Literal["c", "f"]`, `ConditionGroup` e `Band` são `Literal` com os valores da seção 6.3.
@@ -784,9 +844,9 @@ Abaixo de 600 px, tudo fica empilhado em uma coluna.
 | Item | Decisão |
 |---|---|
 | Log de acesso do Uvicorn | Desligado (`--no-access-log`), porque registra a query string com as coordenadas (P-006) |
-| Log próprio | Middleware em `logging_setup.py`: `método caminho-sem-query status duração` |
+| Log próprio | Middleware em `logging_setup.py`: `método rota status duração`. A rota é o modelo da rota encontrada (ex.: `/api/tiles/precipitation/{z}/{x}/{y}.png`), para que os `z/x/y` das tiles, que revelam a área vista no mapa, não vão para o log (P-006). Sem rota encontrada (arquivos estáticos, 404), registra o caminho sem a query string |
 | `httpx` e `httpcore` | Nível `WARNING`. Em `INFO` registram a URL completa, com `appid` (P-001) |
-| Erros do provedor | Só o código de 6.4 e o status HTTP. Nunca a URL, o corpo ou a chave |
+| Erros do provedor | Só o código de 6.4 e o status HTTP. Nunca a URL, o corpo ou a chave. As URLs da One Call 4.0 aparecem também nos campos `next`/`prev` das respostas, com a chave, e por isso o corpo nunca é registrado |
 
 ---
 
@@ -845,6 +905,7 @@ Abaixo de 600 px, tudo fica empilhado em uma coluna.
 10. Escrever texto fixo de interface fora do `messages.js`, ou regra de negócio dentro de `ui/`.
 11. Alterar `spec.md` ou `constitution.md` sem decisão explícita do usuário.
 12. Escrever a chave real em qualquer arquivo, teste, fixture, commit ou prompt (P-001).
+13. Seguir, registrar ou repassar os links `next`/`prev` das respostas do provedor, que trazem a chave (ADR-013).
 
 ### 8.5 Commits
 Conventional Commits, conforme o [CLAUDE.md](../CLAUDE.md), com os IDs atendidos no corpo da mensagem. Exemplo:
@@ -875,17 +936,18 @@ Os testes de ponta a ponta sobem o backend numa thread (fixture `live_server` no
 
 | Arquivo | Origem | Uso |
 |---|---|---|
-| `onecall_uberlandia.json` | Captura real (fatia 0) | Caso completo |
-| `onecall_tokyo.json` | Captura real | Fuso diferente do usuário (categoria 8) |
-| `onecall_no_minutely.json` | Variante editada da completa | RF-045, CA-032 |
-| `onecall_partial.json` | Variante: sem `hourly`, sem `daily`, campos `current` ausentes | RF-023, RF-038, CA-014, CA-025 |
-| `onecall_alerts.json` | Variante com alertas de vigências controladas | CA-010, CA-021, RN-032 |
-| `onecall_minutely_bands.json` | Variante com intensidades de borda (0; 0,3; 0,5; 1,0; 2,5; 5,0; 7,5; 8,0; 12; −1; ausente) | CA-027, CA-028, RN-047 |
+| `onecall4/uberlandia/{current,1min,1h_p1,1h_p2,1day}.json` | Captura real, uma por endpoint (fatia 0) | Caso completo. Combinadas por `merge_onecall` num pacote |
+| `onecall4/uberlandia/alert_{1,2,3}.json` | Captura real do detalhe dos 3 alertas ativos | RN-032 com vigências reais |
+| `onecall4/tokyo/{current,1min,1h_p1,1h_p2,1day}.json` | Captura real | Fuso diferente do usuário (categoria 8) |
+| `onecall_no_minutely.json` | Pacote variante do de Uberlândia, sem `minutely` | RF-045, CA-032 |
+| `onecall_partial.json` | Pacote variante: sem `hourly`, sem `daily`, campos de `current` ausentes | RF-023, RF-038, CA-014, CA-025 |
+| `onecall_alerts.json` | Pacote variante com alertas de vigências controladas | CA-010, CA-021, RN-032 |
+| `onecall_minutely_bands.json` | Pacote variante com intensidades de borda (0; 0,3; 0,5; 1,0; 2,5; 5,0; 7,5; 8,0; 12; −1; ausente) | CA-027, CA-028, RN-047 |
 | `geo_direct_santa_maria.json`, `geo_direct_empty.json`, `geo_reverse_uberlandia.json` | Captura real | Feature 1 |
 
 **Regras das fixtures:**
 - Só cidades públicas, nunca a localização real de alguém (P-006).
-- Nenhuma fixture contém a chave.
+- Nenhuma fixture contém a chave. Os campos `next` e `prev` das capturas são removidos, porque trazem a URL com a chave (ADR-013).
 - Cada variante tem a origem e a alteração descritas em `tests/fixtures/README.md`.
 
 ### 9.3 Nomes dos testes
@@ -902,7 +964,7 @@ Os testes de ponta a ponta sobem o backend numa thread (fixture `live_server` no
 4. Contratos alterados foram atualizados **antes** neste documento.
 5. A aplicação sobe com `uvicorn` e a fatia foi conferida visualmente contra o print, quando houver interface.
 6. As tarefas concluídas estão marcadas em [tasks.md](tasks.md), com "Onde paramos" e "Progresso" atualizados.
-7. Commit em Conventional Commits, com os IDs no corpo. A marcação do item 6 entra no mesmo commit do código.
+7. Um commit no fim da fatia, em Conventional Commits, com os IDs no corpo. A marcação do item 6 entra nesse mesmo commit, junto com o código.
 
 ---
 
@@ -912,11 +974,11 @@ Cada fatia é pequena, verificável e depende só das anteriores. As tarefas de 
 
 | # | Fatia | Entregas | IDs principais |
 |---|---|---|---|
-| 0 | Setup | Ambiente conda, `pyproject.toml`, `create_app()` servindo um `index.html` mínimo, Leaflet copiado (com SHA-256), `logging_setup.py`, captura das fixtures reais | P-001, P-002, P-006 |
+| 0 | Setup | Ambiente conda, `pyproject.toml`, `create_app()` servindo um `index.html` mínimo, Leaflet copiado (com SHA-256), `logging_setup.py`, captura das fixtures reais da One Call 4.0 | P-001, P-002, P-006 |
 | 1 | Domínio: formatação e unidades | `formatting.py`, `units.py`, `time.py` | RN-014, RN-015, RN-020 a RN-025, RN-053 a RN-055, CA-009, CA-039, CA-042 |
 | 2 | Domínio: regras de clima | `conditions.py`, `precipitation.py`, `alerts.py`, `places.py` | RN-006 a RN-009, RN-017 a RN-019, RN-032, RN-036, RN-037, RN-041, CA-012, CA-015, CA-021 |
 | 3 | View model | `schemas/provider.py`, `schemas/view.py`, `view_model.py` com fixtures | Seção 6.3, P-013, CA-013, CA-014 |
-| 4 | Cliente e rotas | `OpenWeatherClient`, `routes.py`, tratadores de erro, `Cache-Control` | RF-004, RF-006, RF-013, RN-012, RN-059, seção 6.4, RNF-004 |
+| 4 | Cliente e rotas | `OpenWeatherClient` (5 chamadas em paralelo, `merge_onecall`), `routes.py`, tratadores de erro, `Cache-Control` | RF-004, RF-006, RF-013, RN-012, RN-059, seção 6.4, RNF-004 |
 | 5 | Estrutura da tela | `index.html`, `tokens.css`, `styles.css` com conteúdo estático, comparados com o print | P-024, RNF-011, RNF-015, RNF-021 |
 | 6a | Estado, cache e chamadas ao backend | `state.js`, `actions.js` (`selectCity`, `retry`), `services/api.js`, `services/cache.js`, `messages.js`, `ui/dom.js` | RF-004, RF-005, RF-013, RN-010 a RN-012, CA-008 |
 | 6b | Cabeçalho, busca e seletor de escala | `ui/header.js`, `actions.js` (`search`, `closeSearch`, `setScale`) | RF-006 a RF-012, RF-015, RF-053, RF-054, CA-004 a CA-007, CA-044 |
@@ -936,7 +998,8 @@ Implementar a tarefa <T-N.x> da fatia <N> de docs/tasks.md: <nome>.
 IDs: <lista da tarefa>. Arquivos: <lista da seção 5.1>.
 Escreva primeiro os testes dos IDs, depois o código. Siga os contratos (seção 6),
 as decisões de detalhe (seção 7) e os guardrails (seção 8.4).
-Marque a tarefa e atualize "Onde paramos" em docs/tasks.md no mesmo commit.
+Ao concluir, marque a tarefa e atualize "Onde paramos" em docs/tasks.md.
+O commit sai no fim da fatia.
 Cumpra a definição de pronto (seção 9.4) e proponha a mensagem de commit.
 ```
 
@@ -973,7 +1036,7 @@ conda env update -f environment.yml --prune
 **Sem conda:** `python -m venv .venv`, ativar o ambiente e rodar `pip install -r requirements-dev.txt`.
 
 Configuração do `pyproject.toml` (criada na fatia 0):
-- `[tool.pytest.ini_options]`: `testpaths = ["tests"]`, `markers = ["e2e", "live"]`, `addopts = "-m 'not live' --browser-channel chrome"`
+- `[tool.pytest.ini_options]`: `testpaths = ["tests"]`, `pythonpath = ["."]` (para o comando `pytest` importar o pacote `app`), `markers = ["e2e", "live"]`, `addopts = "-m 'not live' --browser-channel chrome"`
 - `[tool.ruff]`: `line-length = 100`, `target-version = "py313"`
 
 ---
@@ -996,8 +1059,8 @@ Configuração do `pyproject.toml` (criada na fatia 0):
 
 | Risco | Impacto | Mitigação |
 |---|---|---|
-| One Call 3.0 descontinuada (o fornecedor recomenda a 4.0) | Todas as features param | Risco aceito no spec. O cliente fica isolado em `clients/openweather.py`, e o view model protege o frontend de mudanças no formato |
-| Cota de 1.000 consultas por dia | Erro `provider_rate_limited` | Cache de 10 min, testes sem internet (`page.route` e `MockTransport`) e fumaça `live` só manual |
+| One Call 4.0 é recente (lançada em junho de 2026) e a documentação tem lacunas | Formato real diferente do documentado | As capturas da T-0.8 já mostraram três diferenças (data do dia, alertas fora da previsão diária e primeiro minuto), registradas no ADR-013 e em `tests/fixtures/README.md`. Ainda não se sabe se `timeline/1min` sem cobertura responde 404 ou lista vazia, e o cliente trata os dois casos. O cliente fica isolado em `clients/openweather.py`, o pacote (`merge_onecall`) isola a paginação, e o view model protege o frontend |
+| Cota de 1.000 chamadas por dia, com 5 por consulta de clima mais 1 por alerta | Erro `provider_rate_limited` depois de cerca de 200 consultas no dia (menos em cidades com alertas) | Cache de 10 min, testes sem internet (`page.route` e `MockTransport`), fumaça `live` só manual e limite diário de chamadas configurado na conta do provedor |
 | Termos de uso do CARTO | Bloqueio das tiles do mapa base | Uso acadêmico leve, com atribuição. Plano B: OpenStreetMap padrão (troca de uma URL em `ui/map.js`) |
 | Cache de tiles de terceiros no navegador | Fica no disco uma região visitada (escala regional), fora do controle da aplicação | `/api` usa `no-store`. As tiles do CARTO seguem os cabeçalhos do CARTO, que mostram a região e não a posição exata. Limitação aceita |
 | Leaflet copiado não recebe atualização automática | Correções de segurança manuais | Versão e SHA-256 registrados em `static/vendor/README.md` |

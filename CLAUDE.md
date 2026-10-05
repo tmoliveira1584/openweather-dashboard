@@ -1,7 +1,7 @@
 # OpenWeather Dashboard
 
 MVP acadêmico (pós-graduação): dashboard web de página única que consome a OpenWeatherMap
-One Call API 3.0 e mostra condições atuais, previsão diária, hora a hora, por minuto e mapa
+One Call API 4.0 e mostra condições atuais, previsão diária, hora a hora, por minuto e mapa
 de chuva da cidade do usuário (localização do navegador) ou de uma cidade buscada.
 
 ## Stack
@@ -17,7 +17,7 @@ de chuva da cidade do usuário (localização do navegador) ou de uma cidade bus
 - Trabalhe em passos pequenos e verificáveis, um de cada vez.
 - Siga os princípios de `docs/constitution.md` e implemente conforme `docs/spec.md`, citando os IDs (RF, RN, RNF, CA).
 - Implemente uma fatia por vez de `docs/arquitetura.md` (seção 10), respeitando contratos, guardrails (seção 8.4) e a definição de pronto (seção 9.4).
-- Em toda sessão de implementação, comece por `docs/tasks.md` ("Onde paramos") e continue da próxima tarefa não marcada. Marque a tarefa (`[x]`) e atualize "Onde paramos" no mesmo commit do código.
+- Em toda sessão de implementação, comece por `docs/tasks.md` ("Onde paramos") e continue da próxima tarefa não marcada. Ao concluir cada tarefa, marque-a (`[x]`) e atualize "Onde paramos" na hora. O commit é feito no fim da fatia, junto com o código.
 
 ## Commits
 - Todo commit segue [Conventional Commits](https://www.conventionalcommits.org/pt-br/): `<tipo>(<escopo opcional>): <descrição>`.
