@@ -1,0 +1,16 @@
+{
+  "id": "urn:oid:2.49.0.0.76.0.2026.28421.1:be659ad39a59fb765139d8f532ff6a91",
+  "sender_name": "Instituto Nacional de Meteorologia",
+  "event": "",
+  "start": 1791255600,
+  "end": 1791341940,
+  "description": [
+    {
+      "language": "pt-BR",
+      "description": "INMET publica aviso iniciando em: 06/10/2026 00:00. Chuva entre 20 e 30 mm/h ou até 50 mm/dia, ventos intensos (40-60 km/h), e queda de granizo. Baixo risco de corte de energia elétrica, estragos em plantações, queda de galhos de árvores e de alagamentos."
+    }
+  ],
+  "tags": [
+    "Wind"
+  ]
+}

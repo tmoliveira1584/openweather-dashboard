@@ -1,0 +1,39 @@
+{
+  "lat": -18.92,
+  "lon": -48.28,
+  "timezone": "America/Sao_Paulo",
+  "timezone_offset": -10800,
+  "data": [
+    {
+      "dt": 1791229263,
+      "sunrise": 1791190283,
+      "sunset": 1791234689,
+      "temp": 20.54,
+      "feels_like": 21.1,
+      "pressure": 1017,
+      "humidity": 94,
+      "dew_point": 19.54,
+      "uvi": 0.12,
+      "clouds": 100,
+      "visibility": 10000,
+      "wind_speed": 6.17,
+      "wind_deg": 90,
+      "weather": [
+        {
+          "id": 500,
+          "main": "Rain",
+          "description": "chuva leve",
+          "icon": "10d"
+        }
+      ],
+      "rain": {
+        "1h": 0.56
+      },
+      "alerts": [
+        "urn:oid:2.49.0.0.76.0.2026.28421.1:be659ad39a59fb765139d8f532ff6a91",
+        "urn:oid:2.49.0.0.76.0.2026.28422.1:94820dbf0b05bc87fe005dcd9d5cab69",
+        "urn:oid:2.49.0.0.76.0.2026.28420.1:d078ce02fb9dfd6577b1e39b84c28649"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,574 @@
+{
+  "lat": -18.92,
+  "lon": -48.28,
+  "timezone": "America/Sao_Paulo",
+  "timezone_offset": -10800,
+  "data": [
+    {
+      "dt": 1791226800,
+      "temp": 20.34,
+      "feels_like": 20.88,
+      "pressure": 1017,
+      "humidity": 94,
+      "dew_point": 19.34,
+      "uvi": 0.29,
+      "clouds": 100,
+      "visibility": 10000,
+      "wind_speed": 2.39,
+      "wind_deg": 29,
+      "wind_gust": 3.64,
+      "weather": [
+        {
+          "id": 500,
+          "main": "Rain",
+          "description": "chuva leve",
+          "icon": "10d"
+        }
+      ],
+      "pop": 1,
+      "rain": {
+        "1h": 0.66
+      },
+      "alerts": [
+        "urn:oid:2.49.0.0.76.0.2026.28421.1:be659ad39a59fb765139d8f532ff6a91",
+        "urn:oid:2.49.0.0.76.0.2026.28422.1:94820dbf0b05bc87fe005dcd9d5cab69",
+        "urn:oid:2.49.0.0.76.0.2026.28420.1:d078ce02fb9dfd6577b1e39b84c28649"
+      ]
+    },
+    {
+      "dt": 1791230400,
+      "temp": 20.54,
+      "feels_like": 21.1,
+      "pressure": 1017,
+      "humidity": 94,
+      "dew_point": 19.54,
+      "uvi": 0.12,
+      "clouds": 100,
+      "visibility": 10000,
+      "wind_speed": 2.73,
+      "wind_deg": 39,
+      "wind_gust": 4.7,
+      "weather": [
+        {
+          "id": 500,
+          "main": "Rain",
+          "description": "chuva leve",
+          "icon": "10d"
+        }
+      ],
+      "pop": 1,
+      "rain": {
+        "1h": 0.42
+      },
+      "alerts": [
+        "urn:oid:2.49.0.0.76.0.2026.28421.1:be659ad39a59fb765139d8f532ff6a91",
+        "urn:oid:2.49.0.0.76.0.2026.28422.1:94820dbf0b05bc87fe005dcd9d5cab69",
+        "urn:oid:2.49.0.0.76.0.2026.28420.1:d078ce02fb9dfd6577b1e39b84c28649"
+      ]
+    },
+    {
+      "dt": 1791234000,
+      "temp": 20.07,
+      "feels_like": 20.56,
+      "pressure": 1017,
+      "humidity": 93,
+      "dew_point": 18.9,
+      "uvi": 0.01,
+      "clouds": 100,
+      "visibility": 10000,
+      "wind_speed": 3.34,
+      "wind_deg": 48,
+      "wind_gust": 6.57,
+      "weather": [
+        {
+          "id": 804,
+          "main": "Clouds",
+          "description": "nublado",
+          "icon": "04d"
+        }
+      ],
+      "pop": 0.8,
+      "alerts": [
+        "urn:oid:2.49.0.0.76.0.2026.28421.1:be659ad39a59fb765139d8f532ff6a91",
+        "urn:oid:2.49.0.0.76.0.2026.28422.1:94820dbf0b05bc87fe005dcd9d5cab69",
+        "urn:oid:2.49.0.0.76.0.2026.28420.1:d078ce02fb9dfd6577b1e39b84c28649"
+      ]
+    },
+    {
+      "dt": 1791237600,
+      "temp": 19.78,
+      "feels_like": 20.24,
+      "pressure": 1017,
+      "humidity": 93,
+      "dew_point": 18.62,
+      "uvi": 0,
+      "clouds": 100,
+      "visibility": 10000,
+      "wind_speed": 3.9,
+      "wind_deg": 48,
+      "wind_gust": 8.12,
+      "weather": [
+        {
+          "id": 804,
+          "main": "Clouds",
+          "description": "nublado",
+          "icon": "04n"
+        }
+      ],
+      "pop": 0.8,
+      "alerts": [
+        "urn:oid:2.49.0.0.76.0.2026.28421.1:be659ad39a59fb765139d8f532ff6a91",
+        "urn:oid:2.49.0.0.76.0.2026.28422.1:94820dbf0b05bc87fe005dcd9d5cab69",
+        "urn:oid:2.49.0.0.76.0.2026.28420.1:d078ce02fb9dfd6577b1e39b84c28649"
+      ]
+    },
+    {
+      "dt": 1791241200,
+      "temp": 19.45,
+      "feels_like": 19.85,
+      "pressure": 1016,
+      "humidity": 92,
+      "dew_point": 18.12,
+      "uvi": 0,
+      "clouds": 100,
+      "visibility": 10000,
+      "wind_speed": 3.36,
+      "wind_deg": 48,
+      "wind_gust": 7.62,
+      "weather": [
+        {
+          "id": 804,
+          "main": "Clouds",
+          "description": "nublado",
+          "icon": "04n"
+        }
+      ],
+      "pop": 0.8,
+      "alerts": [
+        "urn:oid:2.49.0.0.76.0.2026.28421.1:be659ad39a59fb765139d8f532ff6a91",
+        "urn:oid:2.49.0.0.76.0.2026.28422.1:94820dbf0b05bc87fe005dcd9d5cab69",
+        "urn:oid:2.49.0.0.76.0.2026.28420.1:d078ce02fb9dfd6577b1e39b84c28649"
+      ]
+    },
+    {
+      "dt": 1791244800,
+      "temp": 19.2,
+      "feels_like": 19.55,
+      "pressure": 1016,
+      "humidity": 91,
+      "dew_point": 17.7,
+      "uvi": 0,
+      "clouds": 100,
+      "visibility": 10000,
+      "wind_speed": 3.81,
+      "wind_deg": 52,
+      "wind_gust": 8.21,
+      "weather": [
+        {
+          "id": 804,
+          "main": "Clouds",
+          "description": "nublado",
+          "icon": "04n"
+        }
+      ],
+      "pop": 0.8,
+      "alerts": [
+        "urn:oid:2.49.0.0.76.0.2026.28421.1:be659ad39a59fb765139d8f532ff6a91",
+        "urn:oid:2.49.0.0.76.0.2026.28422.1:94820dbf0b05bc87fe005dcd9d5cab69",
+        "urn:oid:2.49.0.0.76.0.2026.28420.1:d078ce02fb9dfd6577b1e39b84c28649"
+      ]
+    },
+    {
+      "dt": 1791248400,
+      "temp": 19.05,
+      "feels_like": 19.33,
+      "pressure": 1016,
+      "humidity": 89,
+      "dew_point": 17.48,
+      "uvi": 0,
+      "clouds": 100,
+      "visibility": 10000,
+      "wind_speed": 3.64,
+      "wind_deg": 29,
+      "wind_gust": 10.13,
+      "weather": [
+        {
+          "id": 804,
+          "main": "Clouds",
+          "description": "nublado",
+          "icon": "04n"
+        }
+      ],
+      "pop": 0,
+      "alerts": [
+        "urn:oid:2.49.0.0.76.0.2026.28421.1:be659ad39a59fb765139d8f532ff6a91",
+        "urn:oid:2.49.0.0.76.0.2026.28422.1:94820dbf0b05bc87fe005dcd9d5cab69",
+        "urn:oid:2.49.0.0.76.0.2026.28420.1:d078ce02fb9dfd6577b1e39b84c28649"
+      ]
+    },
+    {
+      "dt": 1791252000,
+      "temp": 18.72,
+      "feels_like": 19.02,
+      "pressure": 1016,
+      "humidity": 91,
+      "dew_point": 17.39,
+      "uvi": 0,
+      "clouds": 100,
+      "visibility": 10000,
+      "wind_speed": 2.92,
+      "wind_deg": 27,
+      "wind_gust": 8.87,
+      "weather": [
+        {
+          "id": 804,
+          "main": "Clouds",
+          "description": "nublado",
+          "icon": "04n"
+        }
+      ],
+      "pop": 0,
+      "alerts": [
+        "urn:oid:2.49.0.0.76.0.2026.28421.1:be659ad39a59fb765139d8f532ff6a91",
+        "urn:oid:2.49.0.0.76.0.2026.28422.1:94820dbf0b05bc87fe005dcd9d5cab69",
+        "urn:oid:2.49.0.0.76.0.2026.28420.1:d078ce02fb9dfd6577b1e39b84c28649"
+      ]
+    },
+    {
+      "dt": 1791255600,
+      "temp": 18.75,
+      "feels_like": 19.06,
+      "pressure": 1015,
+      "humidity": 91,
+      "dew_point": 17.68,
+      "uvi": 0,
+      "clouds": 100,
+      "visibility": 10000,
+      "wind_speed": 3.16,
+      "wind_deg": 39,
+      "wind_gust": 9.48,
+      "weather": [
+        {
+          "id": 804,
+          "main": "Clouds",
+          "description": "nublado",
+          "icon": "04n"
+        }
+      ],
+      "pop": 0,
+      "alerts": [
+        "urn:oid:2.49.0.0.76.0.2026.28421.1:be659ad39a59fb765139d8f532ff6a91",
+        "urn:oid:2.49.0.0.76.0.2026.28422.1:94820dbf0b05bc87fe005dcd9d5cab69",
+        "urn:oid:2.49.0.0.76.0.2026.28420.1:d078ce02fb9dfd6577b1e39b84c28649"
+      ]
+    },
+    {
+      "dt": 1791259200,
+      "temp": 18.65,
+      "feels_like": 18.95,
+      "pressure": 1014,
+      "humidity": 91,
+      "dew_point": 17.62,
+      "uvi": 0,
+      "clouds": 100,
+      "visibility": 10000,
+      "wind_speed": 2.03,
+      "wind_deg": 43,
+      "wind_gust": 5.11,
+      "weather": [
+        {
+          "id": 804,
+          "main": "Clouds",
+          "description": "nublado",
+          "icon": "04n"
+        }
+      ],
+      "pop": 0,
+      "alerts": [
+        "urn:oid:2.49.0.0.76.0.2026.28421.1:be659ad39a59fb765139d8f532ff6a91",
+        "urn:oid:2.49.0.0.76.0.2026.28422.1:94820dbf0b05bc87fe005dcd9d5cab69",
+        "urn:oid:2.49.0.0.76.0.2026.28420.1:d078ce02fb9dfd6577b1e39b84c28649"
+      ]
+    },
+    {
+      "dt": 1791262800,
+      "temp": 18.78,
+      "feels_like": 19.09,
+      "pressure": 1014,
+      "humidity": 91,
+      "dew_point": 17.67,
+      "uvi": 0,
+      "clouds": 100,
+      "visibility": 10000,
+      "wind_speed": 2.15,
+      "wind_deg": 40,
+      "wind_gust": 4.39,
+      "weather": [
+        {
+          "id": 804,
+          "main": "Clouds",
+          "description": "nublado",
+          "icon": "04n"
+        }
+      ],
+      "pop": 0,
+      "alerts": [
+        "urn:oid:2.49.0.0.76.0.2026.28421.1:be659ad39a59fb765139d8f532ff6a91",
+        "urn:oid:2.49.0.0.76.0.2026.28422.1:94820dbf0b05bc87fe005dcd9d5cab69",
+        "urn:oid:2.49.0.0.76.0.2026.28420.1:d078ce02fb9dfd6577b1e39b84c28649"
+      ]
+    },
+    {
+      "dt": 1791266400,
+      "temp": 18.92,
+      "feels_like": 19.24,
+      "pressure": 1014,
+      "humidity": 91,
+      "dew_point": 17.66,
+      "uvi": 0,
+      "clouds": 100,
+      "visibility": 10000,
+      "wind_speed": 1.84,
+      "wind_deg": 340,
+      "wind_gust": 4.54,
+      "weather": [
+        {
+          "id": 804,
+          "main": "Clouds",
+          "description": "nublado",
+          "icon": "04n"
+        }
+      ],
+      "pop": 0,
+      "alerts": [
+        "urn:oid:2.49.0.0.76.0.2026.28421.1:be659ad39a59fb765139d8f532ff6a91",
+        "urn:oid:2.49.0.0.76.0.2026.28422.1:94820dbf0b05bc87fe005dcd9d5cab69",
+        "urn:oid:2.49.0.0.76.0.2026.28420.1:d078ce02fb9dfd6577b1e39b84c28649"
+      ]
+    },
+    {
+      "dt": 1791270000,
+      "temp": 18.84,
+      "feels_like": 19.16,
+      "pressure": 1015,
+      "humidity": 91,
+      "dew_point": 17.65,
+      "uvi": 0,
+      "clouds": 100,
+      "visibility": 10000,
+      "wind_speed": 1.72,
+      "wind_deg": 20,
+      "wind_gust": 3.66,
+      "weather": [
+        {
+          "id": 804,
+          "main": "Clouds",
+          "description": "nublado",
+          "icon": "04n"
+        }
+      ],
+      "pop": 0.37,
+      "alerts": [
+        "urn:oid:2.49.0.0.76.0.2026.28421.1:be659ad39a59fb765139d8f532ff6a91",
+        "urn:oid:2.49.0.0.76.0.2026.28422.1:94820dbf0b05bc87fe005dcd9d5cab69",
+        "urn:oid:2.49.0.0.76.0.2026.28420.1:d078ce02fb9dfd6577b1e39b84c28649"
+      ]
+    },
+    {
+      "dt": 1791273600,
+      "temp": 18.7,
+      "feels_like": 19,
+      "pressure": 1016,
+      "humidity": 91,
+      "dew_point": 17.66,
+      "uvi": 0,
+      "clouds": 100,
+      "visibility": 10000,
+      "wind_speed": 1.83,
+      "wind_deg": 45,
+      "wind_gust": 2.48,
+      "weather": [
+        {
+          "id": 804,
+          "main": "Clouds",
+          "description": "nublado",
+          "icon": "04n"
+        }
+      ],
+      "pop": 0.3,
+      "alerts": [
+        "urn:oid:2.49.0.0.76.0.2026.28421.1:be659ad39a59fb765139d8f532ff6a91",
+        "urn:oid:2.49.0.0.76.0.2026.28422.1:94820dbf0b05bc87fe005dcd9d5cab69",
+        "urn:oid:2.49.0.0.76.0.2026.28420.1:d078ce02fb9dfd6577b1e39b84c28649"
+      ]
+    },
+    {
+      "dt": 1791277200,
+      "temp": 18.33,
+      "feels_like": 18.62,
+      "pressure": 1016,
+      "humidity": 92,
+      "dew_point": 17.58,
+      "uvi": 0,
+      "clouds": 100,
+      "visibility": 10000,
+      "wind_speed": 2.49,
+      "wind_deg": 63,
+      "wind_gust": 3.91,
+      "weather": [
+        {
+          "id": 804,
+          "main": "Clouds",
+          "description": "nublado",
+          "icon": "04d"
+        }
+      ],
+      "pop": 0.2,
+      "alerts": [
+        "urn:oid:2.49.0.0.76.0.2026.28421.1:be659ad39a59fb765139d8f532ff6a91",
+        "urn:oid:2.49.0.0.76.0.2026.28422.1:94820dbf0b05bc87fe005dcd9d5cab69",
+        "urn:oid:2.49.0.0.76.0.2026.28420.1:d078ce02fb9dfd6577b1e39b84c28649"
+      ]
+    },
+    {
+      "dt": 1791280800,
+      "temp": 18.92,
+      "feels_like": 19.17,
+      "pressure": 1016,
+      "humidity": 88,
+      "dew_point": 17.61,
+      "uvi": 0.37,
+      "clouds": 100,
+      "visibility": 10000,
+      "wind_speed": 3.04,
+      "wind_deg": 72,
+      "wind_gust": 4.66,
+      "weather": [
+        {
+          "id": 804,
+          "main": "Clouds",
+          "description": "nublado",
+          "icon": "04d"
+        }
+      ],
+      "pop": 0.1,
+      "alerts": [
+        "urn:oid:2.49.0.0.76.0.2026.28421.1:be659ad39a59fb765139d8f532ff6a91",
+        "urn:oid:2.49.0.0.76.0.2026.28422.1:94820dbf0b05bc87fe005dcd9d5cab69",
+        "urn:oid:2.49.0.0.76.0.2026.28420.1:d078ce02fb9dfd6577b1e39b84c28649"
+      ]
+    },
+    {
+      "dt": 1791284400,
+      "temp": 19.81,
+      "feels_like": 19.99,
+      "pressure": 1016,
+      "humidity": 82,
+      "dew_point": 17.47,
+      "uvi": 1.65,
+      "clouds": 100,
+      "visibility": 10000,
+      "wind_speed": 3.41,
+      "wind_deg": 75,
+      "wind_gust": 5.36,
+      "weather": [
+        {
+          "id": 804,
+          "main": "Clouds",
+          "description": "nublado",
+          "icon": "04d"
+        }
+      ],
+      "pop": 0.06,
+      "alerts": [
+        "urn:oid:2.49.0.0.76.0.2026.28421.1:be659ad39a59fb765139d8f532ff6a91",
+        "urn:oid:2.49.0.0.76.0.2026.28422.1:94820dbf0b05bc87fe005dcd9d5cab69",
+        "urn:oid:2.49.0.0.76.0.2026.28420.1:d078ce02fb9dfd6577b1e39b84c28649"
+      ]
+    },
+    {
+      "dt": 1791288000,
+      "temp": 22.42,
+      "feels_like": 22.6,
+      "pressure": 1017,
+      "humidity": 72,
+      "dew_point": 17.47,
+      "uvi": 3.7,
+      "clouds": 100,
+      "visibility": 10000,
+      "wind_speed": 3.23,
+      "wind_deg": 63,
+      "wind_gust": 3.87,
+      "weather": [
+        {
+          "id": 804,
+          "main": "Clouds",
+          "description": "nublado",
+          "icon": "04d"
+        }
+      ],
+      "pop": 0,
+      "alerts": [
+        "urn:oid:2.49.0.0.76.0.2026.28421.1:be659ad39a59fb765139d8f532ff6a91",
+        "urn:oid:2.49.0.0.76.0.2026.28422.1:94820dbf0b05bc87fe005dcd9d5cab69",
+        "urn:oid:2.49.0.0.76.0.2026.28420.1:d078ce02fb9dfd6577b1e39b84c28649"
+      ]
+    },
+    {
+      "dt": 1791291600,
+      "temp": 23.82,
+      "feels_like": 23.93,
+      "pressure": 1017,
+      "humidity": 64,
+      "dew_point": 17.32,
+      "uvi": 4.16,
+      "clouds": 100,
+      "visibility": 10000,
+      "wind_speed": 3.64,
+      "wind_deg": 37,
+      "wind_gust": 4.2,
+      "weather": [
+        {
+          "id": 804,
+          "main": "Clouds",
+          "description": "nublado",
+          "icon": "04d"
+        }
+      ],
+      "pop": 0,
+      "alerts": [
+        "urn:oid:2.49.0.0.76.0.2026.28421.1:be659ad39a59fb765139d8f532ff6a91",
+        "urn:oid:2.49.0.0.76.0.2026.28422.1:94820dbf0b05bc87fe005dcd9d5cab69",
+        "urn:oid:2.49.0.0.76.0.2026.28420.1:d078ce02fb9dfd6577b1e39b84c28649"
+      ]
+    },
+    {
+      "dt": 1791295200,
+      "temp": 24.48,
+      "feels_like": 24.55,
+      "pressure": 1016,
+      "humidity": 60,
+      "dew_point": 16.97,
+      "uvi": 3.73,
+      "clouds": 100,
+      "visibility": 10000,
+      "wind_speed": 3.57,
+      "wind_deg": 27,
+      "wind_gust": 4.09,
+      "weather": [
+        {
+          "id": 804,
+          "main": "Clouds",
+          "description": "nublado",
+          "icon": "04d"
+        }
+      ],
+      "pop": 0,
+      "alerts": [
+        "urn:oid:2.49.0.0.76.0.2026.28421.1:be659ad39a59fb765139d8f532ff6a91",
+        "urn:oid:2.49.0.0.76.0.2026.28422.1:94820dbf0b05bc87fe005dcd9d5cab69",
+        "urn:oid:2.49.0.0.76.0.2026.28420.1:d078ce02fb9dfd6577b1e39b84c28649"
+      ]
+    }
+  ]
+}

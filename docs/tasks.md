@@ -7,24 +7,25 @@ Lista de tarefas que leva a aplicação de zero a 100% dos requisitos, uma fatia
 
 ## Onde paramos
 
-> Atualize este bloco no mesmo commit em que marcar uma tarefa.
+> Atualize este bloco ao concluir cada tarefa, antes de passar para a próxima. Ele vai para o Git no commit do fim da fatia (D-06).
 
 | Item | Valor |
 |---|---|
-| Fatia atual | 0 — Setup (não iniciada) |
-| Próxima tarefa | T-0.1 |
-| Último commit de implementação | — |
-| IDs fechados | 0 de 217 (0%) |
+| Fatia atual | 1 — Domínio: formatação, unidades e horas (não iniciada) |
+| Próxima tarefa | T-1.1 |
+| Concluídas, ainda sem commit | — |
+| Último commit de implementação | Fatia 0, commit `build: configurar ambiente, app mínimo e fixtures reais` de 2026-10-05 (o hash é registrado aqui no início da fatia 1) |
+| IDs fechados | 1 de 217 (0,5%) |
 
 ## Como usar
 
-1. **Ao abrir uma sessão:** leia o [CLAUDE.md](../CLAUDE.md), o bloco "Onde paramos" e as seções da arquitetura citadas na fatia atual.
+1. **Ao abrir uma sessão:** leia o [CLAUDE.md](../CLAUDE.md), o bloco "Onde paramos" e as seções da arquitetura citadas na fatia atual. Rode `git status`: os arquivos não commitados são o trabalho da fatia atual já registrado em "Onde paramos".
 2. **Antes de codificar:** explique a decisão da próxima tarefa não marcada e aguarde a confirmação (CLAUDE.md). Use o modelo de pedido da seção 10 da arquitetura, se quiser registrar o prompt com `/costar`.
 3. **Ordem dentro da tarefa:** testes dos IDs primeiro (nome `test_<id>_<comportamento>`, seção 9.3), depois o código.
-4. **Marcar o ✓:** a tarefa recebe `[x]` **no mesmo commit** do código que a conclui, junto com a atualização de "Onde paramos". Assim, o `git log` deste arquivo mostra quando cada item foi feito.
+4. **Marcar o ✓:** ao concluir uma tarefa, marque `[x]` e atualize "Onde paramos" **na hora**, sem esperar o commit. Assim, uma nova sessão sabe onde continuar mesmo com o trabalho ainda sem commit.
 5. **Fechar a fatia:** quando todas as tarefas e a definição de pronto (seção 9.4 da arquitetura) estiverem marcadas, atualize a tabela "Progresso" com os IDs que a fatia fecha.
 6. **Trabalho não previsto:** se surgir algo fora da lista, acrescente uma tarefa nova na fatia (ex.: T-7.7) antes de fazê-la. Se um contrato mudar, atualize a arquitetura antes do código.
-7. **Uma tarefa cabe numa sessão** e costuma gerar um commit. Uma fatia pode ter vários commits.
+7. **Um commit por fatia:** as tarefas ficam na pasta de trabalho até a última da fatia, que cumpre a definição de pronto e faz um único commit com o código, as marcações e a tabela "Progresso" (D-06). Uma tarefa cabe numa sessão.
 
 **O que "fecha" quer dizer:** cada ID tem uma única fatia em que fica totalmente atendido e testado, listada na linha **Fecha** dela. Uma fatia anterior pode ter testes de unidade que citam o mesmo ID (ex.: CA-039 nas regras de conversão da fatia 1), mas o ID só conta como fechado na fatia indicada.
 
@@ -32,7 +33,7 @@ Lista de tarefas que leva a aplicação de zero a 100% dos requisitos, uma fatia
 
 | Fatia | Nome | IDs que fecha | Status |
 |---|---|---|---|
-| 0 | Setup | 1 | Pendente |
+| 0 | Setup | 1 | Concluída |
 | 1 | Domínio: formatação, unidades e horas | 12 | Pendente |
 | 2 | Domínio: regras de clima | 11 | Pendente |
 | 3 | View model | 3 | Pendente |
@@ -48,23 +49,24 @@ Lista de tarefas que leva a aplicação de zero a 100% dos requisitos, uma fatia
 | 11 | Mapa | 24 | Pendente |
 | 12 | Robustez, desempenho e acessibilidade | 15 | Pendente |
 | 13 | Fechamento | 4 | Pendente |
-| | **Total** | **217** | **0%** |
+| | **Total** | **217** | **0,5%** |
 
 ---
 
 ## Fatia 0 — Setup
 
-Arquitetura: seções 1, 5.1, 7.6, 9.1, 9.2 e 11. **Pré-requisito:** `.env` com a chave e a assinatura "One Call by Call" ativa (a T-0.8 usa cerca de 6 consultas da cota).
+Arquitetura: seções 1, 5.1, 7.6, 9.1, 9.2 e 11. **Pré-requisito:** `.env` com a chave e a assinatura "One Call by Call" da One Call 4.0 ativa (a T-0.8 usa 10 chamadas da One Call e 3 de geocodificação).
 
-- [ ] **T-0.1** Criar o ambiente conda (`conda env create -f environment.yml`) e conferir `python --version` (3.13.5) e `pip check`.
-- [ ] **T-0.2** Criar o `pyproject.toml` só com a configuração de ferramentas: pytest (`testpaths`, marcadores `e2e` e `live`, `addopts`) e ruff (`line-length = 100`, `target-version = "py313"`).
-- [ ] **T-0.3** `app/config.py`: ler `OPENWEATHER_API_KEY` do ambiente e falhar ao iniciar se ela não existir. Teste em `tests/unit/test_config.py`. (P-002)
-- [ ] **T-0.4** `app/logging_setup.py`: middleware que registra `método caminho-sem-query status duração`, e loggers `httpx`/`httpcore` em `WARNING`. (P-001, P-006)
-- [ ] **T-0.5** `app/main.py`: `create_app(client=None)` com o `lifespan` do `httpx.AsyncClient` e `StaticFiles` servindo um `static/index.html` mínimo com `<html lang="pt-BR">`.
-- [ ] **T-0.6** Copiar o Leaflet 1.9.4 para `static/vendor/leaflet-1.9.4/` (`leaflet.js`, `leaflet.css`, `images/`) e registrar a origem, a versão e o SHA-256 em `static/vendor/README.md`.
-- [ ] **T-0.7** `tests/conftest.py`: fixtures para carregar JSON, app com cliente simulado (`httpx.MockTransport`) e `live_server` numa thread. Interceptar `/api/*`, as tiles do CARTO e os ícones do OpenWeatherMap, para os testes de ponta a ponta rodarem sem internet. Incluir um teste de fumaça que abre a página no Chrome (`--browser-channel chrome`).
-- [ ] **T-0.8** Capturar as fixtures reais (`onecall_uberlandia.json`, `onecall_tokyo.json`, `geo_direct_santa_maria.json`, `geo_direct_empty.json`, `geo_reverse_uberlandia.json`) sem gravar a chave, e descrever a origem em `tests/fixtures/README.md`. Conferir com `git grep` que a chave não aparece. (P-001)
-- [ ] **T-0.9** Definição de pronto (seção 9.4) + commit. Sugestão: `build: configurar ambiente, app mínimo e fixtures reais`.
+- [x] **T-0.1** Criar o ambiente conda (`conda env create -f environment.yml`) e conferir `python --version` (3.13.5) e `pip check`.
+- [x] **T-0.2** Criar o `pyproject.toml` só com a configuração de ferramentas: pytest (`testpaths`, marcadores `e2e` e `live`, `addopts`) e ruff (`line-length = 100`, `target-version = "py313"`).
+- [x] **T-0.3** `app/config.py`: ler `OPENWEATHER_API_KEY` do ambiente e falhar ao iniciar se ela não existir. Teste em `tests/unit/test_config.py`. (P-002)
+- [x] **T-0.4** `app/logging_setup.py`: middleware que registra `método rota status duração` (modelo da rota, ou caminho sem query se não houver rota), e loggers `httpx`/`httpcore` em `WARNING`. (P-001, P-006)
+- [x] **T-0.5** `app/main.py`: `create_app(client=None)` com o `lifespan` do `httpx.AsyncClient` e `StaticFiles` servindo um `static/index.html` mínimo com `<html lang="pt-BR">`.
+- [x] **T-0.6** Copiar o Leaflet 1.9.4 para `static/vendor/leaflet-1.9.4/` (`leaflet.js`, `leaflet.css`, `images/`) e registrar a origem, a versão e o SHA-256 em `static/vendor/README.md`.
+- [x] **T-0.7** `tests/conftest.py`: fixtures para carregar JSON, app com cliente simulado (`httpx.MockTransport`) e `live_server` numa thread. Interceptar `/api/*`, as tiles do CARTO e os ícones do OpenWeatherMap, para os testes de ponta a ponta rodarem sem internet. Incluir um teste de fumaça que abre a página no Chrome (`--browser-channel chrome`).
+- [x] **T-0.8** Capturar as fixtures reais da One Call 4.0 de Uberlândia e de Tóquio, uma por endpoint (`onecall4/<cidade>/current.json`, `1min.json`, `1h_p1.json`, `1h_p2.json` e `1day.json`), e as de geocodificação (`geo_direct_santa_maria.json`, `geo_direct_empty.json` e `geo_reverse_uberlandia.json`). Não gravar a chave e remover os campos `next`/`prev`, que a contêm. Descrever a origem em `tests/fixtures/README.md` e registrar ali o que as capturas mostram sobre as lacunas da documentação (risco da seção 13 da arquitetura). Conferir com `git grep` que a chave não aparece. (P-001, ADR-013)
+- [x] **T-0.10** (não prevista) Ajustar spec, arquitetura e tarefas aos achados da T-0.8: data de cada dia da previsão diária, alertas por dia e primeiro minuto da previsão por minuto. Fica antes da T-0.9, que fecha a fatia.
+- [x] **T-0.9** Definição de pronto (seção 9.4) + commit. Sugestão: `build: configurar ambiente, app mínimo e fixtures reais`.
 
 **Fecha:** P-002
 
@@ -85,7 +87,7 @@ Arquitetura: seções 6.3 e 6.6. Testes em `tests/unit/`.
 
 - [ ] **T-2.1** `domain/conditions.py`: `condition_group` por faixa de código (fora das faixas → `neutral`), `wind_direction` na rosa de 8 pontos (0° e 360° → "N", limites dos setores) e `wind_label` ("Calmo" abaixo de 0,5 m/s originais, só a velocidade se faltar a direção). (RN-017, RN-019)
 - [ ] **T-2.2** `domain/precipitation.py`: `pop_label`, `rain_label` (2 casas, `null` quando arredonda para 0), `intensity_band` (limite superior incluído, negativo ou não numérico → `None`) e `minute_tooltip`. (RN-036, RN-037, RN-041, RN-045)
-- [ ] **T-2.3** `domain/alerts.py`: `alerts_label` ("1 alerta", "N alertas", "99+ alertas", `None` com 0) e `count_alerts_on_day` (sobreposição maior que zero, alerta sem início ou fim conta em todos os dias, fim às 00:00 conta só no dia anterior). (RN-018, RN-032)
+- [ ] **T-2.3** `domain/alerts.py`: `alerts_label` ("1 alerta", "N alertas", "99+ alertas", `None` com 0) `count_alert_ids` (IDs distintos e não vazios, lista ausente = 0, para o selo de "Hoje") e `count_alerts_on_day` (sobreposição maior que zero, alerta sem início ou fim conta em todos os dias, fim às 00:00 conta só no dia anterior). (RN-018, RN-032)
 - [ ] **T-2.4** `domain/places.py`: `city_option` com nome em português ou o nome padrão, e os rótulos do cabeçalho, da lista e do marcador. (RN-006 a RN-008)
 - [ ] **T-2.5** Definição de pronto + commit.
 
@@ -95,10 +97,10 @@ Arquitetura: seções 6.3 e 6.6. Testes em `tests/unit/`.
 
 Arquitetura: seções 6.2, 6.3 e 9.2. Testes em `tests/unit/test_view_model.py`.
 
-- [ ] **T-3.1** Criar as fixtures variantes `onecall_no_minutely.json`, `onecall_partial.json`, `onecall_alerts.json` e `onecall_minutely_bands.json`, com a origem e a alteração descritas em `tests/fixtures/README.md`.
-- [ ] **T-3.2** `schemas/provider.py`: todos os campos opcionais, `extra="ignore"`, e valor fora do formato vira `None` em vez de erro 500.
+- [ ] **T-3.1** `clients/openweather.py`, só a função pura `merge_onecall` (seção 6.2, ADR-013): combina as respostas da One Call 4.0 no pacote, une as 2 páginas por hora sem repetir `dt`, descarta `next`/`prev`, deixa o bloco ausente quando a resposta é `None` (404) ou tem `data` vazia e junta em `alerts` o detalhe de cada alerta. Testar com as capturas da T-0.8. Depois, criar os pacotes variantes `onecall_no_minutely.json`, `onecall_partial.json`, `onecall_alerts.json` e `onecall_minutely_bands.json` a partir do pacote de Uberlândia, com a origem e a alteração descritas em `tests/fixtures/README.md`.
+- [ ] **T-3.2** `schemas/provider.py`: modelos do pacote (`OneCallBundle`, seção 6.2) e da geocodificação, com todos os campos opcionais, `extra="ignore"`, e valor fora do formato vira `None` em vez de erro 500.
 - [ ] **T-3.3** `schemas/view.py`: `WeatherView`, `Scaled`, `CitySearchResult`, `ReverseResult` e os `Literal` (`Scale`, `ConditionGroup`, `Band`).
-- [ ] **T-3.4** `view_model.build_weather_view`: blocos `current`, `daily`, `hourly` e `minutely` conforme a tabela de regras da seção 6.3. Descrição com inicial maiúscula e "Sensação de", dia da semana só às 00:00, `"—"` e `null` para ausentes, bloco ausente ou vazio → `null`. Testar contra o exemplo JSON da seção 6.3. (RN-016, RN-035, P-013)
+- [ ] **T-3.4** `view_model.build_weather_view`: blocos `current`, `daily`, `hourly` e `minutely` conforme a tabela de regras da seção 6.3. Descrição com inicial maiúscula e "Sensação de", dia da semana só às 00:00, `"—"` e `null` para ausentes, bloco ausente ou vazio → `null`, `daily` com no máximo 8 dias, data do dia pela data UTC do `dt` (funções de data com `offset = 0`), visibilidade do dia quando houver, selo de "Hoje" pelos IDs de `current.alerts` e selo de cada dia pela vigência (RN-032). Testar contra o exemplo JSON da seção 6.3. (RN-016, RN-035, P-013)
 - [ ] **T-3.5** `view_model.build_search_result`: até 5 itens, `truncated` com exatamente 5, lista vazia sem resultados.
 - [ ] **T-3.6** Definição de pronto + commit.
 
@@ -108,10 +110,10 @@ Arquitetura: seções 6.2, 6.3 e 9.2. Testes em `tests/unit/test_view_model.py`.
 
 Arquitetura: seções 6.1, 6.4, 7.6 e ADR-003. Testes em `tests/api/` com `TestClient` e `httpx.MockTransport`.
 
-- [ ] **T-4.1** `clients/openweather.py`: `OpenWeatherClient` com `onecall` (`units=metric`, `lang=pt_br`), `geocode` (`limit=5`), `reverse` (`limit=1`) e `tile`, tempo limite de 15 s e `ProviderError` com os códigos da seção 6.4 (401/403, 429, outros erros, JSON inválido, `TimeoutException`, `ConnectError`). (RN-012, RN-059)
+- [ ] **T-4.1** `clients/openweather.py`: `OpenWeatherClient(http, api_key, clock)` com `weather`, `geocode` (`limit=5`), `reverse` (`limit=1`) e `tile`, tempo limite de 15 s por chamada e `ProviderError` com os códigos da seção 6.4 (401/403, 429, outros erros, JSON inválido, `TimeoutException`, `ConnectError`). O `weather` faz as 5 chamadas em paralelo do ADR-013 (`units=metric`, `lang=pt_br`, `start` da previsão por hora pelo relógio injetado), trata 404 numa previsão como bloco ausente, busca numa segunda rodada o detalhe de cada alerta distinto (404 → alerta sem vigência), aplica a precedência de erros da seção 6.4 e devolve o pacote de `merge_onecall`. (RN-012, RN-059)
 - [ ] **T-4.2** `api/routes.py`: as 4 rotas, com validação antes de chamar o provedor (lat/lon, termo de 2 a 100 caracteres sem os espaços das pontas, z/x/y), `400 invalid_request` no lugar do 422 e `Cache-Control: no-store`. (RN-004)
 - [ ] **T-4.3** Tratadores de exceção em `main.py`: formato `{"error": "<código>"}`, 502/504, sem repassar o corpo do provedor. (P-004)
-- [ ] **T-4.4** Testes de segurança: com uma chave falsa de teste, ela não aparece em nenhuma resposta, cabeçalho ou log (`caplog`), e o log não contém query string nem coordenadas. (RNF-004, P-001, P-006)
+- [ ] **T-4.4** Testes de segurança: com uma chave falsa de teste, ela não aparece em nenhuma resposta, cabeçalho ou log (`caplog`), e o log não contém query string nem coordenadas. Os links `next`/`prev` de uma resposta simulada do provedor não aparecem na resposta do `/api/weather` nem no log (guardrail 13). (RNF-004, P-001, P-006)
 - [ ] **T-4.5** Definição de pronto + commit.
 
 **Fecha:** RN-059, RNF-004, P-001, P-006
@@ -191,7 +193,7 @@ Arquitetura: seções 6.3, 6.6 e 7.4. Testes em `tests/e2e/test_js_logic.py` e `
 
 - [ ] **T-8.1** `logic/time-window.js`: `cityToday` e `visibleDays`, com testes de virada da meia-noite e de fuso diferente (Tóquio). (RN-026, RN-027)
 - [ ] **T-8.2** `ui/day-tabs.js`: aba "Hoje" + dias da semana, máxima e ícone com texto alternativo, padrão ARIA de tablist (setas e Enter), `aria-selected` com destaque além da cor, rolagem própria, aba selecionada trazida para a área visível e mensagem "Previsão diária indisponível.". (RF-024, RF-025, RF-032, RN-028, RN-029, RNF-014, RNF-015)
-- [ ] **T-8.3** `actions.selectDay` e resumo do dia no card principal e nos cards: máxima, "Mín. X°", sensação diurna, data, "—" em Visibilidade, ilustração do dia e selo com os alertas do dia. (RF-026 a RF-028, RF-030, RN-030, RN-031, RN-033)
+- [ ] **T-8.3** `actions.selectDay` e resumo do dia no card principal e nos cards: máxima, "Mín. X°", sensação diurna, data, visibilidade prevista ou "—", ilustração do dia e selo com os alertas do dia. (RF-026 a RF-028, RF-030, RN-030, RN-031, RN-033)
 - [ ] **T-8.4** Troca de cidade volta para "Hoje", dados atualizados mantêm o dia se ele ainda existir, e a escala é mantida. (RF-031, RF-057)
 - [ ] **T-8.5** Testes de ponta a ponta: CA-016, CA-017, CA-018, CA-020 e CA-021, atualização em até 100 ms e nenhuma consulta ao trocar de aba. (RNF-013, P-011)
 - [ ] **T-8.6** Definição de pronto + commit.
@@ -215,7 +217,7 @@ Arquitetura: seções 6.3, 6.6 e ADR-007. Testes em `tests/e2e/test_js_logic.py`
 
 Arquitetura: seções 6.3, 6.6, 7.1 e ADR-007. Testes em `tests/e2e/test_js_logic.py` e `tests/e2e/test_f5_minutely.py`.
 
-- [ ] **T-10.1** Lógica: `minuteWindow` (descarta minutos passados), `minuteMarks` (sem marcos sem dados), `minuteSummary` (4 frases) e `barHeight` (teto de 10 mm/h e altura mínima). (RN-042, RN-043, RN-044, RN-047, P-015)
+- [ ] **T-10.1** Lógica: `minuteWindow` (descarta minutos passados), `minuteMarks` (o marco de k minutos só aparece com pelo menos k barras, e o de 60 min fica no fim da última barra), `minuteSummary` (4 frases) e `barHeight` (teto de 10 mm/h e altura mínima). (RN-042, RN-043, RN-044, RN-047, P-015)
 - [ ] **T-10.2** `ui/minutely.js`: barras coloridas por faixa, espaço vazio para minuto ausente, marcos com horário, legenda das 5 faixas em texto e resumo. (RF-039 a RF-043)
 - [ ] **T-10.3** Gráfico como um único elemento focável: setas percorrem os minutos e anunciam "HH:MM — X,XX mm/h", e o mesmo valor aparece ao passar o cursor. (RF-044, RNF-020)
 - [ ] **T-10.4** Mensagem de indisponibilidade, painel que não muda com a escala e posição sobreposta ou abaixo do mapa. (RF-045, RN-046, RN-057, RNF-021)
@@ -276,4 +278,11 @@ Arquitetura: seções 9 e 11.
 | D-01 | 2026-10-04 | A fatia 6 da arquitetura foi dividida em 6a (estado, cache e chamadas ao backend), 6b (cabeçalho, busca e seletor de escala) e 6c (localização inicial e cidade padrão), para caber em sessões curtas. A fatia 12 passou a se chamar "Robustez, desempenho e acessibilidade" |
 | D-02 | 2026-10-04 | Cada um dos 217 IDs fecha em uma única fatia (linhas **Fecha**). A distribuição foi conferida por script em 2026-10-04: nenhum ID faltando e nenhum repetido |
 | D-03 | 2026-10-04 | Os requisitos de tempo (RNF-001, RNF-002, RNF-013, RNF-022 e RNF-026) são medidos nos testes de ponta a ponta com o `/api` e as tiles simulados. O tempo da rede e do provedor real não é medido |
+| D-04 | 2026-10-05 | O log próprio registra o modelo da rota (ex.: `/api/tiles/precipitation/{z}/{x}/{y}.png`) em vez do caminho real, porque os `z/x/y` das tiles revelam a área vista no mapa (P-006). Sem rota encontrada, registra o caminho sem a query string. Seção 7.6 da arquitetura atualizada |
+| D-05 | 2026-10-05 | `pythonpath = ["."]` na configuração do pytest, para o comando `pytest` (sem `python -m`) importar o pacote `app`. Seção 11 da arquitetura atualizada |
+| D-06 | 2026-10-05 | Um commit por fatia, no fim dela. O `tasks.md` é atualizado a cada tarefa concluída, para que uma nova sessão saiba onde continuar mesmo com o trabalho ainda sem commit |
+| D-07 | 2026-10-05 | O Starlette 1.7 emite `StarletteDeprecationWarning` ao usar o `TestClient` com o `httpx` e sugere o `httpx2`. O aviso fica visível e não é filtrado; adotar o `httpx2` exigiria um ADR (guardrail 1). Rever na fatia 4 se atrapalhar |
+| D-08 | 2026-10-05 | `.gitattributes` com `static/vendor/** -text`: os arquivos de terceiros ficam byte a byte como foram baixados, sem a conversão de fim de linha do `core.autocrlf`, para que o SHA-256 de `static/vendor/README.md` continue conferindo. O `LICENSE` do Leaflet (BSD-2-Clause) também foi copiado |
+| D-09 | 2026-10-05 | **Troca da One Call API 3.0 pela 4.0** (ADR-013). A 3.0 foi descontinuada e não aceita novas assinaturas, e uma chave só com a 4.0 recebe 401 nela. Ela tinha sido mantida como "risco aceito" sem verificar se ainda era possível assiná-la. Mudanças: spec (serviços externos, glossário, RF-004, RF-027, RF-030, RF-039, RN-018, RN-027, RN-031, RN-032, RN-043, RN-047, RNF-003, CA-017, CA-021, casos de borda, dependências e premissas das features 1 a 5), arquitetura (seções 1, 2, 4, 5, 6, 7.6, 8.4, 9.2, 10 e 13, ADR-007 e o novo ADR-013), README, CLAUDE.md, `requisitos.md`, `.env.example` e as tarefas T-0.8, T-2.3, T-3.1, T-3.2, T-3.4, T-4.1, T-4.4, T-8.3 e T-10.1. As tarefas T-0.1 a T-0.7 não mudaram. Cada consulta de clima passa a custar 5 chamadas na cota |
+| D-10 | 2026-10-05 | **Ajustes depois das capturas reais da 4.0** (T-0.10). (1) A previsão diária não traz alertas: o selo de cada dia volta à regra original da vigência (RF-030, RN-032, CA-021 e o caso das 00:00 voltam ao texto anterior à D-09), com o detalhe de cada alerta buscado numa segunda rodada (+1 chamada por alerta, opção escolhida entre três). (2) O `dt` de cada dia é 00:00 UTC da data do dia: a data do dia é a data UTC do `dt`, sem somar o fuso. (3) A previsão por minuto começa no minuto seguinte ao da consulta: RF-039, RN-043 e o "Dado" do CA-029 contam a partir do primeiro minuto da janela. (4) RN-018 volta a contar todos os alertas da resposta, inclusive os futuros. Achados detalhados em `tests/fixtures/README.md` |
 | L-01 | 2026-10-04 | **Limitação:** os testes são feitos só no Google Chrome instalado. Edge, Firefox e Safari não são testados, nem em computador nem em celular. O RNF-006 continua no spec como meta, mas a compatibilidade com outros navegadores não é verificada no MVP |

@@ -1,0 +1,3 @@
+# Arquivos de terceiros ficam byte a byte como foram baixados, sem conversão de fim de linha,
+# para que o SHA-256 registrado em static/vendor/README.md continue conferindo.
+static/vendor/** -text

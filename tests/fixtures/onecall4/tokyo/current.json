@@ -1,0 +1,31 @@
+{
+  "lat": 35.68,
+  "lon": 139.69,
+  "timezone": "Asia/Tokyo",
+  "timezone_offset": 32400,
+  "data": [
+    {
+      "dt": 1791229265,
+      "sunrise": 1791232771,
+      "sunset": 1791274758,
+      "temp": 20.04,
+      "feels_like": 20.5,
+      "pressure": 1007,
+      "humidity": 92,
+      "dew_point": 18.7,
+      "uvi": 0,
+      "clouds": 0,
+      "visibility": 10000,
+      "wind_speed": 4.63,
+      "wind_deg": 360,
+      "weather": [
+        {
+          "id": 800,
+          "main": "Clear",
+          "description": "céu limpo",
+          "icon": "01n"
+        }
+      ]
+    }
+  ]
+}

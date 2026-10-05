@@ -1,0 +1,27 @@
+[
+  {
+    "name": "Uberlândia",
+    "local_names": {
+      "kk": "Уберландия",
+      "ru": "Уберландия",
+      "en": "Uberlândia",
+      "sr": "Уберландија",
+      "ja": "ウベルランジア",
+      "bg": "Уберландия",
+      "feature_name": "Uberlandia",
+      "lt": "Uberlandija",
+      "zh": "烏貝蘭迪亞",
+      "pt": "Uberlândia",
+      "th": "อูเบร์ลังเดีย",
+      "la": "Fertilia",
+      "ascii": "Uberlandia",
+      "ka": "უბერლანდია",
+      "ko": "우베를란지아",
+      "mk": "Уберландија"
+    },
+    "lat": -18.9188041,
+    "lon": -48.2767837,
+    "country": "BR",
+    "state": "Minas Gerais"
+  }
+]

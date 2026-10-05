@@ -1,0 +1,14 @@
+# Só configuração de ferramentas (pytest e ruff). O projeto não é um pacote instalável.
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+markers = [
+    "e2e: testes de ponta a ponta no Chrome instalado (pytest-playwright)",
+    "live: fumaça com o provedor real; usa a cota e roda só manualmente",
+]
+addopts = "-m 'not live' --browser-channel chrome"
+
+[tool.ruff]
+line-length = 100
+target-version = "py313"

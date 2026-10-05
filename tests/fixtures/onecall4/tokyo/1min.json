@@ -1,0 +1,248 @@
+{
+  "lat": 35.68,
+  "lon": 139.69,
+  "timezone": "Asia/Tokyo",
+  "timezone_offset": 32400,
+  "data": [
+    {
+      "dt": 1791229320,
+      "precipitation": 0
+    },
+    {
+      "dt": 1791229380,
+      "precipitation": 0
+    },
+    {
+      "dt": 1791229440,
+      "precipitation": 0
+    },
+    {
+      "dt": 1791229500,
+      "precipitation": 0
+    },
+    {
+      "dt": 1791229560,
+      "precipitation": 0
+    },
+    {
+      "dt": 1791229620,
+      "precipitation": 0
+    },
+    {
+      "dt": 1791229680,
+      "precipitation": 0
+    },
+    {
+      "dt": 1791229740,
+      "precipitation": 0
+    },
+    {
+      "dt": 1791229800,
+      "precipitation": 0
+    },
+    {
+      "dt": 1791229860,
+      "precipitation": 0
+    },
+    {
+      "dt": 1791229920,
+      "precipitation": 0
+    },
+    {
+      "dt": 1791229980,
+      "precipitation": 0
+    },
+    {
+      "dt": 1791230040,
+      "precipitation": 0
+    },
+    {
+      "dt": 1791230100,
+      "precipitation": 0
+    },
+    {
+      "dt": 1791230160,
+      "precipitation": 0
+    },
+    {
+      "dt": 1791230220,
+      "precipitation": 0
+    },
+    {
+      "dt": 1791230280,
+      "precipitation": 0
+    },
+    {
+      "dt": 1791230340,
+      "precipitation": 0
+    },
+    {
+      "dt": 1791230400,
+      "precipitation": 0
+    },
+    {
+      "dt": 1791230460,
+      "precipitation": 0
+    },
+    {
+      "dt": 1791230520,
+      "precipitation": 0
+    },
+    {
+      "dt": 1791230580,
+      "precipitation": 0
+    },
+    {
+      "dt": 1791230640,
+      "precipitation": 0
+    },
+    {
+      "dt": 1791230700,
+      "precipitation": 0
+    },
+    {
+      "dt": 1791230760,
+      "precipitation": 0
+    },
+    {
+      "dt": 1791230820,
+      "precipitation": 0
+    },
+    {
+      "dt": 1791230880,
+      "precipitation": 0
+    },
+    {
+      "dt": 1791230940,
+      "precipitation": 0
+    },
+    {
+      "dt": 1791231000,
+      "precipitation": 0
+    },
+    {
+      "dt": 1791231060,
+      "precipitation": 0
+    },
+    {
+      "dt": 1791231120,
+      "precipitation": 0
+    },
+    {
+      "dt": 1791231180,
+      "precipitation": 0
+    },
+    {
+      "dt": 1791231240,
+      "precipitation": 0
+    },
+    {
+      "dt": 1791231300,
+      "precipitation": 0
+    },
+    {
+      "dt": 1791231360,
+      "precipitation": 0
+    },
+    {
+      "dt": 1791231420,
+      "precipitation": 0
+    },
+    {
+      "dt": 1791231480,
+      "precipitation": 0
+    },
+    {
+      "dt": 1791231540,
+      "precipitation": 0
+    },
+    {
+      "dt": 1791231600,
+      "precipitation": 0
+    },
+    {
+      "dt": 1791231660,
+      "precipitation": 0
+    },
+    {
+      "dt": 1791231720,
+      "precipitation": 0
+    },
+    {
+      "dt": 1791231780,
+      "precipitation": 0
+    },
+    {
+      "dt": 1791231840,
+      "precipitation": 0
+    },
+    {
+      "dt": 1791231900,
+      "precipitation": 0
+    },
+    {
+      "dt": 1791231960,
+      "precipitation": 0
+    },
+    {
+      "dt": 1791232020,
+      "precipitation": 0
+    },
+    {
+      "dt": 1791232080,
+      "precipitation": 0
+    },
+    {
+      "dt": 1791232140,
+      "precipitation": 0
+    },
+    {
+      "dt": 1791232200,
+      "precipitation": 0
+    },
+    {
+      "dt": 1791232260,
+      "precipitation": 0
+    },
+    {
+      "dt": 1791232320,
+      "precipitation": 0
+    },
+    {
+      "dt": 1791232380,
+      "precipitation": 0
+    },
+    {
+      "dt": 1791232440,
+      "precipitation": 0
+    },
+    {
+      "dt": 1791232500,
+      "precipitation": 0
+    },
+    {
+      "dt": 1791232560,
+      "precipitation": 0
+    },
+    {
+      "dt": 1791232620,
+      "precipitation": 0
+    },
+    {
+      "dt": 1791232680,
+      "precipitation": 0
+    },
+    {
+      "dt": 1791232740,
+      "precipitation": 0
+    },
+    {
+      "dt": 1791232800,
+      "precipitation": 0
+    },
+    {
+      "dt": 1791232860,
+      "precipitation": 0
+    }
+  ]
+}

@@ -1,0 +1,57 @@
+[
+  {
+    "name": "Santa Maria",
+    "local_names": {
+      "ru": "Санта-Мария",
+      "pt": "Santa Maria"
+    },
+    "lat": -29.6860512,
+    "lon": -53.8069214,
+    "country": "BR",
+    "state": "Rio Grande do Sul"
+  },
+  {
+    "name": "Santa Maria",
+    "local_names": {
+      "bg": "Санта Мария",
+      "en": "Santa Maria",
+      "es": "Santa María",
+      "sr": "Санта Марија",
+      "ur": "سانتا ماریا"
+    },
+    "lat": 34.9531295,
+    "lon": -120.435857,
+    "country": "US",
+    "state": "California"
+  },
+  {
+    "name": "Santa-Maria-Siché",
+    "local_names": {
+      "co": "Santa Marìa d'Urnanu",
+      "fr": "Santa-Maria-Siché"
+    },
+    "lat": 41.8762163,
+    "lon": 8.9779271,
+    "country": "FR",
+    "state": "Corsica"
+  },
+  {
+    "name": "Ilha de Santa Maria",
+    "local_names": {
+      "pt": "Ilha de Santa Maria",
+      "ru": "Санта-Мария",
+      "de": "Santa Maria",
+      "es": "Isla de Santa María"
+    },
+    "lat": 36.97262155,
+    "lon": -25.10264949987561,
+    "country": "PT"
+  },
+  {
+    "name": "Santa Maria",
+    "lat": 45.029815,
+    "lon": 8.291873,
+    "country": "IT",
+    "state": "Piedmont"
+  }
+]
