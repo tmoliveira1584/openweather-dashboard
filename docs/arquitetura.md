@@ -712,7 +712,7 @@ Assinaturas mínimas. A implementação pode ter funções auxiliares privadas a
 
 | Módulo | Funções e classes públicas |
 |---|---|
-| `domain/formatting.py` | `format_number(value: float, decimals: int = 0) -> str` (vírgula, sem "-0"); `format_temp(celsius: float \| None, scale: Scale, with_unit: bool = False) -> str` |
+| `domain/formatting.py` | `format_number(value: float, decimals: int = 0) -> str` (vírgula, sem "-0", empate em 0,5 para longe do zero); `format_temp(celsius: float \| None, scale: Scale, with_unit: bool = False) -> str` |
 | `domain/units.py` | `celsius_to_fahrenheit(c: float) -> float`; `ms_to_mph(v: float) -> float` |
 | `domain/time.py` | `local_datetime(ts: int, offset: int) -> datetime`; `time_label(ts, offset) -> str`; `hour_label(ts, offset) -> str`; `weekday_label(ts, offset) -> str`; `date_label(ts, offset) -> str`; `local_date(ts, offset) -> str` |
 | `domain/conditions.py` | `condition_group(code: int \| None) -> ConditionGroup`; `wind_direction(deg: float \| None) -> str \| None`; `wind_label(speed_ms: float \| None, deg: float \| None) -> Scaled` |

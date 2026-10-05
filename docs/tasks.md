@@ -11,11 +11,11 @@ Lista de tarefas que leva a aplicação de zero a 100% dos requisitos, uma fatia
 
 | Item | Valor |
 |---|---|
-| Fatia atual | 1 — Domínio: formatação, unidades e horas (não iniciada) |
-| Próxima tarefa | T-1.1 |
+| Fatia atual | 2 — Domínio: regras de clima (não iniciada) |
+| Próxima tarefa | T-2.1 |
 | Concluídas, ainda sem commit | — |
-| Último commit de implementação | Fatia 0, commit `build: configurar ambiente, app mínimo e fixtures reais` de 2026-10-05 (o hash é registrado aqui no início da fatia 1) |
-| IDs fechados | 1 de 217 (0,5%) |
+| Último commit de implementação | Fatia 1, commit `feat(domain): formatar números, unidades e horas locais` de 2026-10-05 (o hash é registrado aqui no início da fatia 2). Fatia 0: `880fa41` |
+| IDs fechados | 13 de 217 (6,0%) |
 
 ## Como usar
 
@@ -34,7 +34,7 @@ Lista de tarefas que leva a aplicação de zero a 100% dos requisitos, uma fatia
 | Fatia | Nome | IDs que fecha | Status |
 |---|---|---|---|
 | 0 | Setup | 1 | Concluída |
-| 1 | Domínio: formatação, unidades e horas | 12 | Pendente |
+| 1 | Domínio: formatação, unidades e horas | 12 | Concluída |
 | 2 | Domínio: regras de clima | 11 | Pendente |
 | 3 | View model | 3 | Pendente |
 | 4 | Cliente e rotas | 4 | Pendente |
@@ -49,7 +49,7 @@ Lista de tarefas que leva a aplicação de zero a 100% dos requisitos, uma fatia
 | 11 | Mapa | 24 | Pendente |
 | 12 | Robustez, desempenho e acessibilidade | 15 | Pendente |
 | 13 | Fechamento | 4 | Pendente |
-| | **Total** | **217** | **0,5%** |
+| | **Total** | **217** | **6,0%** |
 
 ---
 
@@ -74,10 +74,10 @@ Arquitetura: seções 1, 5.1, 7.6, 9.1, 9.2 e 11. **Pré-requisito:** `.env` com
 
 Arquitetura: seções 6.3, 6.6, 7.5 e 8.1. Testes em `tests/unit/`.
 
-- [ ] **T-1.1** `domain/formatting.py`: `format_number` (vírgula, sem separador de milhar, nunca "-0") e `format_temp` (com "°" ou com a escala completa), mais os formatos de umidade, visibilidade, pressão, índice UV e ponto de orvalho. (RN-014, RN-020 a RN-025)
-- [ ] **T-1.2** `domain/units.py`: `celsius_to_fahrenheit` e `ms_to_mph`, sempre a partir do valor original. Testes com 20,4 °C → "69°", alternância repetida sem erro acumulado, -40 °C e -17,8 °C → "0°". (RN-053 a RN-055, P-014)
-- [ ] **T-1.3** `domain/time.py`: `local_datetime`, `time_label`, `hour_label`, `weekday_label`, `date_label` e `local_date`, com `dt + offset` em UTC e nunca o fuso da máquina. Testes com Uberlândia e Tóquio. (RN-015, RN-028, RN-030, RN-035)
-- [ ] **T-1.4** Definição de pronto + commit.
+- [x] **T-1.1** `domain/formatting.py`: `format_number` (vírgula, sem separador de milhar, nunca "-0") e `format_temp` (com "°" ou com a escala completa), mais os formatos de umidade, visibilidade, pressão, índice UV e ponto de orvalho. (RN-014, RN-020 a RN-025)
+- [x] **T-1.2** `domain/units.py`: `celsius_to_fahrenheit` e `ms_to_mph`, sempre a partir do valor original. Testes com 20,4 °C → "69°", alternância repetida sem erro acumulado, -40 °C e -17,8 °C → "0°". (RN-053 a RN-055, P-014)
+- [x] **T-1.3** `domain/time.py`: `local_datetime`, `time_label`, `hour_label`, `weekday_label`, `date_label` e `local_date`, com `dt + offset` em UTC e nunca o fuso da máquina. Testes com Uberlândia e Tóquio. (RN-015, RN-028, RN-030, RN-035)
+- [x] **T-1.4** Definição de pronto + commit.
 
 **Fecha:** RN-014, RN-015, RN-020, RN-021, RN-022, RN-023, RN-024, RN-025, RN-053, RN-054, RN-055, P-014
 
@@ -285,4 +285,6 @@ Arquitetura: seções 9 e 11.
 | D-08 | 2026-10-05 | `.gitattributes` com `static/vendor/** -text`: os arquivos de terceiros ficam byte a byte como foram baixados, sem a conversão de fim de linha do `core.autocrlf`, para que o SHA-256 de `static/vendor/README.md` continue conferindo. O `LICENSE` do Leaflet (BSD-2-Clause) também foi copiado |
 | D-09 | 2026-10-05 | **Troca da One Call API 3.0 pela 4.0** (ADR-013). A 3.0 foi descontinuada e não aceita novas assinaturas, e uma chave só com a 4.0 recebe 401 nela. Ela tinha sido mantida como "risco aceito" sem verificar se ainda era possível assiná-la. Mudanças: spec (serviços externos, glossário, RF-004, RF-027, RF-030, RF-039, RN-018, RN-027, RN-031, RN-032, RN-043, RN-047, RNF-003, CA-017, CA-021, casos de borda, dependências e premissas das features 1 a 5), arquitetura (seções 1, 2, 4, 5, 6, 7.6, 8.4, 9.2, 10 e 13, ADR-007 e o novo ADR-013), README, CLAUDE.md, `requisitos.md`, `.env.example` e as tarefas T-0.8, T-2.3, T-3.1, T-3.2, T-3.4, T-4.1, T-4.4, T-8.3 e T-10.1. As tarefas T-0.1 a T-0.7 não mudaram. Cada consulta de clima passa a custar 5 chamadas na cota |
 | D-10 | 2026-10-05 | **Ajustes depois das capturas reais da 4.0** (T-0.10). (1) A previsão diária não traz alertas: o selo de cada dia volta à regra original da vigência (RF-030, RN-032, CA-021 e o caso das 00:00 voltam ao texto anterior à D-09), com o detalhe de cada alerta buscado numa segunda rodada (+1 chamada por alerta, opção escolhida entre três). (2) O `dt` de cada dia é 00:00 UTC da data do dia: a data do dia é a data UTC do `dt`, sem somar o fuso. (3) A previsão por minuto começa no minuto seguinte ao da consulta: RF-039, RN-043 e o "Dado" do CA-029 contam a partir do primeiro minuto da janela. (4) RN-018 volta a contar todos os alertas da resposta, inclusive os futuros. Achados detalhados em `tests/fixtures/README.md` |
+| D-11 | 2026-10-05 | **Arredondamento na exibição.** O spec pede o "inteiro mais próximo" (RN-014) sem dizer o que fazer no empate, e as capturas reais já trazem um (sensação de 20,5 °C em Tóquio). O `format_number` arredonda o empate para longe do zero (20,5 → "21"; -20,5 → "-21") e parte do texto decimal do valor, não do float binário (2,675 com 2 casas → "2,68"). O `round()` do Python foi descartado porque arredonda o empate para o par (20,5 → "20"). Seção 6.6 da arquitetura atualizada |
+| D-12 | 2026-10-05 | O tipo `Scale` (`Literal["c", "f"]`), usado pelo `format_temp`, foi criado em `app/schemas/view.py` já na fatia 1, que é onde a seção 6.6 o coloca. O restante do view model continua na fatia 3 |
 | L-01 | 2026-10-04 | **Limitação:** os testes são feitos só no Google Chrome instalado. Edge, Firefox e Safari não são testados, nem em computador nem em celular. O RNF-006 continua no spec como meta, mas a compatibilidade com outros navegadores não é verificada no MVP |

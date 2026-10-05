@@ -329,3 +329,14 @@
 - **[T] Tom:** Objetivo
 - **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
 - **[R] Resposta:** Informe os hashes enviados, confirme o push e mostre o estado de sincronização.
+
+## 2026-10-05 — Etapa: Implementação
+
+- **[C] Contexto:** Concluí a fatia 0 e estou seguindo com a implementação do MVP. O passo a passo está nos documentos do projeto.
+- **[O] Objetivo:**
+  1. Leia os documentos do projeto, identifique de onde paramos e continue a partir daí.
+  2. Implemente a fatia 1 inteira, sem parar para pedir confirmação a cada tarefa. Só me pergunte se surgir alguma dúvida.
+- **[S] Estilo:** Didático e resumido
+- **[T] Tom:** Objetivo
+- **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
+- **[R] Resposta:** No fim da fatia, apresente o que foi feito e proponha a mensagem de commit. Aguarde a minha validação antes de commitar.
