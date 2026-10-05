@@ -318,3 +318,14 @@
 - **[T] Tom:** Objetivo
 - **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
 - **[R] Resposta:** Resuma o desenho adotado para a 4.0 e o que mudou em cada documento. Destaque as mudanças no spec que dependem da minha validação e o que ficou de fora. Liste os pontos a conferir na T-0.8 e aguarde a minha confirmação antes de rodar a captura.
+
+## 2026-10-05 — Etapa: Implementação
+
+- **[C] Contexto:** Concluí a fatia 0 e fiz dois commits locais: `a794730` (`docs: migrar especificação e arquitetura para a One Call API 4.0`) e `880fa41` (`build: configurar ambiente, app mínimo e fixtures reais`). A branch `main` local está 2 commits à frente de `origin/main`. O CLAUDE.md exige Conventional Commits.
+- **[O] Objetivo:**
+  1. Registre este prompt em `docs/prompts-costar.md` e faça um commit com a mensagem `docs(prompts): registrar prompt de envio da fatia 0`
+  2. Envie os commits ao GitHub com `git push` e confirme a sincronização entre local e remoto
+- **[S] Estilo:** Técnico e organizado
+- **[T] Tom:** Objetivo
+- **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
+- **[R] Resposta:** Informe os hashes enviados, confirme o push e mostre o estado de sincronização.
