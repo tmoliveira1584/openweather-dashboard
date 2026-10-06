@@ -4,9 +4,7 @@ Dashboard web de página única que consome a API do [OpenWeatherMap](https://op
 
 MVP acadêmico da pós-graduação, desenvolvido com apoio de IA Generativa em todas as etapas do SDLC.
 
-> **Status:** 🚧 Requisitos ([docs/requisitos.md](docs/requisitos.md)), arquitetura ([docs/arquitetura.md](docs/arquitetura.md)) e plano de tarefas ([docs/tasks.md](docs/tasks.md)) definidos. O código da aplicação ainda não foi escrito, então os comandos abaixo passam a funcionar a partir da fatia 0 de implementação.
->
-> Neste README, **⚠️ A definir** marca o que ainda não foi decidido.
+> **Status:** ✅ MVP implementado, versão `v0.1.0`. As 7 features do [spec](docs/spec.md) estão prontas, e os 217 IDs rastreáveis (58 RF, 59 RN, 29 RNF, 44 CA e os princípios P-001 a P-027) estão cobertos por testes automatizados. O andamento fatia a fatia está em [docs/tasks.md](docs/tasks.md).
 
 ---
 
@@ -30,13 +28,15 @@ MVP acadêmico da pós-graduação, desenvolvido com apoio de IA Generativa em t
 
 Escopo do MVP, especificado em [docs/spec.md](docs/spec.md):
 
-- [ ] Localização inicial pelo navegador (Uberlândia, BR, se não estiver disponível), busca de cidade e carregamento dos dados com cache de 10 minutos
-- [ ] Condições atuais: temperatura, descrição, sensação térmica, alertas, vento, umidade, visibilidade, pressão, índice UV e ponto de orvalho
-- [ ] Previsão diária em abas ("Hoje" + 7 dias)
-- [ ] Previsão hora a hora (24 horas) com curva de temperatura e chance de chuva
-- [ ] Previsão por minuto da precipitação na próxima hora, com legenda de cores
-- [ ] Mapa com a camada de precipitação
-- [ ] Alternância °C/°F, com vento em m/s ou mph
+- [x] Localização inicial pelo navegador (Uberlândia, BR, se não estiver disponível em 10 s), busca de cidade com até 5 resultados e carregamento dos dados com cache de 10 minutos
+- [x] Condições atuais: temperatura, descrição, ilustração do tipo de tempo, sensação térmica, alertas, vento, umidade, visibilidade, pressão, índice UV e ponto de orvalho
+- [x] Previsão diária em abas ("Hoje" + 7 dias), com o resumo do dia escolhido no card principal
+- [x] Previsão hora a hora (24 horas) com curva de temperatura, chance e volume de chuva
+- [x] Previsão por minuto da precipitação na próxima hora, com barras por faixa, legenda e resumo em texto
+- [x] Mapa com a camada de precipitação, centrado na cidade selecionada
+- [x] Alternância °C/°F, com vento em m/s ou mph, sem nova consulta
+- [x] Estados de carregamento, erro com "Tentar novamente" e "indisponível" em cada bloco, e atualização ao voltar à página depois de 10 minutos
+- [x] Operação completa pelo teclado, textos em pt-BR e layout a partir de 360 px de largura
 
 ## Tecnologias utilizadas
 
@@ -58,33 +58,54 @@ As versões exatas de todas as dependências estão em [requirements.txt](requir
 
 ## Estrutura do projeto
 
-Estado atual:
-
 ```
 openweather-dashboard/
-├── .claude/
-│   └── commands/
-│       └── costar.md        # Comando /costar: reescreve pedidos em CO-STAR, registra e executa
+├── .claude/commands/costar.md   # Comando /costar: reescreve pedidos em CO-STAR, registra e executa
+├── app/                         # Backend Python (FastAPI): proxy com a chave e regras de negócio
+│   ├── main.py                  # create_app: rotas, arquivos estáticos e Cache-Control
+│   ├── config.py                # Lê a chave do ambiente e falha sem ela
+│   ├── logging_setup.py         # Log próprio sem query string nem coordenadas
+│   ├── api/routes.py            # /api/weather, /api/geo/search, /api/geo/reverse e /api/tiles/...
+│   ├── clients/openweather.py   # Chamadas ao OpenWeatherMap (One Call 4.0, Geocoding e tiles)
+│   ├── domain/                  # Regras puras: formatação, unidades, fuso, condições, chuva, alertas
+│   └── schemas/                 # Modelos do provedor e do view model entregue ao navegador
+├── static/                      # Frontend: HTML, CSS e JavaScript puro, sem build
+│   ├── index.html
+│   ├── css/                     # tokens.css (cores e medidas) e styles.css
+│   ├── img/conditions/          # Ilustrações próprias por tipo de tempo (SVG)
+│   ├── vendor/leaflet-1.9.4/    # Leaflet copiado para o projeto, com SHA-256 conferido
+│   └── js/
+│       ├── main.js              # Monta os blocos, inicia a localização e acompanha o relógio
+│       ├── state.js, actions.js # Estado único e fluxos (única camada que muda o estado)
+│       ├── messages.js          # Todos os textos fixos da interface
+│       ├── services/            # /api, cache em memória e geolocalização
+│       ├── logic/               # Janelas de tempo, resumos e cálculos dos gráficos
+│       └── ui/                  # Um módulo por bloco da tela
+├── tests/
+│   ├── unit/                    # Domínio, schemas, configuração e rastreabilidade dos requisitos
+│   ├── api/                     # Rotas, cliente, segurança e fumaça com o provedor real (live)
+│   ├── e2e/                     # Ponta a ponta no Chrome, com /api, tiles e relógio simulados
+│   └── fixtures/                # Capturas reais da One Call 4.0 e do Geocoding, sem a chave
 ├── docs/
-│   ├── requisitos.md        # Índice dos artefatos de requisitos
-│   ├── product-brief.md     # Visão do produto, atores, fluxo de uso e glossário geral
-│   ├── constitution.md      # Princípios permanentes (P-xxx)
-│   ├── spec.md              # Especificação por feature (RF, RN, RNF, CA)
-│   ├── arquitetura.md       # Stack, decisões (ADR), contratos, convenções, testes e fatias
-│   ├── tasks.md             # Tarefas por fatia, ponto de retomada e progresso da implementação
-│   ├── prompts-costar.md    # Histórico de prompts por etapa do SDLC
-│   └── referencia/
-│       └── referencia_visual.png  # Print de referência visual do layout
-├── .env.example             # Modelo do .env (sem a chave real)
-├── .gitignore               # Deixa .env, caches do Python e resultados de teste fora do Git
-├── environment.yml          # Ambiente conda: Python 3.13.5 + pip
-├── requirements.txt         # Dependências de execução, com versões exatas
-├── requirements-dev.txt     # Dependências de teste e qualidade, com versões exatas
-├── CLAUDE.md                # Contexto e regras para o Claude Code
-└── README.md                # Este arquivo
+│   ├── requisitos.md            # Índice dos artefatos de requisitos
+│   ├── product-brief.md         # Visão do produto, atores, fluxo de uso e glossário geral
+│   ├── constitution.md          # Princípios permanentes (P-xxx)
+│   ├── spec.md                  # Especificação por feature (RF, RN, RNF, CA)
+│   ├── arquitetura.md           # Stack, decisões (ADR), contratos, convenções, testes e fatias
+│   ├── tasks.md                 # Tarefas por fatia, decisões, limitações e progresso
+│   ├── prompts-costar.md        # Histórico de prompts por etapa do SDLC
+│   ├── capturas/                # Capturas de tela do dashboard
+│   └── referencia/referencia_visual.png  # Print de referência visual do layout
+├── .env.example                 # Modelo do .env (sem a chave real)
+├── environment.yml              # Ambiente conda: Python 3.13.5 + pip
+├── requirements.txt             # Dependências de execução, com versões exatas
+├── requirements-dev.txt         # Dependências de teste e qualidade, com versões exatas
+├── pyproject.toml               # Configuração do pytest e do ruff
+├── CLAUDE.md                    # Contexto e regras para o Claude Code
+└── README.md                    # Este arquivo
 ```
 
-O código vai ficar em `app/` (backend Python), `static/` (frontend) e `tests/`, conforme a seção 5 de [docs/arquitetura.md](docs/arquitetura.md).
+As responsabilidades e as regras de dependência entre as pastas estão na seção 5 de [docs/arquitetura.md](docs/arquitetura.md).
 
 ## Pré-requisitos
 
@@ -153,15 +174,36 @@ pytest -m live                            # fumaça com o provedor real (usa a c
 ruff check . && ruff format --check .     # lint e formatação
 ```
 
+Os testes de unidade, de API e de ponta a ponta não usam a internet nem a cota: o provedor, as tiles do mapa e o relógio do navegador são simulados. O `pytest -m live` faz cerca de 11 chamadas reais e só roda quando pedido assim: em qualquer outra execução, esses testes ficam de fora ou pulados.
+
+**Resultado da suíte (2026-10-06, versão `v0.1.0`):**
+
+| Suíte | Ambiente | Resultado |
+|---|---|---|
+| `pytest -m "not e2e"` | Python 3.13.5 | 503 testes passando (os 4 `live` ficam pulados) |
+| `pytest -m e2e` | Google Chrome 154.0.8037.98 (Windows 11), Playwright 1.63.0 | 336 testes passando, incluindo os 44 critérios de aceite |
+| `pytest -m live` | OpenWeatherMap real | 4 testes passando (uma chamada a cada rota) |
+| `ruff check .` e `ruff format --check .` | Ruff 0.16.10 | Sem apontamentos |
+
+Só o Google Chrome é testado. Edge, Firefox e Safari não foram verificados (limitação L-01).
+
 ## Exemplos de uso
 
-> ⚠️ A interface ainda não existe. O fluxo abaixo é o previsto. Capturas de tela serão adicionadas depois da implementação.
+![Dashboard em 1280 px](docs/capturas/dashboard-1280.png)
 
-1. Abra a aplicação no navegador e autorize o acesso à localização. Se você negar, o dashboard mostra Uberlândia, BR.
+*Dashboard em 1280 px, com os dados reais de Uberlândia capturados para os testes. Nas capturas, o mapa base aparece vazio porque as tiles são simuladas.*
+
+<img src="docs/capturas/dashboard-360.png" alt="Dashboard em 360 px" width="240">
+
+*O mesmo dashboard em 360 px: os blocos ficam em uma coluna, e as abas e os cards por hora rolam na horizontal.*
+
+1. Abra a aplicação no navegador e autorize o acesso à localização. Se você negar, ou não responder em 10 s, o dashboard mostra Uberlândia, BR, com um aviso.
 2. Veja as condições atuais, as abas de dias, a previsão hora a hora, a previsão por minuto e o mapa de chuva.
-3. Para outra cidade, digite o nome no campo de busca (por exemplo, `Curitiba` ou `Santa Maria, BR`), pressione **Enter** ou clique na lupa e escolha um item da lista.
+3. Para outra cidade, digite o nome no campo de busca (por exemplo, `Curitiba` ou `Santa Maria, BR`), pressione **Enter** ou clique na lupa e escolha um item da lista com o mouse ou com as setas e **Enter**.
 4. Clique em uma aba de dia para ver o resumo daquele dia, ou alterne entre **°C** e **°F** no cabeçalho.
-5. Se a cidade não existir ou o serviço falhar, a aplicação mostra uma mensagem explicando o que fazer.
+5. Passe o mouse (ou use as setas do teclado) sobre a curva por hora e sobre as barras por minuto para ver o valor de cada ponto.
+6. Se a cidade não existir ou o serviço falhar, a aplicação mostra uma mensagem explicando o que fazer e, quando cabe, o botão **Tentar novamente**.
+7. Ao voltar à aba do navegador depois de mais de 10 minutos, os dados são atualizados sozinhos, com "Atualizando…" sobre os dados antigos.
 
 O navegador chama só as rotas do servidor local (`/api/weather`, `/api/geo/search`, `/api/geo/reverse` e `/api/tiles/precipitation/...`, detalhadas na seção 6 de [docs/arquitetura.md](docs/arquitetura.md)). O servidor acrescenta a chave e chama os endpoints do OpenWeatherMap abaixo (detalhes em [docs/spec.md](docs/spec.md)):
 
@@ -206,11 +248,12 @@ O projeto mostra como a IA Generativa pode ajudar em cada etapa do SDLC:
 
 ### Limitações conhecidas
 
-- **Projeto em arquitetura:** nenhuma funcionalidade foi implementada ainda.
 - **Execução só local:** o servidor atende apenas em `127.0.0.1`. Não há deploy.
 - **Limites do plano gratuito** do OpenWeatherMap: a One Call API 4.0 tem 1.000 chamadas gratuitas por dia, e cada consulta de clima usa 5 (dados atuais, por minuto, 2 páginas por hora e diária), mais 1 por alerta da cidade. O cache de 10 minutos por cidade reduz o consumo.
 - **One Call API 4.0:** a 3.0, escolhida no início do projeto, foi descontinuada pelo fornecedor e não aceita novas assinaturas. O projeto usa a 4.0, lançada em junho de 2026 (decisão D-09 em [docs/tasks.md](docs/tasks.md) e ADR-013 em [docs/arquitetura.md](docs/arquitetura.md)).
 - **Previsão por minuto:** não está disponível para todas as localidades.
+- **Mapa base sem ruas nem cidades:** o CARTO passou a exigir chave de API e devolve tiles só com a marca d'água "API KEY REQUIRED". O mapa continua com a camada de chuva, o marcador, o zoom e as atribuições. O plano B é trocar para o OpenStreetMap padrão (limitação L-02 de [docs/tasks.md](docs/tasks.md)).
+- **Atualização automática:** os dados são consultados de novo ao voltar à página depois de 10 minutos. Com a página aberta e visível o tempo todo, as janelas de minutos, horas e dias avançam com o relógio, mas não há nova consulta.
 - **Testado só no Google Chrome:** os testes automatizados rodam só no Chrome instalado. Edge, Firefox e Safari não são testados, nem em computador nem em celular (limitação L-01 de [docs/tasks.md](docs/tasks.md)).
 - **Escopo reduzido:** sem favoritos, histórico de buscas, detalhes dos alertas ou preferências lembradas entre visitas.
 
@@ -220,9 +263,9 @@ O projeto mostra como a IA Generativa pode ajudar em cada etapa do SDLC:
 - [x] Definir a stack, a arquitetura e o provedor de mapa base em [docs/arquitetura.md](docs/arquitetura.md)
 - [x] Criar o `.env.example` e atualizar as instruções de execução
 - [x] Planejar a implementação em tarefas por fatia em [docs/tasks.md](docs/tasks.md)
-- [ ] Implementar as 7 features de [docs/spec.md](docs/spec.md), seguindo as tarefas de [docs/tasks.md](docs/tasks.md)
-- [ ] Tratar os erros e casos de borda descritos no spec (cidade inexistente, localização negada, falha de rede, chave inválida etc.)
-- [ ] Escrever testes e publicar a primeira release
+- [x] Implementar as 7 features de [docs/spec.md](docs/spec.md), seguindo as tarefas de [docs/tasks.md](docs/tasks.md)
+- [x] Tratar os erros e casos de borda descritos no spec (cidade inexistente, localização negada, falha de rede, chave inválida etc.)
+- [x] Escrever testes e publicar a primeira release
 
 ### Evoluções possíveis
 
@@ -230,19 +273,20 @@ O projeto mostra como a IA Generativa pode ajudar em cada etapa do SDLC:
 - Cidades favoritas, histórico de buscas e preferências lembradas entre visitas
 - Detalhes dos alertas meteorológicos
 - PWA com suporte offline
-- Acessibilidade (WCAG) e internacionalização
+- Auditoria completa de acessibilidade (WCAG) e internacionalização
+- Mapa base sem chave (OpenStreetMap) ou com chave própria
 - CI/CD com testes automatizados e deploy contínuo
 
 ## Releases
 
-As versões seguem [Versionamento Semântico](https://semver.org/lang/pt-BR/) (`MAJOR.MINOR.PATCH`). As mudanças serão registradas neste README (ou num `CHANGELOG.md` futuro) a partir das mensagens de commit.
+As versões seguem [Versionamento Semântico](https://semver.org/lang/pt-BR/) (`MAJOR.MINOR.PATCH`). As mudanças são registradas neste README a partir das mensagens de commit, e cada versão publicada tem uma tag no Git (por exemplo, `v0.1.0`).
 
 | Versão | Data | Etapa | Descrição |
 |---|---|---|---|
 | *Não lançada* | 2026-09-29 | Setup | Estrutura inicial: Git, `.gitignore`, `CLAUDE.md`, `docs/`, comando `/costar` e README |
 | *Não lançada* | 2026-10-03 | Requisitos | Product brief, constitution e spec do MVP |
 | *Não lançada* | 2026-10-04 | Arquitetura | Documento de arquitetura, manifestos de dependências com versões exatas, `.env.example` e print de referência |
-| `v0.1.0` (prevista) | ⚠️ A definir | Implementação | Primeira versão funcional do MVP, conforme [docs/spec.md](docs/spec.md) |
+| `v0.1.0` | 2026-10-06 | Implementação | Primeira versão funcional do MVP: as 7 features de [docs/spec.md](docs/spec.md), implementadas em 16 fatias (0 a 13, com a 6 dividida em 6a, 6b e 6c), com os 217 IDs rastreados a testes |
 
 ## Créditos
 

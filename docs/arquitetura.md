@@ -1057,13 +1057,16 @@ Configuração do `pyproject.toml` (criada na fatia 0):
 
 | Feature | Backend | Frontend | Testes |
 |---|---|---|---|
-| 1. Localização, busca e carregamento | `routes.py`, `openweather.py`, `places.py` | `actions.js`, `services/*`, `ui/header.js` | `tests/api/test_routes_*.py`, `tests/unit/test_places.py`, `tests/e2e/test_f1_location_search.py` |
-| 2. Condições atuais | `formatting.py`, `conditions.py`, `alerts.py`, `view_model.py` | `ui/current.js` | `tests/unit/test_formatting.py`, `test_conditions.py`, `tests/e2e/test_f2_current.py` |
-| 3. Previsão diária | `time.py`, `alerts.py`, `view_model.py` | `ui/day-tabs.js`, `logic/time-window.js` | `tests/unit/test_alerts.py`, `tests/e2e/test_f3_daily.py`, `test_js_logic.py` |
+| 1. Localização, busca e carregamento | `routes.py`, `openweather.py`, `places.py` | `actions.js`, `services/*`, `ui/header.js` | `tests/api/test_routes.py`, `test_openweather_client.py`, `tests/unit/test_places.py`, `tests/e2e/test_f1_location.py`, `test_f1_search.py`, `test_f1_loading.py` |
+| 2. Condições atuais | `formatting.py`, `conditions.py`, `alerts.py`, `view_model.py` | `ui/current.js` | `tests/unit/test_formatting.py`, `test_conditions.py`, `test_view_model.py`, `tests/e2e/test_f2_current.py` |
+| 3. Previsão diária | `time.py`, `alerts.py`, `view_model.py` | `ui/day-tabs.js`, `logic/time-window.js` | `tests/unit/test_alerts.py`, `test_time.py`, `tests/e2e/test_f3_daily.py`, `test_js_logic.py` |
 | 4. Hora a hora | `precipitation.py`, `time.py` | `ui/hourly.js`, `logic/chart-math.js`, `logic/summaries.js` | `tests/unit/test_precipitation.py`, `tests/e2e/test_f4_hourly.py`, `test_js_logic.py` |
 | 5. Por minuto | `precipitation.py` | `ui/minutely.js`, `logic/time-window.js`, `logic/summaries.js` | `tests/unit/test_precipitation.py`, `tests/e2e/test_f5_minutely.py`, `test_js_logic.py` |
-| 6. Mapa | rota de tiles em `routes.py` | `ui/map.js` | `tests/api/test_routes_tiles.py`, `tests/e2e/test_f6_map.py` |
-| 7. Unidades | `units.py`, `formatting.py` (duas escalas) | `state.scale`, `ui/header.js` | `tests/unit/test_units.py`, `tests/e2e/test_f7_units.py` |
+| 6. Mapa | rota de tiles em `routes.py` | `ui/map.js` | `tests/api/test_routes.py`, `tests/e2e/test_f6_map.py` |
+| 7. Unidades | `units.py`, `formatting.py` (duas escalas) | `state.scale`, `ui/header.js` | `tests/unit/test_units.py`, `tests/e2e/test_f7_scale_selector.py` |
+| Transversais (constitution e RNF) | `config.py`, `logging_setup.py`, `main.py` | `main.js`, `state.js`, `ui/dom.js`, `messages.js` | `tests/unit/test_traceability.py`, `tests/api/test_security.py`, `test_app.py`, `test_live.py` (manual), `tests/e2e/test_layout.py`, `test_time_and_concurrency.py`, `test_performance.py`, `test_privacy.py`, `test_accessibility.py`, `test_smoke.py` |
+
+A cobertura de cada ID é conferida por `tests/unit/test_traceability.py` (P-027): todo RF, RN, RNF e CA do spec e todo princípio da constitution aparece no nome ou na docstring de pelo menos um teste.
 
 ---
 

@@ -1,4 +1,7 @@
-"""Teste de fumaça: a página abre no Chrome instalado e os testes rodam sem internet."""
+"""Teste de fumaça: a página abre no Chrome instalado, sem erros nem login, e os testes rodam
+sem internet."""
+
+import re
 
 from playwright.sync_api import Page, expect
 
@@ -35,3 +38,33 @@ def test_setup_e2e_runs_offline(page: Page):
     assert page.evaluate(FETCH_JS, OWM_ICON) == "200 image/png"
     assert page.evaluate(FETCH_JS, "https://example.com/") == "falhou"
     assert page.evaluate(FETCH_JS, "/api/weather?lat=-18.91&lon=-48.27") == "falhou"
+
+
+def test_rnf_006_page_works_in_the_installed_chrome_without_errors(
+    page: Page, browser, browser_channel, weather_api, tiles
+):
+    """RNF-006, L-01: no Chrome instalado (o único navegador testado no MVP), a página abre e
+    mostra todos os blocos sem nenhum erro de JavaScript nem mensagem de erro no console."""
+    errors: list[str] = []
+    page.on("pageerror", lambda error: errors.append(str(error)))
+    page.on("console", lambda msg: errors.append(msg.text) if msg.type == "error" else None)
+
+    page.goto("/")
+
+    for block in (".day-tabs", ".current", ".hourly", ".minutely"):
+        expect(page.locator(block)).to_have_attribute("data-block-state", "ready")
+    expect(page.locator("#map .map-marker")).to_be_visible()
+    assert browser_channel == "chrome"
+    assert int(browser.version.split(".")[0]) >= 100
+    assert errors == []
+
+
+def test_p_025_page_has_no_sign_up_or_login(page: Page, weather_api):
+    """P-025: a página não pede cadastro nem login: nenhum campo de senha nem texto de acesso
+    à conta."""
+    page.goto("/")
+    expect(page.locator(".current")).to_have_attribute("data-block-state", "ready")
+
+    expect(page.locator("input[type='password']")).to_have_count(0)
+    text = page.locator("body").inner_text()
+    assert not re.search(r"(?i)\b(entrar|login|senha|cadastr\w*|criar conta)\b", text)

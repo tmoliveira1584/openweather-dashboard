@@ -1,4 +1,5 @@
-"""Testes da montagem da aplicação: inicialização, página estática e log (P-002, P-006)."""
+"""Testes da montagem da aplicação: inicialização, página estática, log e acesso sem login
+(P-002, P-006, P-025)."""
 
 import logging
 import re
@@ -19,6 +20,23 @@ def test_p_002_app_fails_to_start_without_api_key(monkeypatch):
 
     with pytest.raises(ConfigError, match=API_KEY_VAR), TestClient(create_app()):
         pass
+
+
+def test_p_025_no_route_requires_sign_up_or_login(fake_key):
+    """P-025: não há rota de cadastro, login ou sessão, nenhum esquema de autenticação na API,
+    e a página abre sem credenciais e sem gravar cookie."""
+    with TestClient(create_app()) as client:
+        page = client.get("/")
+        schema = client.get("/openapi.json").json()
+
+    paths = list(schema["paths"])
+    assert paths
+    assert not [
+        p for p in paths if re.search(r"login|logout|sign|regist|auth|user|sess|account", p)
+    ]
+    assert "securitySchemes" not in schema.get("components", {})
+    assert page.status_code == 200
+    assert "set-cookie" not in page.headers
 
 
 def test_setup_mock_app_skips_settings(monkeypatch, make_mock_app):

@@ -32,11 +32,20 @@ FAKE_IMAGE_URL = re.compile(
 
 
 @pytest.hookimpl(tryfirst=True)
-def pytest_collection_modifyitems(items):
-    """Todo teste em tests/e2e/ recebe o marcador e2e, antes da seleção por -m."""
+def pytest_collection_modifyitems(config, items):
+    """Todo teste em tests/e2e/ recebe o marcador e2e, antes da seleção por -m.
+
+    Os testes `live` usam a cota e só rodam quando o `-m` cita `live` (`pytest -m live`). Um
+    `-m` na linha de comando substitui o `-m 'not live'` do `addopts`, então sem esta trava o
+    `pytest -m "not e2e"` chamaria o provedor real.
+    """
+    run_live = "live" in (config.getoption("markexpr") or "").replace("not live", "")
+    skip_live = pytest.mark.skip(reason="usa a cota do provedor: rode com pytest -m live")
     for item in items:
         if E2E_DIR in Path(item.path).parents:
             item.add_marker(pytest.mark.e2e)
+        if not run_live and item.get_closest_marker("live"):
+            item.add_marker(skip_live)
 
 
 @pytest.fixture

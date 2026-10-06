@@ -120,8 +120,8 @@ def min_text_contrast(page: Page) -> float:
 def test_rf_017_each_condition_group_has_its_own_illustration(
     page: Page, weather_api, base_url, group: str
 ):
-    """RF-017, RN-017, ADR-012: o card usa a ilustração SVG própria do grupo da condição, e o
-    arquivo existe em /img/conditions/."""
+    """RF-017, RN-017, ADR-012, CA-015: o card usa a ilustração SVG própria do grupo da
+    condição (o código 501 usa a do grupo Chuva), e o arquivo existe em /img/conditions/."""
     open_with(page, weather_api, current_view(code=GROUP_CODES[group]))
 
     expect(card(page)).to_have_attribute("data-condition", group)
