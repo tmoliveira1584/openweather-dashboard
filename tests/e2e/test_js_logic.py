@@ -9,6 +9,8 @@ import re
 import pytest
 from playwright.sync_api import Page
 
+from app.domain.precipitation import intensity_band, minute_tooltip
+from app.domain.time import time_label
 from tests.e2e.clock import open_paused
 from tests.e2e.weather_api import TOKYO, UBERLANDIA
 from tests.fakes import CAPTURE_HOUR, CAPTURE_NOW
@@ -907,6 +909,137 @@ def test_rn_034_fewer_than_24_hours_shows_only_the_available(logic_page: Page, w
     assert window_labels(logic_page, shuffled, 0) == ["h100", "h200", "h300"]
 
 
+# ---------- logic/time-window.js: minutos ----------
+
+
+def minute(dt: int, intensity: float | None, offset: int = UBERLANDIA_OFFSET) -> dict:
+    """Minuto do view model, montado pelas mesmas funções do backend (seção 6.3)."""
+    return {
+        "dt": dt,
+        "time_label": time_label(dt, offset),
+        "intensity": intensity,
+        "band": intensity_band(intensity),
+        "tooltip": minute_tooltip(dt, offset, intensity),
+    }
+
+
+def minutes_from(start: int, intensities: list[float | None]) -> list[dict]:
+    """Minutos seguidos a partir de `start`, um por intensidade."""
+    return [minute(start + 60 * k, p) for k, p in enumerate(intensities)]
+
+
+def minute_window(page: Page, minutely, now_sec: int, offset: int = UBERLANDIA_OFFSET):
+    return evaluate(
+        page,
+        "logic/time-window.js",
+        "return m.minuteWindow(arg.minutely, arg.now, arg.offset);",
+        {"minutely": minutely, "now": now_sec, "offset": offset},
+    )
+
+
+def minute_marks(page: Page, window, offset: int = UBERLANDIA_OFFSET):
+    """Marcos como `(rótulo, horário, posição)`."""
+    marks = evaluate(
+        page,
+        "logic/time-window.js",
+        "return m.minuteMarks(arg.window, arg.offset);",
+        {"window": window, "offset": offset},
+    )
+    return [(mark["label"], mark["time"], mark["position"]) for mark in marks]
+
+
+def test_rn_047_minute_window_starts_at_the_first_minute_not_gone(logic_page: Page, weather_views):
+    """RN-047, RF-039: a janela começa no primeiro minuto que ainda não passou. Na captura
+    (16:41:05), o primeiro minuto é 16:42 e há 60; no início das 16:47, as 16:46 já passaram
+    e sobram 55 (dados em cache, feature 5, categoria 8)."""
+    minutely = weather_views["uberlandia"]["minutely"]
+    first = minutely[0]["dt"]
+
+    at_capture = minute_window(logic_page, minutely, CAPTURE_NOW)
+    before_1647 = minute_window(logic_page, minutely, first + 5 * 60 - 1)
+    at_1647 = minute_window(logic_page, minutely, first + 5 * 60)
+
+    assert (len(at_capture), at_capture[0]["time_label"]) == (60, "16:42")
+    assert before_1647[0]["time_label"] == "16:46"
+    assert (len(at_1647), at_1647[0]["time_label"]) == (55, "16:47")
+    assert minute_window(logic_page, minutely, first + 60 * 60) == []
+    assert minute_window(logic_page, None, CAPTURE_NOW) == []
+
+
+def test_rn_047_missing_minute_in_the_series_keeps_an_empty_place(logic_page: Page):
+    """RN-047, feature 5 (categoria 5): um minuto que falta no meio da série (registro sem
+    `dt`, descartado pelo backend) ocupa o lugar dele, sem intensidade, e o cursor mostra
+    "—". Os minutos saem em ordem e a janela vai até a próxima hora, no máximo 60."""
+    minutely = minutes_from(UBERLANDIA_0818, [0.3] * 70)
+    del minutely[4]
+    minutely.reverse()
+
+    window = minute_window(logic_page, minutely, UBERLANDIA_0818)
+
+    assert len(window) == 60
+    assert [m["time_label"] for m in window[:6]] == [
+        "08:18",
+        "08:19",
+        "08:20",
+        "08:21",
+        "08:22",
+        "08:23",
+    ]
+    assert window[4] == {
+        "dt": UBERLANDIA_0818 + 4 * 60,
+        "time_label": "08:22",
+        "intensity": None,
+        "band": None,
+        "tooltip": "08:22 — —",
+    }
+    assert window[-1]["time_label"] == "09:17"
+
+
+def test_ca_029_marks_every_15_minutes_with_city_time(logic_page: Page):
+    """CA-029, RN-043, RF-041: com a previsão a partir das 08:18, os marcos são "Agora 08:18",
+    "15 min 08:33", "30 min 08:48", "45 min 09:03" e "60 min 09:18". Cada um fica no início
+    do seu minuto, e o de 60 min, no fim da última barra."""
+    window = minutes_from(UBERLANDIA_0818, [0] * 60)
+
+    assert minute_marks(logic_page, window) == [
+        ("Agora", "08:18", 0),
+        ("15 min", "08:33", 0.25),
+        ("30 min", "08:48", 0.5),
+        ("45 min", "09:03", 0.75),
+        ("60 min", "09:18", 1),
+    ]
+
+
+def test_rn_047_mark_only_with_enough_bars(logic_page: Page):
+    """RN-047, feature 5 (categoria 8): o marco de k minutos só aparece com pelo menos k
+    barras, e o de "Agora", com pelo menos 1. Com 45 barras, o de 45 min fica no fim da
+    última."""
+
+    def labels_and_positions(count: int):
+        window = minutes_from(UBERLANDIA_0818, [0] * count)
+        return [(label, position) for label, _, position in minute_marks(logic_page, window)]
+
+    assert labels_and_positions(45) == [
+        ("Agora", 0),
+        ("15 min", 15 / 45),
+        ("30 min", 30 / 45),
+        ("45 min", 1),
+    ]
+    assert [label for label, _ in labels_and_positions(44)] == ["Agora", "15 min", "30 min"]
+    assert labels_and_positions(1) == [("Agora", 0)]
+    assert minute_marks(logic_page, []) == []
+
+
+def test_p_015_marks_in_the_city_timezone(logic_page: Page, weather_views):
+    """P-015, RN-043, feature 5 (categoria 8): os horários dos marcos ficam no fuso da cidade,
+    não no do usuário. Tóquio, na captura: das 04:42 às 05:42."""
+    window = minute_window(logic_page, weather_views["tokyo"]["minutely"], CAPTURE_NOW)
+
+    marks = minute_marks(logic_page, window, TOKYO_OFFSET)
+
+    assert [time for _, time, _ in marks] == ["04:42", "04:57", "05:12", "05:27", "05:42"]
+
+
 # ---------- logic/chart-math.js ----------
 
 NUMBER = re.compile(r"-?\d+(?:\.\d+)?")
@@ -1018,6 +1151,24 @@ def test_rn_038_rain_in_many_hours_in_a_row(logic_page: Page):
     assert group(logic_page, [0.5, 0.5]) == [True, False]
 
 
+@pytest.mark.parametrize(
+    ("intensity", "height"),
+    [(0, 8), (0.01, 8), (2.5, 25), (5, 50), (10, 100), (12, 100), (None, 0), (-1, 0)],
+)
+def test_rn_042_bar_height_has_a_ceiling_and_a_minimum(logic_page: Page, intensity, height):
+    """RN-042, RN-047, feature 5 (categoria 6): a altura é proporcional à intensidade, com teto
+    em 10 mm/h; zero (ou quase) tem a altura mínima, e um minuto sem intensidade não tem
+    barra."""
+    result = evaluate(
+        logic_page,
+        "logic/chart-math.js",
+        "return m.barHeight(arg, 100, 8);",
+        intensity,
+    )
+
+    assert result == pytest.approx(height)
+
+
 # ---------- logic/summaries.js ----------
 
 
@@ -1074,3 +1225,44 @@ def test_rnf_016_alt_text_for_steady_temperature(logic_page: Page):
     assert alt_text(logic_page, [hour("23:00", 22)]) == (
         "Na próxima hora, temperatura estável em 22°"
     )
+
+
+def summary(page: Page, intensities: list[float | None]):
+    """`minuteSummary` de minutos seguidos a partir das 08:18."""
+    window = minutes_from(UBERLANDIA_0818, intensities)
+    return evaluate(page, "logic/summaries.js", "return m.minuteSummary(arg);", window)
+
+
+def test_ca_030_no_rain_in_any_minute(logic_page: Page):
+    """CA-030, RN-044: sem chuva em nenhum minuto, o resumo é "Sem chuva prevista na próxima
+    hora."."""
+    assert summary(logic_page, [0] * 60) == "Sem chuva prevista na próxima hora."
+
+
+def test_ca_031_rain_only_from_a_future_minute(logic_page: Page):
+    """CA-031, RN-044: com chuva só a partir das 08:38, o resumo é "Chuva prevista a partir de
+    08:38."."""
+    intensities = [0] * 20 + [0.4] * 10 + [0] * 30
+
+    assert summary(logic_page, intensities) == "Chuva prevista a partir de 08:38."
+
+
+def test_rn_044_rain_now_stopping_and_rain_all_hour(logic_page: Page):
+    """RN-044, RF-043: chuva agora que para antes do fim dá o horário do primeiro minuto sem
+    chuva; chuva em todos os minutos dá "Chuva durante toda a próxima hora."."""
+    assert summary(logic_page, [1.2] * 44 + [0] * 16) == (
+        "Chuva agora, parando por volta de 09:02."
+    )
+    assert summary(logic_page, [0.1] * 60) == "Chuva durante toda a próxima hora."
+    assert summary(logic_page, [0.1] * 12) == "Chuva durante toda a próxima hora."
+
+
+def test_rn_047_summary_ignores_minutes_without_intensity(logic_page: Page):
+    """RN-047, P-013: um minuto sem intensidade não conta como chuva nem como estiagem. Sem
+    nenhuma intensidade, não há resumo."""
+    assert summary(logic_page, [None, 0, 0]) == "Sem chuva prevista na próxima hora."
+    assert summary(logic_page, [None, 0.5, 0]) == "Chuva prevista a partir de 08:19."
+    assert summary(logic_page, [0.5, None, 0.5]) == "Chuva durante toda a próxima hora."
+    assert summary(logic_page, [0.5, None, 0]) == "Chuva agora, parando por volta de 08:20."
+    assert summary(logic_page, [None, None]) is None
+    assert summary(logic_page, []) is None

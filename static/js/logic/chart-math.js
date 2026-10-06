@@ -1,13 +1,13 @@
 /**
  * Geometria dos gráficos em SVG próprio (ADR-007, seção 6.6): escala e caminho da curva por
- * hora e etiquetas de chuva sobre ela.
+ * hora, etiquetas de chuva sobre ela e altura das barras por minuto.
  *
  * Funções puras, sem DOM: as posições e larguras chegam por parâmetro, nas unidades de quem
  * desenha.
- *
- * Até aqui: a curva por hora (fatia 9). A altura das barras por minuto (`barHeight`) entra
- * na fatia 10.
  */
+
+// Teto visual das barras por minuto, em mm/h (RN-042).
+export const BAR_CEILING = 10;
 
 /**
  * Posição vertical de cada temperatura na faixa da curva (RN-039). A maior fica em `top` e a
@@ -130,4 +130,18 @@ export function groupRainLabels(items, minGapPx) {
   const visible = items.map(() => false);
   for (const item of shown) visible[item.index] = true;
   return visible;
+}
+
+/**
+ * Altura da barra de um minuto (RN-042): proporcional à intensidade, com teto em 10 mm/h
+ * (valores maiores ocupam `maxPx`). Intensidade 0, ou tão pequena que ficaria abaixo de
+ * `minPx`, fica com a altura mínima visível. Sem intensidade, nenhuma barra (RN-047).
+ * @param {number | null} intensity mm/h
+ * @param {number} maxPx altura máxima, nas unidades de quem desenha
+ * @param {number} minPx altura mínima visível
+ * @returns {number}
+ */
+export function barHeight(intensity, maxPx, minPx) {
+  if (!Number.isFinite(intensity) || intensity < 0) return 0;
+  return Math.max(minPx, (Math.min(intensity, BAR_CEILING) / BAR_CEILING) * maxPx);
 }

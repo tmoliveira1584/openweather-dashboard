@@ -739,8 +739,7 @@ button {
   display: grid;
   grid-template-areas:
     "title"
-    "marks"
-    "bars"
+    "chart"
     "summary"
     "legend";
   gap: var(--space-2);
@@ -751,21 +750,48 @@ button {
   grid-area: title;
 }
 
-.minutely-marks {
+/* Marcos, barras e dica. As barras afinam com a largura, sem rolagem (feature 5, cat. 10). */
+.minutely-chart {
+  position: relative;
   display: flex;
-  grid-area: marks;
-  justify-content: space-between;
+  flex-direction: column;
+  grid-area: chart;
   gap: var(--space-1);
+  min-width: 0;
+}
+
+/*
+ * Cada marco é deslocado pela mesma fração da posição dele (--position, de 0 a 1): o de
+ * "Agora" começa no início da primeira barra, o de 60 min termina no fim da última, e a
+ * marca no pé de cada um fica no início do seu minuto (RN-043; ui/minutely.js).
+ */
+.minutely-marks {
+  position: relative;
+  height: 44px;
 }
 
 .mark {
+  position: absolute;
+  top: 0;
+  left: calc(var(--position) * 100%);
   display: flex;
   flex-direction: column;
   align-items: center;
-  min-width: 0;
   padding: var(--space-1) var(--space-2);
   border-radius: var(--radius-card);
   background: var(--color-tile);
+  transform: translateX(calc(var(--position) * -100%));
+  white-space: nowrap;
+}
+
+.mark::after {
+  position: absolute;
+  top: 100%;
+  left: calc(var(--position) * 100%);
+  width: 1px;
+  height: var(--space-1);
+  background: var(--color-text-muted);
+  content: "";
 }
 
 .mark-label {
@@ -778,40 +804,63 @@ button {
   font-weight: 600;
 }
 
-/* As barras afinam com a largura, sem rolagem horizontal (feature 5, categoria 10). */
+/* SVG esticado: cada minuto é uma coluna de largura 1, e a altura vai de 0 a 100 (ADR-007). */
 .minutely-bars {
-  display: flex;
-  grid-area: bars;
-  align-items: flex-end;
-  gap: 1px;
-  height: 32px;
+  display: block;
+  width: 100%;
+  height: 40px;
+  overflow: visible;
+  border-radius: 2px;
+}
+
+.minutely-bars:focus-visible {
+  outline: 3px solid var(--color-accent);
+  outline-offset: 3px;
+}
+
+.minutely-cursor {
+  fill: rgb(28 25 23 / 0.12);
 }
 
 .bar {
-  flex: 1 1 0;
-  min-width: 1px;
-  height: 60%; /* provisório: a altura por intensidade (RN-042) entra na fatia 10 */
-  border-radius: 1px;
+  fill: var(--band-color);
 }
 
+/* Cor de cada faixa de intensidade, nas barras e na legenda (RN-041, RNF-019). */
 .band-none {
-  background: var(--color-band-none);
+  --band-color: var(--color-band-none);
 }
 
 .band-light {
-  background: var(--color-band-light);
+  --band-color: var(--color-band-light);
 }
 
 .band-moderate {
-  background: var(--color-band-moderate);
+  --band-color: var(--color-band-moderate);
 }
 
 .band-heavy {
-  background: var(--color-band-heavy);
+  --band-color: var(--color-band-heavy);
 }
 
 .band-extreme {
-  background: var(--color-band-extreme);
+  --band-color: var(--color-band-extreme);
+}
+
+/* Horário e intensidade do minuto ativo (RF-044), logo acima das barras, sobre os marcos. */
+.minutely-tooltip {
+  position: absolute;
+  bottom: calc(40px + var(--space-1));
+  left: calc(var(--position) * 100%);
+  z-index: 1;
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-card);
+  background: var(--color-text);
+  color: var(--color-surface);
+  font-size: 0.75rem;
+  pointer-events: none;
+  transform: translateX(calc(var(--position) * -100%));
+  white-space: nowrap;
 }
 
 .minutely-summary {
@@ -838,6 +887,7 @@ button {
   width: 16px;
   height: 16px;
   border-radius: 4px;
+  background: var(--band-color);
 }
 
 /* ---------- Estados dos blocos de dados (seção 6.5; RF-005, RF-013, P-020) ---------- */
@@ -979,8 +1029,7 @@ button {
     z-index: 1;
     grid-template-areas:
       "title   legend"
-      "marks   legend"
-      "bars    legend"
+      "chart   legend"
       "summary legend";
     grid-template-columns: minmax(0, 1fr) auto;
     column-gap: var(--space-6);

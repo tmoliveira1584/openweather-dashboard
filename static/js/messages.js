@@ -105,11 +105,13 @@ export const MESSAGES = deepFreeze({
     point: (hour, temp, rain) => [hour, temp, rain].filter(Boolean).join(' · '),
   },
 
-  // Previsão por minuto (feature 5: RF-041, RN-041, RN-044, categoria 5).
+  // Previsão por minuto (feature 5: RF-041, RN-041, RN-044, RN-045, RN-047, categoria 5).
   minutely: {
     title: 'Previsão por minuto — precipitação',
     unavailable: 'Previsão por minuto indisponível para esta localidade.',
     marks: ['Agora', '15 min', '30 min', '45 min', '60 min'],
+    // Valor do cursor de um minuto que falta na série, igual ao do backend (RN-045, RN-047).
+    missingTooltip: (time) => `${time} — —`,
     legend: {
       none: '0 mm/h',
       light: 'até 0,5 mm/h',

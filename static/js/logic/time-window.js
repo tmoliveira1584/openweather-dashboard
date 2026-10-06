@@ -5,14 +5,24 @@
  * `Date.now()` (guardrail 9). Datas e horas no fuso da cidade: `(ts + offset)` lido em UTC
  * (seção 7.5).
  *
- * Até aqui: os dias da previsão diária (fatia 8) e as horas da previsão hora a hora (fatia
- * 9). A janela por minuto entra na fatia 10.
+ * Janelas: os dias da previsão diária, as horas da previsão hora a hora e os minutos da
+ * previsão por minuto, com os marcos.
  */
+
+import { MESSAGES } from '../messages.js';
 
 export const MAX_DAYS = 8; // "Hoje" mais 7 (RN-027)
 export const MAX_HOURS = 24; // RN-034
+export const MAX_MINUTES = 60; // a próxima hora (RF-039)
+export const MARK_STEP = 15; // minutos entre dois marcos (RN-043)
 
 const HOUR_SEC = 3600;
+const MINUTE_SEC = 60;
+
+/** Horário `HH:MM` no fuso da cidade, como o `time_label` do backend (RN-015, P-015). */
+function timeLabel(ts, offset) {
+  return new Date((ts + offset) * 1000).toISOString().slice(11, 16);
+}
 
 /**
  * Data atual da cidade, no formato `AAAA-MM-DD` de `daily[].local_date` (RN-026, P-015).
@@ -75,4 +85,66 @@ export function hourlyWindow(hourly, nowSec) {
     .filter((hour) => hour.dt + HOUR_SEC > nowSec)
     .sort((a, b) => a.dt - b.dt)
     .slice(0, MAX_HOURS);
+}
+
+/**
+ * Minutos da previsão por minuto: começa no primeiro minuto que ainda não passou e vai, em
+ * ordem, até o último recebido, no máximo 60 (RF-039, RN-047). Um minuto que falta no meio
+ * da série (registro sem `dt`, descartado pelo backend) ocupa o lugar dele, sem intensidade:
+ * a barra fica vazia e o cursor mostra "—". Sem previsão por minuto, nenhum.
+ * @template {{ dt: number, time_label: string, intensity: number | null,
+ *              band: string | null, tooltip: string }} Minute
+ * @param {Minute[] | null} minutely `WeatherView.minutely`
+ * @param {number} nowSec agora, em segundos Unix
+ * @param {number} offset fuso da cidade, em segundos em relação ao UTC
+ * @returns {Minute[]}
+ */
+export function minuteWindow(minutely, nowSec, offset) {
+  if (!minutely) return [];
+  const coming = new Map();
+  for (const minute of minutely) {
+    if (minute.dt + MINUTE_SEC > nowSec) coming.set(minute.dt, minute);
+  }
+  if (!coming.size) return [];
+  const first = Math.min(...coming.keys());
+  const last = Math.max(...coming.keys());
+  const count = Math.min(MAX_MINUTES, Math.floor((last - first) / MINUTE_SEC) + 1);
+  return Array.from({ length: count }, (_, k) => {
+    const dt = first + k * MINUTE_SEC;
+    return coming.get(dt) ?? missingMinute(dt, offset);
+  });
+}
+
+/** Minuto sem registro: sem intensidade nem faixa, e "HH:MM — —" no cursor (RN-047). */
+function missingMinute(dt, offset) {
+  const time = timeLabel(dt, offset);
+  return {
+    dt,
+    time_label: time,
+    intensity: null,
+    band: null,
+    tooltip: MESSAGES.minutely.missingTooltip(time),
+  };
+}
+
+/**
+ * Marcos da previsão por minuto: "Agora", "15 min", "30 min", "45 min" e "60 min", nos
+ * minutos 0, 15, 30, 45 e 60 da janela, com o horário no fuso da cidade (RF-041, RN-043,
+ * P-015). O marco de k minutos só aparece com pelo menos k barras, e o de "Agora", com pelo
+ * menos 1 (RN-047). A posição vai de 0 (início da primeira barra) a 1 (fim da última): cada
+ * marco fica no início do seu minuto, e o de 60 min, no fim da última barra.
+ * @param {{ dt: number }[]} window resultado de `minuteWindow`
+ * @param {number} offset
+ * @returns {{ label: string, time: string, position: number }[]}
+ */
+export function minuteMarks(window, offset) {
+  const count = window.length;
+  return MESSAGES.minutely.marks
+    .map((label, index) => ({ label, minute: index * MARK_STEP }))
+    .filter(({ minute }) => count >= Math.max(minute, 1))
+    .map(({ label, minute }) => ({
+      label,
+      time: timeLabel(window[0].dt + minute * MINUTE_SEC, offset),
+      position: minute / count,
+    }));
 }
