@@ -21,6 +21,9 @@ Siga estes passos, na ordem:
    - Escreva um pedido natural e independente, não um relato da conversa: em vez de "Pedi na conversa
      um diagrama…", escreva "Crie um diagrama…"; em vez de "Já aprovei a mensagem X", escreva "Use a mensagem X".
    - Nunca use "o usuário", "o autor", "validado pelo usuário" ou construções do seu ponto de vista.
+   - Registrar o prompt e commitar esse registro são etapas do processo (passo 4), não do meu pedido:
+     nunca inclua no prompt itens como "Registre este prompt", "faça o commit dele" ou
+     "incluindo este registro".
    - **[C] Contexto:** situação atual do projeto relevante para o pedido
    - **[O] Objetivo:** o que deve ser feito, em itens claros e verificáveis
    - **[S] Estilo:** como a resposta deve ser estruturada

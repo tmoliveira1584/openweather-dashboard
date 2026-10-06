@@ -8,7 +8,6 @@
   2. Crie um CLAUDE.md curto com descrição, regras (API key só via .env, explicar decisões antes de implementar, passos pequenos) e stack "a definir"
   3. Crie a pasta docs/ com requisitos.md, arquitetura.md e prompts-costar.md vazios, só com título
   4. Crie o comando .claude/commands/costar.md, que reescreve meu pedido em CO-STAR, registra em docs/prompts-costar.md com data e etapa do SDLC e depois executa
-  5. Registre este prompt como a primeira entrada de docs/prompts-costar.md (etapa: Setup)
 - **[S] Estilo:** Didático e organizado
 - **[T] Tom:** Objetivo
 - **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
@@ -155,8 +154,7 @@
   2. Explique brevemente cada componente, por que você o escolheu e quais alternativas descartou
   3. Garanta que a proposta atenda a todo o escopo dos documentos (7 features do spec e princípios da constitution), com uma matriz de cobertura
   4. Defina o provedor de mapa base
-  5. Registre este prompt em `docs/prompts-costar.md`
-  6. Não escreva ainda o `docs/arquitetura.md`
+  5. Não escreva ainda o `docs/arquitetura.md`
 - **[S] Estilo:** Didático e organizado
 - **[T] Tom:** Objetivo
 - **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
@@ -179,7 +177,6 @@
      - **Geração eficiente:** fatias de implementação, definição de pronto, estratégia de testes, convenções e guia rápido
   2. Registre as versões exatas em `requirements.txt`, `requirements-dev.txt` e `environment.yml`, conferidas contra o Python 3.13
   3. Vasculhe o projeto (CLAUDE.md, README, docs/, .gitignore, .claude/) e atualize o que deixou de ser verdade
-  4. Registre este prompt
 - **[S] Estilo:** Técnico e organizado
 - **[T] Tom:** Objetivo
 - **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
@@ -322,9 +319,7 @@
 ## 2026-10-05 — Etapa: Implementação
 
 - **[C] Contexto:** Concluí a fatia 0 e fiz dois commits locais: `a794730` (`docs: migrar especificação e arquitetura para a One Call API 4.0`) e `880fa41` (`build: configurar ambiente, app mínimo e fixtures reais`). A branch `main` local está 2 commits à frente de `origin/main`. O CLAUDE.md exige Conventional Commits.
-- **[O] Objetivo:**
-  1. Registre este prompt em `docs/prompts-costar.md` e faça um commit com a mensagem `docs(prompts): registrar prompt de envio da fatia 0`
-  2. Envie os commits ao GitHub com `git push` e confirme a sincronização entre local e remoto
+- **[O] Objetivo:** Envie os commits ao GitHub com `git push` e confirme a sincronização entre local e remoto.
 - **[S] Estilo:** Técnico e organizado
 - **[T] Tom:** Objetivo
 - **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
@@ -344,9 +339,7 @@
 ## 2026-10-05 — Etapa: Implementação
 
 - **[C] Contexto:** Concluí a fatia 1 e fiz o commit dela localmente.
-- **[O] Objetivo:**
-  1. Registre este prompt e faça o commit dele
-  2. Envie os commits ao GitHub e confirme a sincronização entre local e remoto
+- **[O] Objetivo:** Envie os commits ao GitHub e confirme a sincronização entre local e remoto.
 - **[S] Estilo:** Técnico e organizado
 - **[T] Tom:** Objetivo
 - **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
@@ -366,9 +359,7 @@
 ## 2026-10-05 — Etapa: Implementação
 
 - **[C] Contexto:** Concluí a fatia 2 e fiz o commit dela localmente.
-- **[O] Objetivo:**
-  1. Registre este prompt e faça o commit dele
-  2. Envie os commits ao GitHub e confirme a sincronização entre local e remoto
+- **[O] Objetivo:** Envie os commits ao GitHub e confirme a sincronização entre local e remoto.
 - **[S] Estilo:** Técnico e organizado
 - **[T] Tom:** Objetivo
 - **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
@@ -388,9 +379,7 @@
 ## 2026-10-06 — Etapa: Implementação
 
 - **[C] Contexto:** Concluí a fatia 3 e fiz o commit dela localmente.
-- **[O] Objetivo:**
-  1. Registre este prompt e faça o commit dele
-  2. Envie os commits ao GitHub e confirme a sincronização entre local e remoto
+- **[O] Objetivo:** Envie os commits ao GitHub e confirme a sincronização entre local e remoto.
 - **[S] Estilo:** Técnico e organizado
 - **[T] Tom:** Objetivo
 - **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
@@ -410,9 +399,7 @@
 ## 2026-10-06 — Etapa: Implementação
 
 - **[C] Contexto:** Concluí a fatia 4 e validei a mensagem de commit proposta.
-- **[O] Objetivo:**
-  1. Registre este prompt
-  2. Faça o commit da fatia 4 com a mensagem `feat(api): consultar o provedor e expor as rotas /api`, incluindo este registro
+- **[O] Objetivo:** Faça o commit da fatia 4 com a mensagem `feat(api): consultar o provedor e expor as rotas /api`.
 - **[S] Estilo:** Técnico e organizado
 - **[T] Tom:** Objetivo
 - **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
@@ -421,9 +408,7 @@
 ## 2026-10-06 — Etapa: Implementação
 
 - **[C] Contexto:** Concluí a fatia 4 e fiz o commit dela localmente.
-- **[O] Objetivo:**
-  1. Registre este prompt e faça o commit dele
-  2. Envie os commits ao GitHub e confirme a sincronização entre local e remoto
+- **[O] Objetivo:** Envie os commits ao GitHub e confirme a sincronização entre local e remoto.
 - **[S] Estilo:** Técnico e organizado
 - **[T] Tom:** Objetivo
 - **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
@@ -443,9 +428,7 @@
 ## 2026-10-06 — Etapa: Implementação
 
 - **[C] Contexto:** Concluí a fatia 5 e validei a mensagem de commit proposta.
-- **[O] Objetivo:**
-  1. Registre este prompt
-  2. Faça o commit da fatia 5 com a mensagem `feat(ui): montar o esqueleto da tela com layout responsivo`, incluindo este registro
+- **[O] Objetivo:** Faça o commit da fatia 5 com a mensagem `feat(ui): montar o esqueleto da tela com layout responsivo`.
 - **[S] Estilo:** Técnico e organizado
 - **[T] Tom:** Objetivo
 - **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
@@ -454,9 +437,7 @@
 ## 2026-10-06 — Etapa: Implementação
 
 - **[C] Contexto:** Concluí a fatia 5 e fiz o commit dela localmente.
-- **[O] Objetivo:**
-  1. Registre este prompt e faça o commit dele
-  2. Envie os commits ao GitHub e confirme a sincronização entre local e remoto
+- **[O] Objetivo:** Envie os commits ao GitHub e confirme a sincronização entre local e remoto.
 - **[S] Estilo:** Técnico e organizado
 - **[T] Tom:** Objetivo
 - **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
@@ -476,9 +457,7 @@
 ## 2026-10-06 — Etapa: Implementação
 
 - **[C] Contexto:** Concluí a fatia 6a e validei a mensagem de commit proposta.
-- **[O] Objetivo:**
-  1. Registre este prompt
-  2. Faça o commit da fatia 6a com a mensagem `feat(ui): carregar o clima com cache e estados de carregamento e erro`, incluindo este registro
+- **[O] Objetivo:** Faça o commit da fatia 6a com a mensagem `feat(ui): carregar o clima com cache e estados de carregamento e erro`.
 - **[S] Estilo:** Técnico e organizado
 - **[T] Tom:** Objetivo
 - **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
@@ -487,9 +466,7 @@
 ## 2026-10-06 — Etapa: Implementação
 
 - **[C] Contexto:** Concluí a fatia 6a e fiz o commit dela localmente.
-- **[O] Objetivo:**
-  1. Registre este prompt e faça o commit dele
-  2. Envie os commits ao GitHub e confirme a sincronização entre local e remoto
+- **[O] Objetivo:** Envie os commits ao GitHub e confirme a sincronização entre local e remoto.
 - **[S] Estilo:** Técnico e organizado
 - **[T] Tom:** Objetivo
 - **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
@@ -509,9 +486,7 @@
 ## 2026-10-06 — Etapa: Implementação
 
 - **[C] Contexto:** Concluí a fatia 6b e validei a mensagem de commit proposta.
-- **[O] Objetivo:**
-  1. Registre este prompt
-  2. Faça o commit da fatia 6b com a mensagem `feat(ui): buscar cidades e alternar a escala no cabeçalho`, incluindo este registro
+- **[O] Objetivo:** Faça o commit da fatia 6b com a mensagem `feat(ui): buscar cidades e alternar a escala no cabeçalho`.
 - **[S] Estilo:** Técnico e organizado
 - **[T] Tom:** Objetivo
 - **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
@@ -520,10 +495,20 @@
 ## 2026-10-06 — Etapa: Implementação
 
 - **[C] Contexto:** Concluí a fatia 6b e fiz o commit dela localmente.
-- **[O] Objetivo:**
-  1. Registre este prompt e faça o commit dele
-  2. Envie os commits ao GitHub e confirme a sincronização entre local e remoto
+- **[O] Objetivo:** Envie os commits ao GitHub e confirme a sincronização entre local e remoto.
 - **[S] Estilo:** Técnico e organizado
 - **[T] Tom:** Objetivo
 - **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
 - **[R] Resposta:** Informe os hashes enviados e confirme a sincronização.
+
+## 2026-10-06 — Etapa: Documentação
+
+- **[C] Contexto:** Os registros de `docs/prompts-costar.md` trazem pedidos como "Registre este prompt e faça o commit dele" e "incluindo este registro". O registro simula o prompt que eu escreveria. Registrar o prompt e commitar esse registro são etapas automáticas do processo, não algo que eu pediria.
+- **[O] Objetivo:**
+  1. Revise todos os registros de `docs/prompts-costar.md` e remova os pedidos de registro do próprio prompt e de commit desse registro, mantendo o restante de cada pedido
+  2. Inclua essa regra em `.claude/commands/costar.md`, para que todo registro futuro já siga esse padrão
+  3. Proponha a mensagem de commit e aguarde a minha validação antes de commitar e enviar ao GitHub
+- **[S] Estilo:** Técnico e organizado
+- **[T] Tom:** Objetivo
+- **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
+- **[R] Resposta:** Liste os registros alterados e mostre a mensagem de commit proposta. Depois do commit, informe o hash e confirme a sincronização entre local e remoto.
