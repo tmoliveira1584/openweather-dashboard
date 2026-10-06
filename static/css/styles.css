@@ -132,11 +132,17 @@ button {
   fill: currentColor;
 }
 
-/* Nome longo cortado com "…"; o nome completo fica no title (feature 1, categoria 10). */
+/* Nome longo cortado com "…" e completo, em mais linhas, ao passar o cursor ou focar
+   (feature 1, categoria 10). */
 .city-name {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.city:is(:hover, :focus) .city-name {
+  overflow-wrap: anywhere;
+  white-space: normal;
 }
 
 .search {
@@ -185,8 +191,10 @@ button {
   color: var(--color-text-muted);
 }
 
-/* A lista abre logo abaixo do campo, na mesma largura (feature 1, categoria 10). */
-.search-results {
+/* A lista e as mensagens abrem logo abaixo do campo, na mesma largura, sobre o mapa
+   (feature 1, categoria 10). */
+.search-popup,
+.search-message:not(:empty) {
   position: absolute;
   top: calc(100% + var(--space-1));
   right: 0;
@@ -196,6 +204,41 @@ button {
   border-radius: var(--radius-card);
   background: var(--color-surface);
   box-shadow: 0 8px 24px rgb(0 0 0 / 0.2);
+}
+
+.search-option {
+  padding: var(--space-2) var(--space-3);
+  cursor: pointer;
+}
+
+.search-option:hover {
+  background: var(--color-surface-soft);
+}
+
+/* Opção destacada pelas setas: fundo, barra lateral e negrito, não só a cor (P-018). */
+.search-option[aria-selected="true"] {
+  background: var(--color-tile);
+  box-shadow: inset 4px 0 0 var(--color-accent);
+  font-weight: 700;
+}
+
+.search-hint,
+.search-message {
+  font-size: 0.8125rem;
+}
+
+.search-hint {
+  padding: var(--space-2) var(--space-3);
+  border-top: 1px solid var(--color-tile);
+  color: var(--color-text-muted);
+}
+
+.search-message:not(:empty) {
+  padding: var(--space-2) var(--space-3);
+}
+
+.search[aria-busy="true"] .search-button {
+  cursor: progress;
 }
 
 .location-notice {

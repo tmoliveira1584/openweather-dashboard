@@ -11,11 +11,11 @@ Lista de tarefas que leva a aplicação de zero a 100% dos requisitos, uma fatia
 
 | Item | Valor |
 |---|---|
-| Fatia atual | 6b — Cabeçalho, busca e seletor de escala (não iniciada) |
-| Próxima tarefa | T-6b.1 |
+| Fatia atual | 6c — Localização inicial e cidade padrão (não iniciada) |
+| Próxima tarefa | T-6c.1 |
 | Concluídas, ainda sem commit | — |
-| Último commit de implementação | Fatia 6a, commit `feat(ui): carregar o clima com cache e estados de carregamento e erro` de 2026-10-06 (o hash é registrado aqui no início da fatia 6b). Fatia 5: `ecc8bf0`. Fatia 4: `4ee7d59`. Fatia 3: `8f56a1a`. Fatia 2: `8fb0ce7`. Fatia 1: `b5ff9c1`. Fatia 0: `880fa41` |
-| IDs fechados | 45 de 217 (20,7%) |
+| Último commit de implementação | Fatia 6b, commit `feat(ui): buscar cidades e alternar a escala no cabeçalho` de 2026-10-06 (o hash é registrado aqui no início da fatia 6c). Fatia 6a: `f442956`. Fatia 5: `ecc8bf0`. Fatia 4: `4ee7d59`. Fatia 3: `8f56a1a`. Fatia 2: `8fb0ce7`. Fatia 1: `b5ff9c1`. Fatia 0: `880fa41` |
+| IDs fechados | 69 de 217 (31,8%) |
 
 ## Como usar
 
@@ -40,7 +40,7 @@ Lista de tarefas que leva a aplicação de zero a 100% dos requisitos, uma fatia
 | 4 | Cliente e rotas | 4 | Concluída |
 | 5 | Estrutura da tela | 1 | Concluída |
 | 6a | Estado, cache e chamadas ao backend | 13 | Concluída |
-| 6b | Cabeçalho, busca e seletor de escala | 24 | Pendente |
+| 6b | Cabeçalho, busca e seletor de escala | 24 | Concluída |
 | 6c | Localização inicial e cidade padrão | 12 | Pendente |
 | 7 | Condições atuais | 23 | Pendente |
 | 8 | Previsão diária | 25 | Pendente |
@@ -49,7 +49,7 @@ Lista de tarefas que leva a aplicação de zero a 100% dos requisitos, uma fatia
 | 11 | Mapa | 24 | Pendente |
 | 12 | Robustez, desempenho e acessibilidade | 15 | Pendente |
 | 13 | Fechamento | 4 | Pendente |
-| | **Total** | **217** | **20,7%** |
+| | **Total** | **217** | **31,8%** |
 
 ---
 
@@ -150,13 +150,13 @@ Arquitetura: seções 6.5, 6.6, 7.3 e 7.4. Testes de lógica em `tests/e2e/test_
 
 Arquitetura: seções 6.3, 6.5, 7.3 e 7.4. Testes em `tests/e2e/test_f1_search.py` e `tests/e2e/test_f7_scale_selector.py`.
 
-- [ ] **T-6b.1** `ui/header.js`: título e cidade selecionada (`header_label`), atualizada na hora da troca, cortada com "…" e com o nome completo ao passar o cursor ou focar. (RF-010, RN-013)
-- [ ] **T-6b.2** Campo de busca: rótulo acessível "Buscar cidade", `maxlength` 100, confirmação por Enter ou lupa, validação de campo vazio e de 1 caractere com o foco mantido no campo. (RF-006, RN-004)
-- [ ] **T-6b.3** `actions.search` e `closeSearch`: lista de resultados (combobox ARIA) com estados `loading`, `open`, `empty` e `error`, seleção direta com resultado único, escolha que seleciona, fecha e limpa o campo, Esc ou clique fora, mensagem de nenhum resultado, dica das 5 primeiras, erro da busca, pedidos repetidos ignorados, termo e resultados sempre como texto. (RF-007 a RF-009, RF-011, RF-012, RF-015, RN-005, P-003)
-- [ ] **T-6b.4** Teclado na lista: setas, Enter e Esc. (RNF-007)
-- [ ] **T-6b.5** Seletor °C/°F: inicia em °C, `aria-pressed` e destaque além da cor, `setScale` muda só o estado (zero consultas) e nada é persistido. (RF-053, RF-054, RN-058, RNF-027, RNF-028)
-- [ ] **T-6b.6** Testes de ponta a ponta: CA-004, CA-005, CA-006, CA-007 (escolher de novo uma cidade em cache) e CA-044, contagem de consultas (RNF-003), `<b>Rio</b>` exibido como texto e campo de busca em 360 px.
-- [ ] **T-6b.7** Definição de pronto + commit.
+- [x] **T-6b.1** `ui/header.js`: título e cidade selecionada (`header_label`), atualizada na hora da troca, cortada com "…" e com o nome completo ao passar o cursor ou focar. (RF-010, RN-013)
+- [x] **T-6b.2** Campo de busca: rótulo acessível "Buscar cidade", `maxlength` 100, confirmação por Enter ou lupa, validação de campo vazio e de 1 caractere com o foco mantido no campo. (RF-006, RN-004)
+- [x] **T-6b.3** `actions.search` e `closeSearch`: lista de resultados (combobox ARIA) com estados `loading`, `open`, `empty` e `error`, seleção direta com resultado único, escolha que seleciona, fecha e limpa o campo, Esc ou clique fora, mensagem de nenhum resultado, dica das 5 primeiras, erro da busca, pedidos repetidos ignorados, termo e resultados sempre como texto. (RF-007 a RF-009, RF-011, RF-012, RF-015, RN-005, P-003)
+- [x] **T-6b.4** Teclado na lista: setas, Enter e Esc. (RNF-007)
+- [x] **T-6b.5** Seletor °C/°F: inicia em °C, `aria-pressed` e destaque além da cor, `setScale` muda só o estado (zero consultas) e nada é persistido. (RF-053, RF-054, RN-058, RNF-027, RNF-028)
+- [x] **T-6b.6** Testes de ponta a ponta: CA-004, CA-005, CA-006, CA-007 (escolher de novo uma cidade em cache) e CA-044, contagem de consultas (RNF-003), `<b>Rio</b>` exibido como texto e campo de busca em 360 px.
+- [x] **T-6b.7** Definição de pronto + commit.
 
 **Fecha:** RF-006, RF-007, RF-008, RF-009, RF-010, RF-011, RF-012, RF-015, RF-053, RF-054, RN-004, RN-005, RN-013, RN-058, RNF-003, RNF-007, RNF-027, RNF-028, CA-004, CA-005, CA-006, CA-007, CA-044, P-003
 
@@ -293,4 +293,5 @@ Arquitetura: seções 9 e 11.
 | D-16 | 2026-10-06 | **Layout entre 600 px e a largura do print.** Com os indicadores em 3 colunas a partir de 600 px (RNF-011), 1/3 da largura em 600 px daria cards de cerca de 55 px. Por isso, o card principal e a hora a hora usam `flex-wrap` com larguras-base de 300 px e 520 px: ficam lado a lado (cerca de 1/3 e 2/3) quando cabem e empilham quando não, sem um segundo breakpoint. Pelo mesmo motivo, a busca desce para a segunda linha do cabeçalho quando falta espaço. O painel por minuto fica 24 px acima da borda do mapa, para não cobrir a atribuição (RNF-025). Seção 7.1 da arquitetura atualizada |
 | D-17 | 2026-10-06 | **Textos e dependências da fatia 6a.** (1) O indicador de carregamento é um ícone animado com o nome "Carregando…" para leitores de tela. O spec não dá texto ao indicador (só o "Ainda carregando…" depois de 3 s), e o nome fica no `messages.js` como os demais textos. (2) O `MESSAGES` já traz todos os textos fixos do spec, também os das fatias 6b a 11, para que exista uma única cópia deles. (3) O `DEFAULT_CITY` fica no `actions.js`, onde o `start()` da 6c o usa, com os rótulos "Uberlândia, BR" e "Uberlândia" vindos do `messages.js`. Por isso o `actions.js` passa a poder importar o `messages.js` (seção 5.2 da arquitetura atualizada), que também vai fornecer "Sua localização" na 6c |
 | D-18 | 2026-10-06 | **Resposta de uma cidade anterior.** Ela é descartada da tela (P-012), mas, se for de sucesso, vai para o cache. Assim, voltar a essa cidade em menos de 10 min não gera outra consulta (P-010, RNF-003). O diagrama da seção 2.2 dava a entender que a gravação no cache vinha depois do descarte, e foi ajustado |
+| D-19 | 2026-10-06 | **Cabeçalho e busca (fatia 6b).** (1) Contratos: o estado da busca ganhou o status `invalid` (termo vazio ou com 1 caractere, sem consulta), separado de `error` (falha da busca), e o `actions.js` passou a exportar `SEARCH_MAX_LENGTH` e `chooseSearchResult(result)`, que fecha a lista e seleciona a cidade, para a conversão do item em `City` ficar fora da `ui/`. Seções 6.5 e 6.6 da arquitetura atualizadas. (2) Textos fora do spec, no `messages.js` como na D-17: o título "Previsão do tempo" (do print) e os nomes para leitores de tela da lupa ("Buscar"), da lista ("Cidades encontradas") e do seletor ("Escala de temperatura"). (3) O nome longo da cidade aparece completo, em mais linhas, ao passar o cursor ou focar (a cidade é focável). O `title` foi descartado porque não aparece com o foco. (4) Comportamentos que o spec não detalha: o Esc fecha a lista sem apagar o termo; sair da busca pelo Tab também fecha a lista, como clicar fora; editar o termo apaga a mensagem anterior; e confirmar de novo o termo com a lista dele aberta não repete a busca, como com a busca em andamento (RF-015). (5) A mensagem da busca (termo inválido, nenhum resultado ou falha) abre abaixo do campo, no lugar da lista, com `role="status"` |
 | L-01 | 2026-10-04 | **Limitação:** os testes são feitos só no Google Chrome instalado. Edge, Firefox e Safari não são testados, nem em computador nem em celular. O RNF-006 continua no spec como meta, mas a compatibilidade com outros navegadores não é verificada no MVP |

@@ -1,16 +1,20 @@
 /**
  * Fluxos da aplicação: a única camada que muda o estado (arquitetura, seções 2.2 e 6.6).
  *
- * Nesta fatia: `selectCity` e `retry`. Os demais fluxos (`start`, `search`, `selectDay`,
- * `setScale`, `refreshIfStale`) entram nas fatias 6b, 6c, 8 e 12.
+ * Até aqui: `selectCity` e `retry` (fatia 6a), busca e escala (fatia 6b). Os demais fluxos
+ * (`start`, `selectDay`, `refreshIfStale`) entram nas fatias 6c, 8 e 12.
  */
 
 import { MESSAGES } from './messages.js';
-import { fetchWeather } from './services/api.js';
+import { fetchWeather, searchCities } from './services/api.js';
 import * as cache from './services/cache.js';
 import { getState, setState } from './state.js';
 
 export const SLOW_AFTER_MS = 3_000; // "Ainda carregando…" (RN-012)
+export const SEARCH_MAX_LENGTH = 100; // o campo não aceita mais caracteres (RN-004)
+const SEARCH_MIN_LENGTH = 2; // sem os espaços das pontas (RN-004)
+const SCALES = new Set(['c', 'f']);
+const SEARCH_IDLE = Object.freeze({ status: 'idle', results: [], truncated: false, message: null });
 
 /** Cidade padrão: Uberlândia, BR (RN-001). */
 export const DEFAULT_CITY = Object.freeze({
@@ -80,5 +84,101 @@ async function loadWeather(city, selectionId) {
     );
   } finally {
     clearTimeout(slowTimer);
+  }
+}
+
+// Busca em andamento ou com a lista aberta. `searchRun` aumenta a cada busca nova e a cada
+// fechamento: a resposta de uma busca substituída ou fechada é descartada.
+let searchRun = 0;
+let currentSearch = null; // { term, promise }
+
+/**
+ * Busca cidades pelo termo (RF-006, RN-004, RN-005).
+ * - Termo vazio ou com 1 caractere, sem os espaços das pontas: nenhuma consulta, status
+ *   `invalid` com a mensagem do spec.
+ * - O mesmo termo com a busca em andamento ou com a lista dele aberta: nada muda, e não há
+ *   outra consulta (RF-015).
+ * - Resultado: nenhuma cidade → `empty` com a mensagem (RF-012); uma → selecionada direto,
+ *   sem lista (RF-007); mais → lista aberta (`open`). Falha → `error` com a mensagem do spec.
+ *   Em todos os casos, a cidade selecionada só muda quando uma cidade é escolhida.
+ * @param {string} term texto do campo, tratado sempre como texto (P-003)
+ * @returns {Promise<void>} termina quando a busca termina
+ */
+export function search(term) {
+  const text = String(term ?? '').trim();
+  if (text.length < SEARCH_MIN_LENGTH) {
+    discardSearch();
+    const message = text ? MESSAGES.search.tooShort : MESSAGES.search.empty;
+    setState({ search: { ...SEARCH_IDLE, status: 'invalid', message } });
+    return Promise.resolve();
+  }
+  const { status } = getState().search;
+  if (currentSearch?.term === text && (status === 'loading' || status === 'open')) {
+    return currentSearch.promise;
+  }
+  const run = discardSearch();
+  setState({ search: { ...SEARCH_IDLE, status: 'loading' } });
+  const promise = runSearch(text, run);
+  currentSearch = { term: text, promise };
+  return promise;
+}
+
+/**
+ * Fecha a lista ou a mensagem da busca, sem alterar a cidade selecionada (RF-011). Uma busca
+ * em andamento é descartada.
+ */
+export function closeSearch() {
+  discardSearch();
+  if (getState().search.status !== 'idle') setState({ search: SEARCH_IDLE });
+}
+
+/**
+ * Escolha de uma cidade da lista: fecha a lista e seleciona a cidade (RF-008). O campo é
+ * limpo pelo cabeçalho, que vê a troca de cidade com origem `search`.
+ * @param {{ lat: number, lon: number, header_label: string, marker_label: string }} result
+ *   item de `CitySearchResult.results` (seção 6.3)
+ * @returns {Promise<void>} termina quando a consulta de clima termina
+ */
+export function chooseSearchResult(result) {
+  closeSearch();
+  return selectCity({
+    lat: result.lat,
+    lon: result.lon,
+    headerLabel: result.header_label,
+    markerLabel: result.marker_label,
+    source: 'search',
+  });
+}
+
+/**
+ * Troca a escala ativa. Muda só o estado: nenhuma consulta (RNF-027, P-011) e nada é
+ * guardado (RN-058). Escolher a escala já ativa não muda nada.
+ * @param {'c' | 'f'} scale
+ */
+export function setScale(scale) {
+  if (SCALES.has(scale) && scale !== getState().scale) setState({ scale });
+}
+
+function discardSearch() {
+  currentSearch = null;
+  searchRun += 1;
+  return searchRun;
+}
+
+async function runSearch(term, run) {
+  const result = await searchCities(term);
+  if (run !== searchRun) return; // fechada ou substituída por outra busca
+  if (!result.ok) {
+    setState({ search: { ...SEARCH_IDLE, status: 'error', message: MESSAGES.search.failed } });
+    return;
+  }
+  const { results, truncated } = result.data;
+  if (results.length === 0) {
+    const message = MESSAGES.search.noResults(term);
+    setState({ search: { ...SEARCH_IDLE, status: 'empty', message } });
+  } else if (results.length === 1) {
+    await chooseSearchResult(results[0]);
+  } else {
+    setState({ search: { status: 'open', results, truncated, message: null } });
   }
 }

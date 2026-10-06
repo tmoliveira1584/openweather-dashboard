@@ -13,35 +13,41 @@
 </head>
 <body>
   <!--
-    Esqueleto da tela (fatia 5). Os textos e valores abaixo são provisórios, copiados do
-    exemplo da seção 6.3 da arquitetura. Eles saem nas fatias 6a a 11, quando os blocos
-    passam a ser montados pelos módulos de static/js/ui/ (guardrail 10).
+    Esqueleto da tela (fatia 5). Os textos e valores dos blocos de dados abaixo são
+    provisórios, copiados do exemplo da seção 6.3 da arquitetura. Eles saem nas fatias 7 a 11,
+    quando os blocos passam a ser montados pelos módulos de static/js/ui/ (guardrail 10).
   -->
+  <!-- Cabeçalho: estrutura só. Os textos vêm do messages.js e do estado (ui/header.js). -->
   <header class="app-header">
-    <h1 class="app-title">Previsão do tempo</h1>
+    <h1 class="app-title"></h1>
 
-    <div class="scale-toggle" role="group" aria-label="Escala de temperatura">
-      <button type="button" class="scale-option" aria-pressed="true">°C</button>
-      <button type="button" class="scale-option" aria-pressed="false">°F</button>
+    <div class="scale-toggle" role="group">
+      <button type="button" class="scale-option" data-scale="c"></button>
+      <button type="button" class="scale-option" data-scale="f"></button>
     </div>
 
-    <p class="city" title="Uberlândia, BR">
+    <!-- Focável para mostrar o nome completo de uma cidade longa (feature 1, categoria 10). -->
+    <p class="city" tabindex="0">
       <svg class="city-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
         <path d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5Z"/>
       </svg>
-      <span class="city-name">Uberlândia, BR</span>
+      <span class="city-name"></span>
     </p>
 
-    <form class="search" role="search">
-      <button type="submit" class="search-button" aria-label="Buscar">
+    <form class="search" role="search" novalidate>
+      <button type="submit" class="search-button">
         <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
           <circle cx="10.5" cy="10.5" r="6.5"/>
           <path d="m15.5 15.5 5 5"/>
         </svg>
       </button>
-      <input class="search-input" type="search" name="q" placeholder="Buscar cidade"
-             aria-label="Buscar cidade" autocomplete="off">
-      <ul class="search-results" hidden></ul>
+      <input class="search-input" type="search" name="q" role="combobox" aria-expanded="false"
+             aria-controls="search-results" autocomplete="off" spellcheck="false">
+      <div class="search-popup" hidden>
+        <ul class="search-results" id="search-results" role="listbox"></ul>
+        <p class="search-hint" hidden></p>
+      </div>
+      <p class="search-message" role="status"></p>
     </form>
   </header>
 

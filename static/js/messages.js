@@ -35,6 +35,14 @@ export const MESSAGES = deepFreeze({
     network_unavailable: 'Sem conexão com a internet. Verifique sua rede e tente novamente.',
   },
 
+  // Cabeçalho (feature 7: RF-053). O título vem do print de referência, e o nome do grupo do
+  // seletor não está no spec: é o nome para leitores de tela (D-19).
+  header: {
+    title: 'Previsão do tempo',
+    scaleGroup: 'Escala de temperatura',
+    scales: { c: '°C', f: '°F' },
+  },
+
   // Cidade padrão e localização (feature 1: RN-001, RN-009, categoria 2).
   defaultCity: { headerLabel: 'Uberlândia, BR', markerLabel: 'Uberlândia' },
   location: {
@@ -44,9 +52,12 @@ export const MESSAGES = deepFreeze({
     unnamed: 'Sua localização',
   },
 
-  // Busca de cidade (feature 1: RNF-007, categoria 1 e 4).
+  // Busca de cidade (feature 1: RNF-007, categoria 1 e 4). Os nomes da lupa e da lista não
+  // estão no spec: são os nomes para leitores de tela (D-19).
   search: {
     label: 'Buscar cidade',
+    button: 'Buscar',
+    results: 'Cidades encontradas',
     empty: 'Digite o nome de uma cidade.',
     tooShort: 'Digite pelo menos 2 caracteres.',
     noResults: (term) => `Nenhuma cidade encontrada para "${term}". Verifique a grafia.`,

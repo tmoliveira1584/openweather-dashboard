@@ -697,7 +697,8 @@ const initialState = {
   fetchedAt: null,         // ms do recebimento, para RF-014
   locationNotice: false,   // aviso de cidade padrão (RF-003, RN-002)
   search: { status: 'idle', results: [], truncated: false, message: null }
-                           // status: 'idle' | 'loading' | 'open' | 'empty' | 'error'
+                           // status: 'idle' | 'loading' | 'open' | 'empty' | 'error' | 'invalid'
+                           // 'invalid' = termo vazio ou com 1 caractere, sem consulta (RN-004)
 };
 ```
 
@@ -733,7 +734,7 @@ Assinaturas mínimas. A implementação pode ter funções auxiliares privadas a
 | Módulo | Exportações |
 |---|---|
 | `state.js` | `getState()` (estado congelado), `setState(patch)`, `subscribe(listener(state, previous)) -> unsubscribe` |
-| `actions.js` | `DEFAULT_CITY`, `start()`, `selectCity(city)`, `retry()`, `search(term)`, `closeSearch()`, `selectDay(localDate \| null)`, `setScale(scale)`, `refreshIfStale(nowMs)` |
+| `actions.js` | `DEFAULT_CITY`, `SEARCH_MAX_LENGTH` (100, RN-004), `start()`, `selectCity(city)`, `retry()`, `search(term)`, `closeSearch()`, `chooseSearchResult(result)` (fecha a lista e seleciona a cidade do item, RF-008), `selectDay(localDate \| null)`, `setScale(scale)`, `refreshIfStale(nowMs)` |
 | `messages.js` | `MESSAGES` (catálogo congelado, seção 7.3), `weatherErrorMessage(code)` (código desconhecido ou ausente → mensagem de `provider_unavailable`) |
 | `services/api.js` | `fetchWeather(lat, lon)`, `searchCities(q)`, `reverseGeocode(lat, lon)`, todas devolvendo `{ ok: true, data } \| { ok: false, error }` |
 | `services/cache.js` | `roundCoord(value)` (2 casas, sem "-0.00"), `cacheKey(lat, lon)`, `get(key, nowMs) -> { value, storedAt } \| null`, `set(key, value, nowMs)` |
