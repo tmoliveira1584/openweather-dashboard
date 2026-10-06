@@ -11,11 +11,11 @@ Lista de tarefas que leva a aplicação de zero a 100% dos requisitos, uma fatia
 
 | Item | Valor |
 |---|---|
-| Fatia atual | 8 — Previsão diária (não iniciada) |
-| Próxima tarefa | T-8.1 |
+| Fatia atual | 9 — Hora a hora (não iniciada) |
+| Próxima tarefa | T-9.1 |
 | Concluídas, ainda sem commit | — |
-| Último commit de implementação | Fatia 7, commit `feat(ui): exibir as condições atuais com ilustrações e indicadores` de 2026-10-06 (o hash é registrado aqui no início da fatia 8). Fatia 6c: `38d51e0`. Fatia 6b: `30b078a`. Fatia 6a: `f442956`. Fatia 5: `ecc8bf0`. Fatia 4: `4ee7d59`. Fatia 3: `8f56a1a`. Fatia 2: `8fb0ce7`. Fatia 1: `b5ff9c1`. Fatia 0: `880fa41` |
-| IDs fechados | 104 de 217 (47,9%) |
+| Último commit de implementação | Fatia 8, commit `feat(ui): exibir a previsão diária em abas com o resumo de cada dia` de 2026-10-06 (o hash é registrado aqui no início da fatia 9). Fatia 7: `320a0b8`. Fatia 6c: `38d51e0`. Fatia 6b: `30b078a`. Fatia 6a: `f442956`. Fatia 5: `ecc8bf0`. Fatia 4: `4ee7d59`. Fatia 3: `8f56a1a`. Fatia 2: `8fb0ce7`. Fatia 1: `b5ff9c1`. Fatia 0: `880fa41` |
+| IDs fechados | 129 de 217 (59,4%) |
 
 ## Como usar
 
@@ -43,13 +43,13 @@ Lista de tarefas que leva a aplicação de zero a 100% dos requisitos, uma fatia
 | 6b | Cabeçalho, busca e seletor de escala | 24 | Concluída |
 | 6c | Localização inicial e cidade padrão | 12 | Concluída |
 | 7 | Condições atuais | 23 | Concluída |
-| 8 | Previsão diária | 25 | Pendente |
+| 8 | Previsão diária | 25 | Concluída |
 | 9 | Hora a hora | 23 | Pendente |
 | 10 | Por minuto | 22 | Pendente |
 | 11 | Mapa | 24 | Pendente |
 | 12 | Robustez, desempenho e acessibilidade | 15 | Pendente |
 | 13 | Fechamento | 4 | Pendente |
-| | **Total** | **217** | **47,9%** |
+| | **Total** | **217** | **59,4%** |
 
 ---
 
@@ -191,12 +191,12 @@ Arquitetura: seções 6.3, 7.1 e ADR-012. Testes em `tests/e2e/test_f2_current.p
 
 Arquitetura: seções 6.3, 6.6 e 7.4. Testes em `tests/e2e/test_js_logic.py` e `tests/e2e/test_f3_daily.py`.
 
-- [ ] **T-8.1** `logic/time-window.js`: `cityToday` e `visibleDays` (descarta os dias passados e limita a 8 a partir de "Hoje", D-14), com testes de virada da meia-noite e de fuso diferente (Tóquio). (RN-026, RN-027)
-- [ ] **T-8.2** `ui/day-tabs.js`: aba "Hoje" + dias da semana, máxima e ícone com texto alternativo, padrão ARIA de tablist (setas e Enter), `aria-selected` com destaque além da cor, rolagem própria, aba selecionada trazida para a área visível e mensagem "Previsão diária indisponível.". (RF-024, RF-025, RF-032, RN-028, RN-029, RNF-014, RNF-015)
-- [ ] **T-8.3** `actions.selectDay` e resumo do dia no card principal e nos cards: máxima, "Mín. X°", sensação diurna, data, visibilidade prevista ou "—", ilustração do dia e selo com os alertas do dia. (RF-026 a RF-028, RF-030, RN-030, RN-031, RN-033)
-- [ ] **T-8.4** Troca de cidade volta para "Hoje", dados atualizados mantêm o dia se ele ainda existir, e a escala é mantida. (RF-031, RF-057)
-- [ ] **T-8.5** Testes de ponta a ponta: CA-016, CA-017, CA-018, CA-020 e CA-021, atualização em até 100 ms e nenhuma consulta ao trocar de aba. (RNF-013, P-011)
-- [ ] **T-8.6** Definição de pronto + commit.
+- [x] **T-8.1** `logic/time-window.js`: `cityToday` e `visibleDays` (descarta os dias passados e limita a 8 a partir de "Hoje", D-14), com testes de virada da meia-noite e de fuso diferente (Tóquio). (RN-026, RN-027)
+- [x] **T-8.2** `ui/day-tabs.js`: aba "Hoje" + dias da semana, máxima e ícone com texto alternativo, padrão ARIA de tablist (setas e Enter), `aria-selected` com destaque além da cor, rolagem própria, aba selecionada trazida para a área visível e mensagem "Previsão diária indisponível.". (RF-024, RF-025, RF-032, RN-028, RN-029, RNF-014, RNF-015)
+- [x] **T-8.3** `actions.selectDay` e resumo do dia no card principal e nos cards: máxima, "Mín. X°", sensação diurna, data, visibilidade prevista ou "—", ilustração do dia e selo com os alertas do dia. (RF-026 a RF-028, RF-030, RN-030, RN-031, RN-033)
+- [x] **T-8.4** Troca de cidade volta para "Hoje", dados atualizados mantêm o dia se ele ainda existir, e a escala é mantida. (RF-031, RF-057)
+- [x] **T-8.5** Testes de ponta a ponta: CA-016, CA-017, CA-018, CA-020 e CA-021, atualização em até 100 ms e nenhuma consulta ao trocar de aba. (RNF-013, P-011)
+- [x] **T-8.6** Definição de pronto + commit.
 
 **Fecha:** RF-024, RF-025, RF-026, RF-027, RF-028, RF-030, RF-031, RF-032, RF-057, RN-026, RN-027, RN-028, RN-029, RN-030, RN-031, RN-033, RNF-013, RNF-014, RNF-015, CA-016, CA-017, CA-018, CA-020, CA-021, P-011
 
@@ -296,4 +296,5 @@ Arquitetura: seções 9 e 11.
 | D-19 | 2026-10-06 | **Cabeçalho e busca (fatia 6b).** (1) Contratos: o estado da busca ganhou o status `invalid` (termo vazio ou com 1 caractere, sem consulta), separado de `error` (falha da busca), e o `actions.js` passou a exportar `SEARCH_MAX_LENGTH` e `chooseSearchResult(result)`, que fecha a lista e seleciona a cidade, para a conversão do item em `City` ficar fora da `ui/`. Seções 6.5 e 6.6 da arquitetura atualizadas. (2) Textos fora do spec, no `messages.js` como na D-17: o título "Previsão do tempo" (do print) e os nomes para leitores de tela da lupa ("Buscar"), da lista ("Cidades encontradas") e do seletor ("Escala de temperatura"). (3) O nome longo da cidade aparece completo, em mais linhas, ao passar o cursor ou focar (a cidade é focável). O `title` foi descartado porque não aparece com o foco. (4) Comportamentos que o spec não detalha: o Esc fecha a lista sem apagar o termo; sair da busca pelo Tab também fecha a lista, como clicar fora; editar o termo apaga a mensagem anterior; e confirmar de novo o termo com a lista dele aberta não repete a busca, como com a busca em andamento (RF-015). (5) A mensagem da busca (termo inválido, nenhum resultado ou falha) abre abaixo do campo, no lugar da lista, com `role="status"` |
 | D-20 | 2026-10-06 | **Localização inicial (fatia 6c).** (1) Contrato: o `actions.js` passou a exportar `dismissLocationNotice()`, que fecha o aviso de localização, e o `selectCity` fecha o aviso quando a cidade escolhida não é a padrão (RN-002). Seção 6.6 da arquitetura atualizada. (2) O aviso passou para dentro do `<header>`, como última linha, abaixo da busca, porque é o `header.js` que o desenha (seção 5.1). Ele ganhou um botão de fechar com o nome "Fechar aviso" para leitores de tela, que não está no spec e fica no `messages.js`, como na D-17. (3) Enquanto o pedido de localização está pendente (até 10 s), o cabeçalho fica sem cidade e os blocos mostram o indicador de carregamento, sem consulta de clima. (4) A localização que chega no prazo depois de o usuário escolher uma cidade pela busca também é descartada ("a cidade escolhida prevalece", feature 1, categoria 2), assim como a que chega enquanto o nome é buscado na geocodificação reversa e outra cidade é escolhida. (5) Testes: sem permissão concedida, o Chrome do Playwright nega a localização na hora, por isso os testes das fatias anteriores continuam abrindo com a cidade padrão. O usuário que não responde e a localização tardia usam um `navigator.geolocation` falso (`tests/e2e/location.py`). Dois testes da busca passaram a esperar a lista abrir antes das setas, porque falhavam de vez em quando com o passo assíncrono a mais na abertura da página |
 | D-21 | 2026-10-06 | **Condições atuais (fatia 7).** (1) A ilustração do grupo de condição é o fundo do card principal, escolhida no CSS pelo `data-condition` do card, sob a camada escura. Se ela não carregar, sobra a cor neutra do novo token `--color-illustration-fallback` (`#475569`), com a mesma camada (feature 2, categoria 9; seção 7.1 da arquitetura atualizada). Ela é decorativa: a condição chega aos leitores de tela pela descrição e pelo texto alternativo do ícone (RNF-010). (2) As 7 ilustrações usam só tons médios e escuros, para o texto branco manter 4,5:1 sob a camada (RNF-009). O teste mede o contraste nos pixels do card renderizado, sem o texto: entre 4,87:1 (nublado) e 7,53:1 (neutra); sem a camada, a neve daria 1,96:1. (3) O card mostra o ícone do provedor acima da descrição, que o print não tem, porque a T-7.2 e o RNF-010 pedem o ícone com texto alternativo. O `dom.js` passou a exportar `setConditionIcon(img, icon, description)`, que as abas e a hora a hora também vão usar (seção 6.6 da arquitetura atualizada). (4) Textos e estrutura: o nome do bloco para leitores de tela é "Condições atuais", o título da feature 2 no spec, e fica no `messages.js` como na D-17. Os indicadores ganharam ícones decorativos, como no print. O bloco passou a ser montado pelo `ui/current.js`, que também desenha o estado dele, e saiu da lista provisória do `main.js`. (5) Testes: os cenários dos critérios de aceite partem do pacote real de Uberlândia com campos de `current` trocados e passam pelo view model do backend (`bundle` e `view_of` em `tests/e2e/weather_api.py`), cuja simulação passou a aceitar um `WeatherView` próprio do teste |
+| D-22 | 2026-10-06 | **Previsão diária (fatia 8).** (1) Contrato: o `logic/time-window.js` exporta também `activeDay(days, selectedDay, nowSec, offset)`. O dia ativo é derivado a cada desenho, nas abas e no card: o `selectedDay` guardado só vale enquanto estiver entre os dias visíveis e não for hoje. Assim, dados atualizados mantêm o dia, e um dia que virou passado (dados em cache atravessando a meia-noite) leva a tela de volta para "Hoje" sem mudar o estado, porque um dia passado nunca volta a ser visível. Seções 6.6 e 7.4 da arquitetura atualizadas. A troca de cidade já zerava o `selectedDay` no `selectCity` (RF-031). (2) As abas seguem o padrão de abas da ARIA com ativação manual: as setas movem o foco, dando a volta nas pontas, e o Enter, o Espaço ou o clique selecionam (RNF-014). Home e End, que o spec não cita, vão para a primeira e a última aba, como no padrão. Só a aba selecionada entra na ordem do Tab, e uma aba com o foco continua com ele quando as abas são recriadas. (3) No card, a mínima ("Mín. X°") fica abaixo da máxima, e a data ocupa o lugar da hora (RN-030). (4) O nome da faixa para leitores de tela, "Dias da previsão", saiu do `index.html` da fatia 5 e foi para o `messages.js`, como na D-17. Se nenhum dia da previsão for de hoje em diante, a faixa mostra "Previsão diária indisponível.". (5) Testes: o relógio de toda página de ponta a ponta começa no momento das capturas (`CAPTURE_NOW`) e anda normalmente, e o `open_paused` pausa 1 minuto depois dele. Sem isso, "Hoje" e as abas dependeriam da data em que os testes rodam, e as abas sumiriam dias depois da captura. O tempo da suíte não mudou (conferido com e sem o relógio) |
 | L-01 | 2026-10-04 | **Limitação:** os testes são feitos só no Google Chrome instalado. Edge, Firefox e Safari não são testados, nem em computador nem em celular. O RNF-006 continua no spec como meta, mas a compatibilidade com outros navegadores não é verificada no MVP |

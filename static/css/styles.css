@@ -456,12 +456,21 @@ button {
   font-weight: 700;
 }
 
-.current-temp {
+.current-main {
   grid-area: temp;
   align-self: end;
+}
+
+.current-temp {
   font-size: 3.5rem;
   font-weight: 300;
   line-height: 1;
+}
+
+/* Mínima do dia, abaixo da máxima (RN-030). */
+.current-min {
+  margin-top: var(--space-1);
+  font-size: 0.875rem;
 }
 
 .current-summary {

@@ -121,8 +121,10 @@ def base_url(live_server):
 
 @pytest.fixture
 def page(page, base_url):
-    """Página do Chrome sem internet.
+    """Página do Chrome sem internet, com o relógio no momento das capturas.
 
+    - relógio: `Date` começa em `CAPTURE_NOW` e anda normalmente, para que "Hoje" e as abas de
+      dias não dependam da data em que os testes rodam (D-22);
     - arquivos do servidor local: seguem normalmente;
     - /api/* sem simulação no teste: abortado (o teste precisa simular com page.route);
     - tiles do CARTO e ícones do OpenWeatherMap: PNG transparente;
@@ -147,5 +149,6 @@ def page(page, base_url):
         else:
             route.abort()
 
+    page.clock.install(time=CAPTURE_NOW)
     page.route("**/*", offline)
     return page

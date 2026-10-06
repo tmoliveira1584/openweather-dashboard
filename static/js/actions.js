@@ -2,8 +2,8 @@
  * Fluxos da aplicação: a única camada que muda o estado (arquitetura, seções 2.2 e 6.6).
  *
  * Até aqui: `selectCity` e `retry` (fatia 6a), busca e escala (fatia 6b), localização inicial
- * e aviso de localização (fatia 6c). Os demais fluxos (`selectDay`, `refreshIfStale`) entram
- * nas fatias 8 e 12.
+ * e aviso de localização (fatia 6c) e aba de dia (fatia 8). O `refreshIfStale` entra na
+ * fatia 12.
  */
 
 import { MESSAGES } from './messages.js';
@@ -216,6 +216,18 @@ export function chooseSearchResult(result) {
  */
 export function setScale(scale) {
   if (SCALES.has(scale) && scale !== getState().scale) setState({ scale });
+}
+
+/**
+ * Seleciona a aba de um dia (`local_date`) ou "Hoje" (`null`) (RF-025, RF-026, RF-028). Muda
+ * só o estado: nenhuma consulta (RNF-013, P-011), e a escala continua a mesma (RF-057).
+ * Escolher a aba já selecionada não muda nada. A troca de cidade volta para "Hoje" no
+ * `selectCity` (RF-031).
+ * @param {string | null} localDate
+ */
+export function selectDay(localDate) {
+  const selectedDay = localDate || null;
+  if (selectedDay !== getState().selectedDay) setState({ selectedDay });
 }
 
 function discardSearch() {

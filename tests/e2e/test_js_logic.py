@@ -11,6 +11,7 @@ from playwright.sync_api import Page
 
 from tests.e2e.clock import open_paused
 from tests.e2e.weather_api import TOKYO, UBERLANDIA
+from tests.fakes import CAPTURE_NOW
 
 # Mensagens do spec (feature 1) para cada código de erro (arquitetura, seção 7.3).
 SPEC_ERROR_MESSAGES = {
@@ -745,3 +746,109 @@ def test_rf_013_retry_button_calls_handler_and_survives_rerender(logic_page: Pag
         """,
     )
     assert result == [1, True, True, "button"]
+
+
+# ---------- logic/time-window.js: dias ----------
+
+# 00:00 de terça, 06/10/2026, em Uberlândia (03:00 UTC).
+UBERLANDIA_MIDNIGHT = 1791255600
+UBERLANDIA_OFFSET = -10800
+TOKYO_OFFSET = 32400
+
+
+def visible_dates(page: Page, daily, now_sec: int, offset: int) -> list[str]:
+    return evaluate(
+        page,
+        "logic/time-window.js",
+        "return m.visibleDays(arg.daily, arg.now, arg.offset).map((day) => day.local_date);",
+        {"daily": daily, "now": now_sec, "offset": offset},
+    )
+
+
+def test_rn_026_city_today_is_the_date_in_the_city_timezone(logic_page: Page):
+    """RN-026, P-015: "Hoje" é a data atual no fuso da cidade. No momento da captura (19:41
+    UTC de segunda, 05/10), já é terça em Tóquio; e a data de Uberlândia vira à meia-noite
+    local, não à meia-noite UTC."""
+    result = evaluate(
+        logic_page,
+        "logic/time-window.js",
+        """return [
+            m.cityToday(arg.capture, arg.uberlandia),
+            m.cityToday(arg.capture, arg.tokyo),
+            m.cityToday(arg.midnight - 1, arg.uberlandia),
+            m.cityToday(arg.midnight, arg.uberlandia),
+        ];""",
+        {
+            "capture": CAPTURE_NOW,
+            "uberlandia": UBERLANDIA_OFFSET,
+            "tokyo": TOKYO_OFFSET,
+            "midnight": UBERLANDIA_MIDNIGHT,
+        },
+    )
+    assert result == ["2026-10-05", "2026-10-06", "2026-10-05", "2026-10-06"]
+
+
+def test_rn_027_visible_days_start_today_and_stop_at_8(logic_page: Page, weather_views):
+    """RN-026, RN-027, D-14: dos 10 dias da captura, ficam 8 a partir de "Hoje". Em Tóquio,
+    o primeiro dia recebido (05/10) já é passado e é descartado, e ainda sobram 8."""
+    uberlandia = weather_views["uberlandia"]["daily"]
+    tokyo = weather_views["tokyo"]["daily"]
+
+    days = visible_dates(logic_page, uberlandia, CAPTURE_NOW, UBERLANDIA_OFFSET)
+    assert days == [f"2026-10-{day:02d}" for day in range(5, 13)]
+    days = visible_dates(logic_page, tokyo, CAPTURE_NOW, TOKYO_OFFSET)
+    assert days == [f"2026-10-{day:02d}" for day in range(6, 14)]
+
+
+def test_rn_026_cached_days_cross_the_city_midnight(logic_page: Page, weather_views):
+    """RN-026, feature 3 (categoria 8): com os mesmos dados, o dia que virou passado à
+    meia-noite da cidade é descartado e o seguinte passa a ser o primeiro. Perto do fim da
+    previsão, sobram menos de 8 dias."""
+    daily = weather_views["uberlandia"]["daily"]
+
+    before = visible_dates(logic_page, daily, UBERLANDIA_MIDNIGHT - 1, UBERLANDIA_OFFSET)
+    after = visible_dates(logic_page, daily, UBERLANDIA_MIDNIGHT, UBERLANDIA_OFFSET)
+    last_days = visible_dates(logic_page, daily, UBERLANDIA_MIDNIGHT + 7 * 86400, UBERLANDIA_OFFSET)
+
+    assert before[0] == "2026-10-05"
+    assert after[0] == "2026-10-06"
+    assert len(after) == 8
+    assert last_days == ["2026-10-13", "2026-10-14"]
+
+
+def test_rn_026_visible_days_are_chronological_and_absent_daily_is_empty(logic_page: Page):
+    """RN-026, RF-024: os dias saem em ordem cronológica mesmo fora de ordem na entrada, e
+    sem previsão diária não há dias."""
+    daily = [{"local_date": date} for date in ("2026-10-07", "2026-10-05", "2026-10-06")]
+
+    assert visible_dates(logic_page, daily, CAPTURE_NOW, UBERLANDIA_OFFSET) == [
+        "2026-10-05",
+        "2026-10-06",
+        "2026-10-07",
+    ]
+    assert visible_dates(logic_page, None, CAPTURE_NOW, UBERLANDIA_OFFSET) == []
+
+
+def test_rf_028_active_day_is_null_for_today_and_for_days_gone(logic_page: Page, weather_views):
+    """RF-025, RF-028, seção 7.4 (feature 3, categoria 8): o dia ativo é o selecionado se
+    ele ainda estiver entre os visíveis. "Hoje" (`null` ou a data de hoje) e um dia que virou
+    passado dão `null`, ou seja, as condições atuais."""
+    result = evaluate(
+        logic_page,
+        "logic/time-window.js",
+        """const days = m.visibleDays(arg.daily, arg.now, arg.offset);
+        const active = (selected) => m.activeDay(days, selected, arg.now, arg.offset);
+        return [
+            active(null),
+            active('2026-10-05'),
+            active('2026-10-08')?.local_date,
+            active('2026-10-04'),
+            active('2026-10-20'),
+        ];""",
+        {
+            "daily": weather_views["uberlandia"]["daily"],
+            "now": CAPTURE_NOW,
+            "offset": UBERLANDIA_OFFSET,
+        },
+    )
+    assert result == [None, None, "2026-10-08", None, None]

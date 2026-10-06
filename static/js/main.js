@@ -1,21 +1,22 @@
 /**
  * Ponto de entrada do frontend (arquitetura, seção 5.1).
  *
- * Monta o cabeçalho e as condições atuais, aplica os estados de bloco (carregando, erro,
- * indisponível) aos blocos de dados que ainda são o esqueleto da fatia 5 e inicia o fluxo de
- * localização (`start`). Esses blocos passam a ter o próprio `ui/<bloco>.js` nas fatias 8 a 11.
+ * Monta o cabeçalho, as abas de dias e as condições atuais, aplica os estados de bloco
+ * (carregando, erro, indisponível) aos blocos de dados que ainda são o esqueleto da fatia 5 e
+ * inicia o fluxo de localização (`start`). Esses blocos passam a ter o próprio
+ * `ui/<bloco>.js` nas fatias 9 a 11.
  */
 
 import { retry, start } from './actions.js';
 import { MESSAGES } from './messages.js';
 import { getState, subscribe } from './state.js';
 import { mount as mountCurrent } from './ui/current.js';
+import { mount as mountDayTabs } from './ui/day-tabs.js';
 import { blockState, renderBlockState } from './ui/dom.js';
 import { mount as mountHeader } from './ui/header.js';
 
 // Blocos de dados ainda sem módulo próprio e a parte de cada um no view model (seção 6.3).
 const DATA_BLOCKS = [
-  { selector: '.day-tabs', part: 'daily', unavailable: MESSAGES.daily.unavailable },
   { selector: '.hourly', part: 'hourly', unavailable: MESSAGES.hourly.unavailable },
   { selector: '.minutely', part: 'minutely', unavailable: MESSAGES.minutely.unavailable },
 ];
@@ -35,6 +36,7 @@ function mountDataBlocks() {
 }
 
 mountHeader(document.querySelector('.app-header'));
+mountDayTabs(document.querySelector('.day-tabs'));
 mountCurrent(document.querySelector('.current'));
 mountDataBlocks();
 start();

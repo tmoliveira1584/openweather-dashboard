@@ -83,8 +83,10 @@ export const MESSAGES = deepFreeze({
     dewPoint: 'Ponto de orvalho',
   },
 
-  // Previsão diária (feature 3: RN-028, categoria 5).
+  // Previsão diária (feature 3: RN-028, categoria 5). O nome da faixa de abas não está no
+  // spec: é o nome para leitores de tela (D-22).
   daily: {
+    label: 'Dias da previsão',
     today: 'Hoje',
     unavailable: 'Previsão diária indisponível.',
   },

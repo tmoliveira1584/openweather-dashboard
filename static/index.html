@@ -13,10 +13,10 @@
 </head>
 <body>
   <!--
-    Esqueleto da tela (fatia 5). Os textos e valores das abas, da hora a hora e da previsão
-    por minuto abaixo são provisórios, copiados do exemplo da seção 6.3 da arquitetura. Eles
-    saem nas fatias 8 a 11, quando os blocos passam a ser montados pelos módulos de
-    static/js/ui/ (guardrail 10).
+    Esqueleto da tela (fatia 5). Os textos e valores da hora a hora e da previsão por minuto
+    abaixo são provisórios, copiados do exemplo da seção 6.3 da arquitetura. Eles saem nas
+    fatias 9 a 11, quando os blocos passam a ser montados pelos módulos de static/js/ui/
+    (guardrail 10).
   -->
   <!-- Cabeçalho: estrutura só. Os textos vêm do messages.js e do estado (ui/header.js). -->
   <header class="app-header">
@@ -63,41 +63,9 @@
   </header>
 
   <main class="dashboard">
-    <nav class="day-tabs" aria-label="Dias da previsão">
-      <div class="day-tabs-list" role="tablist">
-        <button type="button" class="day-tab" role="tab" aria-selected="true">
-          <span class="day-tab-label">Hoje</span> <span class="day-tab-temp">31°</span>
-          <img class="day-tab-icon" src="https://openweathermap.org/img/wn/10d@2x.png" alt="Chuva leve" width="32" height="32">
-        </button>
-        <button type="button" class="day-tab" role="tab" aria-selected="false" tabindex="-1">
-          <span class="day-tab-label">Qui</span> <span class="day-tab-temp">35°</span>
-          <img class="day-tab-icon" src="https://openweathermap.org/img/wn/01d@2x.png" alt="Céu limpo" width="32" height="32">
-        </button>
-        <button type="button" class="day-tab" role="tab" aria-selected="false" tabindex="-1">
-          <span class="day-tab-label">Sex</span> <span class="day-tab-temp">37°</span>
-          <img class="day-tab-icon" src="https://openweathermap.org/img/wn/01d@2x.png" alt="Céu limpo" width="32" height="32">
-        </button>
-        <button type="button" class="day-tab" role="tab" aria-selected="false" tabindex="-1">
-          <span class="day-tab-label">Sáb</span> <span class="day-tab-temp">35°</span>
-          <img class="day-tab-icon" src="https://openweathermap.org/img/wn/04d@2x.png" alt="Nublado" width="32" height="32">
-        </button>
-        <button type="button" class="day-tab" role="tab" aria-selected="false" tabindex="-1">
-          <span class="day-tab-label">Dom</span> <span class="day-tab-temp">30°</span>
-          <img class="day-tab-icon" src="https://openweathermap.org/img/wn/10d@2x.png" alt="Chuva leve" width="32" height="32">
-        </button>
-        <button type="button" class="day-tab" role="tab" aria-selected="false" tabindex="-1">
-          <span class="day-tab-label">Seg</span> <span class="day-tab-temp">28°</span>
-          <img class="day-tab-icon" src="https://openweathermap.org/img/wn/10d@2x.png" alt="Chuva leve" width="32" height="32">
-        </button>
-        <button type="button" class="day-tab" role="tab" aria-selected="false" tabindex="-1">
-          <span class="day-tab-label">Ter</span> <span class="day-tab-temp">30°</span>
-          <img class="day-tab-icon" src="https://openweathermap.org/img/wn/04d@2x.png" alt="Nublado" width="32" height="32">
-        </button>
-        <button type="button" class="day-tab" role="tab" aria-selected="false" tabindex="-1">
-          <span class="day-tab-label">Qua</span> <span class="day-tab-temp">33°</span>
-          <img class="day-tab-icon" src="https://openweathermap.org/img/wn/02d@2x.png" alt="Poucas nuvens" width="32" height="32">
-        </button>
-      </div>
+    <!-- Abas de dias: estrutura só. As abas são criadas pelo ui/day-tabs.js. -->
+    <nav class="day-tabs">
+      <div class="day-tabs-list" role="tablist"></div>
     </nav>
 
     <div class="dashboard-row">
@@ -112,7 +80,11 @@
             <span class="current-alerts-text"></span>
           </p>
           <p class="current-time"></p>
-          <p class="current-temp"></p>
+          <!-- Temperatura; num dia diferente de "Hoje", a máxima e a mínima (RN-030). -->
+          <div class="current-main">
+            <p class="current-temp"></p>
+            <p class="current-min" hidden></p>
+          </div>
           <div class="current-summary">
             <img class="current-icon" alt="" width="48" height="48" hidden>
             <p class="current-description"></p>

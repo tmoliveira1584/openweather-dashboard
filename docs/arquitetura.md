@@ -739,7 +739,7 @@ Assinaturas mínimas. A implementação pode ter funções auxiliares privadas a
 | `services/api.js` | `fetchWeather(lat, lon)`, `searchCities(q)`, `reverseGeocode(lat, lon)`, todas devolvendo `{ ok: true, data } \| { ok: false, error }` |
 | `services/cache.js` | `roundCoord(value)` (2 casas, sem "-0.00"), `cacheKey(lat, lon)`, `get(key, nowMs) -> { value, storedAt } \| null`, `set(key, value, nowMs)` |
 | `services/location.js` | `requestLocation({ timeoutMs, onLate }) -> Promise<{ status: 'ok', lat, lon } \| { status: 'unavailable' }>` |
-| `logic/time-window.js` | `cityToday(nowSec, offset)`, `visibleDays(daily, nowSec, offset)` (descarta os dias passados e limita a 8, RN-026 e RN-027), `hourlyWindow(hourly, nowSec)`, `minuteWindow(minutely, nowSec)`, `minuteMarks(window)` |
+| `logic/time-window.js` | `cityToday(nowSec, offset)`, `visibleDays(daily, nowSec, offset)` (descarta os dias passados e limita a 8, RN-026 e RN-027), `activeDay(days, selectedDay, nowSec, offset)` (o dia selecionado, se ainda estiver entre os visíveis e não for hoje; senão `null` = "Hoje", seção 7.4), `hourlyWindow(hourly, nowSec)`, `minuteWindow(minutely, nowSec)`, `minuteMarks(window)` |
 | `logic/summaries.js` | `minuteSummary(window)`, `hourlyAltText(window, scale)` |
 | `logic/chart-math.js` | `monotonePath(points)`, `barHeight(intensity, maxPx, minPx)`, `groupRainLabels(items, minGapPx)` |
 | `ui/dom.js` | `el(tag, { class, text, attrs, on }, children)`, `setText(node, text)`, `setConditionIcon(img, icon, description)` (ícone do provedor com a descrição como texto alternativo; sem código, a imagem fica oculta, RNF-010), `blockState(state, { part, unavailable }) -> { kind, message? }` (seção 6.5), `renderBlockState(block, view, { onRetry })` (`data-block-state`, `aria-busy` e o `.block-state` com indicador, mensagem ou "Tentar novamente") |
@@ -838,7 +838,7 @@ Abaixo de 600 px, tudo fica empilhado em uma coluna. A partir de 600 px, se o ca
 | Tempo limite de 15 s (RN-012) | No backend (httpx). O `api.js` tem uma trava de segurança de 17 s com `AbortController`, tratada como `provider_timeout` |
 | Pedidos idênticos (RF-015) | `api.js` guarda as promessas em andamento por URL e devolve a mesma promessa |
 | Retorno à página (RF-014) | `visibilitychange` → `refreshIfStale(Date.now())`. Se `fetchedAt` passou de 10 min: status `refreshing`, nova consulta e dados antigos visíveis |
-| Aba selecionada após atualização (feature 3, categoria 8) | Mantém `selectedDay` se ele ainda estiver em `visibleDays`. Se não, volta para `null` ("Hoje") |
+| Aba selecionada após atualização ou meia-noite (feature 3, categoria 8) | Mantém `selectedDay` se ele ainda estiver em `visibleDays`. Se não, a tela volta para "Hoje". O dia ativo é derivado por `activeDay` a cada desenho, nas abas e no card, sem mudar o estado: um dia que virou passado nunca volta a ser visível |
 | Coordenadas do `/api/weather` | Arredondadas a 2 casas, iguais à chave do cache (RN-010, P-008). O marcador do mapa usa as coordenadas originais |
 
 ### 7.5 Fuso horário
@@ -937,7 +937,7 @@ Atende RF-039, RF-040, RN-041, RN-042, CA-027, CA-028.
 | Ponta a ponta | pytest-playwright no Chrome (`--browser-channel chrome`) | CAs de interface: localização (permissões e geolocalização simuladas), busca, abas, escala, teclado, larguras de 360 e 600 px, falhas simuladas por `page.route`, relógio controlado por `page.clock` | `tests/e2e/` |
 | Fumaça com o provedor real | pytest, marcador `live` | Uma chamada real a cada rota. **Fica de fora por padrão.** Roda manualmente, com a chave no `.env` | `tests/api/test_live.py` |
 
-Os testes de ponta a ponta sobem o backend numa thread (fixture `live_server` no `conftest.py`) e interceptam `/api/*` com as fixtures. Não usam internet nem cota.
+Os testes de ponta a ponta sobem o backend numa thread (fixture `live_server` no `conftest.py`) e interceptam `/api/*` com as fixtures. Não usam internet nem cota. O relógio de cada página começa no momento das capturas (`CAPTURE_NOW`, com `page.clock`) e anda normalmente, para que "Hoje" e as janelas de tempo não dependam da data em que os testes rodam.
 
 ### 9.2 Fixtures (`tests/fixtures/`)
 

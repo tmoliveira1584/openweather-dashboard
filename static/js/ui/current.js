@@ -1,13 +1,16 @@
 /**
  * Condições atuais (arquitetura, seção 5.1; feature 2): card principal e os seis indicadores.
+ * Com uma aba de dia diferente de "Hoje" selecionada, mostra o resumo desse dia (feature 3).
  *
  * Usa a estrutura do `index.html` e preenche os textos pelo `messages.js` e pelo view model.
  * Os valores chegam prontos do backend, nas duas escalas: aqui só se escolhe o texto da escala
  * ativa (ADR-004, guardrail 8). A ilustração de cada grupo de condição fica no CSS, pelo
- * `data-condition` do card (ADR-012).
+ * `data-condition` do card (ADR-012). O dia ativo sai de `logic/time-window.js`, com o
+ * relógio do navegador, como nas abas (`ui/day-tabs.js`).
  */
 
 import { retry } from '../actions.js';
+import { activeDay, visibleDays } from '../logic/time-window.js';
 import { MESSAGES } from '../messages.js';
 import { getState, subscribe } from '../state.js';
 import { blockState, renderBlockState, setConditionIcon, setText } from './dom.js';
@@ -44,6 +47,7 @@ export function mount(root) {
     alertsText: card.querySelector('.current-alerts-text'),
     time: card.querySelector('.current-time'),
     temp: card.querySelector('.current-temp'),
+    min: card.querySelector('.current-min'),
     icon: card.querySelector('.current-icon'),
     description: card.querySelector('.current-description'),
     feelsLike: card.querySelector('.current-feels-like'),
@@ -55,33 +59,73 @@ export function mount(root) {
     values.set(key, item.querySelector('.indicator-value'));
   }
 
-  let drawn = { current: null, scale: null };
+  let drawn = { current: null, day: null, scale: null };
   const render = (state) => {
     renderBlockState(root, blockState(state), { onRetry: () => retry() });
     const current = state.weather?.current;
-    // Redesenha só com dados novos ou outra escala (RF-055, RF-058).
-    if (!current || (current === drawn.current && state.scale === drawn.scale)) return;
-    drawn = { current, scale: state.scale };
-    drawCard(card, nodes, current, state.scale);
-    for (const [key, node] of values) setText(node, inScale(current.indicators[key], state.scale));
+    if (!current) return;
+    const day = selectedDay(state.weather, state.selectedDay);
+    // Redesenha só com dados novos, outro dia ou outra escala (RF-055, RF-058, RNF-013).
+    const { scale } = state;
+    if (current === drawn.current && day === drawn.day && scale === drawn.scale) return;
+    drawn = { current, day, scale };
+    drawCard(card, nodes, day ? daySummary(day) : currentSummary(current), scale);
+    const { indicators } = day ?? current;
+    for (const [key, node] of values) setText(node, inScale(indicators[key], scale));
   };
   subscribe(render);
   render(getState());
 }
 
 /**
- * Card principal da aba "Hoje": temperatura, descrição, sensação, hora local, selo de alertas,
- * ícone e ilustração (RF-016 a RF-019, RN-014 a RN-018). Valor ausente já vem como "—"
+ * Dia que o bloco resume, ou `null` para as condições atuais (RF-026 a RF-028, seção 7.4).
+ * @returns {object | null} item de `WeatherView.daily`
+ */
+function selectedDay(weather, selected) {
+  if (selected == null || !weather.daily) return null;
+  const nowSec = Math.floor(Date.now() / 1000);
+  const days = visibleDays(weather.daily, nowSec, weather.timezone_offset);
+  return activeDay(days, selected, nowSec, weather.timezone_offset);
+}
+
+/** Card da aba "Hoje": temperatura atual, hora local e sensação (RF-016, RN-014 a RN-016). */
+function currentSummary(current) {
+  return {
+    ...current,
+    time: current.time_label,
+    temp: current.temp,
+    min: null,
+  };
+}
+
+/**
+ * Card de outro dia: máxima, "Mín. X°", sensação diurna e a data no lugar da hora (RF-026,
+ * RN-030), com a ilustração e o selo do dia (RF-030, RN-033).
+ */
+function daySummary(day) {
+  return {
+    ...day,
+    time: day.date_label,
+    temp: day.max,
+    min: day.min_label,
+  };
+}
+
+/**
+ * Desenha o card principal: temperatura, descrição, sensação, hora ou data, selo de alertas,
+ * ícone e ilustração (RF-016 a RF-019, RN-017, RN-018). Valor ausente já vem como "—"
  * (RF-023, P-013).
  */
-function drawCard(card, nodes, current, scale) {
-  card.dataset.condition = current.condition_group;
-  setText(nodes.time, current.time_label);
-  setText(nodes.temp, inScale(current.temp, scale));
-  setText(nodes.description, current.description);
-  setText(nodes.feelsLike, inScale(current.feels_like, scale));
-  setConditionIcon(nodes.icon, current.icon, current.description);
+function drawCard(card, nodes, summary, scale) {
+  card.dataset.condition = summary.condition_group;
+  setText(nodes.time, summary.time);
+  setText(nodes.temp, inScale(summary.temp, scale));
+  setText(nodes.min, summary.min && inScale(summary.min, scale));
+  nodes.min.hidden = summary.min == null;
+  setText(nodes.description, summary.description);
+  setText(nodes.feelsLike, inScale(summary.feels_like, scale));
+  setConditionIcon(nodes.icon, summary.icon, summary.description);
   // O selo diz a quantidade em texto, e some sem alertas (RF-018, RF-019, RNF-010).
-  setText(nodes.alertsText, current.alerts_label);
-  nodes.alerts.hidden = current.alerts_label == null;
+  setText(nodes.alertsText, summary.alerts_label);
+  nodes.alerts.hidden = summary.alerts_label == null;
 }
