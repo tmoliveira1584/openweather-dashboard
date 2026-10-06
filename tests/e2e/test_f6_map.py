@@ -11,15 +11,12 @@ import re
 import time
 
 import pytest
-from playwright.sync_api import Page, Route, expect
+from playwright.sync_api import Page, expect
 
 from tests.e2e.location import allow_location
+from tests.e2e.tiles import CARTO_TILE, TILES_DONE_JS
 from tests.e2e.weather_api import _load, view_of
-from tests.fakes import TRANSPARENT_PNG
 
-CARTO_TILE = re.compile(r"^https://[a-d]\.basemaps\.cartocdn\.com/rastertiles/voyager/")
-RAIN_TILE = re.compile(r"/api/tiles/precipitation/")
-ZXY = re.compile(r"/(\d+)/(\d+)/(\d+)\.png$")
 UBERLANDIA = (-18.9186, -48.2772)
 ATTRIBUTION = "© OpenStreetMap contributors © CARTO · Dados de precipitação © OpenWeather"
 TILE_SIZE = 256
@@ -31,53 +28,6 @@ ZOOM_JS = """() => {
     const top = levels.reduce((a, b) => (+b.style.zIndex > +a.style.zIndex ? b : a));
     return Number(top.querySelector('img').src.match(/\\/(\\d+)\\/\\d+\\/\\d+\\.png/)[1]);
 }"""
-TILES_DONE_JS = """() => {
-    const tiles = [...document.querySelectorAll('#map img.leaflet-tile')];
-    return tiles.length > 0 && tiles.every((tile) => tile.complete);
-}"""
-
-
-def zxy(url: str) -> tuple[int, int, int]:
-    z, x, y = ZXY.search(url).groups()
-    return int(z), int(x), int(y)
-
-
-class Tiles:
-    """Tiles do mapa base (CARTO) e da camada de chuva (`/api/tiles/...`) simuladas.
-
-    - `base` e `rain` guardam o `(z, x, y)` de cada pedido.
-    - `base_fails` e `rain_fails` decidem se cada tile falha. A camada de chuva falha como o
-      backend: 502 com o código de erro (seção 6.4).
-    """
-
-    def __init__(self, page: Page):
-        self.base: list[tuple[int, int, int]] = []
-        self.rain: list[tuple[int, int, int]] = []
-        self.base_fails = lambda tile: False
-        self.rain_fails = lambda tile: False
-        page.route(CARTO_TILE, self._base)
-        page.route(RAIN_TILE, self._rain)
-
-    def _base(self, route: Route) -> None:
-        tile = zxy(route.request.url)
-        self.base.append(tile)
-        if self.base_fails(tile):
-            route.abort()
-        else:
-            route.fulfill(status=200, content_type="image/png", body=TRANSPARENT_PNG)
-
-    def _rain(self, route: Route) -> None:
-        tile = zxy(route.request.url)
-        self.rain.append(tile)
-        if self.rain_fails(tile):
-            route.fulfill(status=502, json={"error": "provider_rate_limited"})
-        else:
-            route.fulfill(status=200, content_type="image/png", body=TRANSPARENT_PNG)
-
-
-@pytest.fixture
-def tiles(page: Page) -> Tiles:
-    return Tiles(page)
 
 
 def the_map(page: Page):

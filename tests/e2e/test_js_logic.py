@@ -112,6 +112,7 @@ INITIAL_STATE = {
     "weatherStatus": "idle",
     "weatherError": None,
     "fetchedAt": None,
+    "minute": None,
     "locationNotice": False,
     "search": {"status": "idle", "results": [], "truncated": False, "message": None},
 }
@@ -120,6 +121,55 @@ INITIAL_STATE = {
 def test_state_starts_with_the_initial_state_of_section_6_5(logic_page: Page):
     """Seção 6.5, RF-054, RF-025: estado inicial com °C, aba "Hoje" e nada carregado."""
     assert evaluate(logic_page, "state.js", "return m.getState();") == INITIAL_STATE
+
+
+def test_tick_changes_the_state_only_when_the_minute_turns(logic_page: Page):
+    """Seção 7.4 (passagem do tempo): `tick` muda `minute` só na virada do minuto, para os
+    blocos recalcularem as janelas sem redesenhos a mais."""
+    changes = evaluate(
+        logic_page,
+        "actions.js",
+        """
+        const { getState, subscribe } = await import('/js/state.js');
+        const minutes = [];
+        subscribe((state) => minutes.push(state.minute));
+        for (const ms of [120_000, 150_000, 179_999, 180_000, 180_001]) m.tick(ms);
+        return [minutes, getState().minute];
+        """,
+    )
+    assert changes == [[2, 3], 3]
+
+
+@pytest.mark.parametrize(
+    ("status", "fetched_ago_ms", "refreshes"),
+    [
+        ("ready", 600_000, True),
+        ("ready", 599_999, False),
+        ("refreshing", 900_000, False),
+        ("loading", 900_000, False),
+        ("error", 900_000, False),
+    ],
+)
+def test_rf_014_refresh_if_stale_only_with_data_shown_for_10_minutes(
+    logic_page: Page, status: str, fetched_ago_ms: int, refreshes: bool
+):
+    """RF-014, seção 7.4: `refreshIfStale` só consulta com os dados exibidos (`ready`) há 10
+    min ou mais, e passa ao status `refreshing` sem apagar os dados antigos."""
+    result = evaluate(
+        logic_page,
+        "actions.js",
+        """
+        const { getState, setState } = await import('/js/state.js');
+        const city = { lat: 1, lon: 2, headerLabel: 'X', markerLabel: 'X', source: 'search' };
+        const weather = { current: null };
+        setState({ city, weather, weatherStatus: arg.status, fetchedAt: 1_000_000 });
+        m.refreshIfStale(1_000_000 + arg.ago);
+        const state = getState();
+        return [state.weatherStatus, state.weather === weather];
+        """,
+        {"status": status, "ago": fetched_ago_ms},
+    )
+    assert result == ["refreshing" if refreshes else status, True]
 
 
 def test_state_set_state_merges_patch_and_notifies_listeners(logic_page: Page):

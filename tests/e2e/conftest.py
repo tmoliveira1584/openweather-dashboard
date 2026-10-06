@@ -1,10 +1,11 @@
-"""Fixtures dos testes de ponta a ponta: `/api/weather` e `/api/geo/*` simulados (ver
-`weather_api.py` e `geo_api.py`)."""
+"""Fixtures dos testes de ponta a ponta: `/api/weather`, `/api/geo/*` e as tiles do mapa
+simulados (ver `weather_api.py`, `geo_api.py` e `tiles.py`)."""
 
 import pytest
 from playwright.sync_api import Page
 
 from tests.e2e.geo_api import GeoApi
+from tests.e2e.tiles import Tiles
 from tests.e2e.weather_api import WeatherApi, weather_view
 
 
@@ -24,3 +25,9 @@ def weather_api(page: Page, weather_views) -> WeatherApi:
 def geo_api(page: Page) -> GeoApi:
     """Simulação do `/api/geo/search` e do `/api/geo/reverse` registrada na página do teste."""
     return GeoApi(page)
+
+
+@pytest.fixture
+def tiles(page: Page) -> Tiles:
+    """Tiles do mapa base e da camada de chuva simuladas na página do teste."""
+    return Tiles(page)

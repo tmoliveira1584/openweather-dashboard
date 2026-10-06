@@ -421,7 +421,7 @@ openweather-dashboard/
 │   └── js/
 │       ├── main.js                   # ponto de entrada: monta os blocos e inicia o fluxo de localização
 │       ├── state.js                  # estado único: getState, setState, subscribe
-│       ├── actions.js                # start, selectCity, retry, search, selectDay, setScale, refreshIfStale
+│       ├── actions.js                # start, selectCity, retry, search, selectDay, setScale, refreshIfStale, tick
 │       ├── messages.js               # todos os textos fixos da interface (seção 7.3)
 │       ├── services/
 │       │   ├── api.js                # chamadas ao /api: tempo limite, "Ainda carregando…", erros
@@ -696,6 +696,7 @@ const initialState = {
   weatherStatus: 'idle',   // 'slow' = mais de 3 s ("Ainda carregando…", RN-012)
   weatherError: null,      // código da seção 6.4 | 'server_unreachable' | null
   fetchedAt: null,         // ms do recebimento, para RF-014
+  minute: null,            // minuto do relógio (ms / 60 000), muda a cada minuto (seção 7.4)
   locationNotice: false,   // aviso de cidade padrão (RF-003, RN-002)
   search: { status: 'idle', results: [], truncated: false, message: null }
                            // status: 'idle' | 'loading' | 'open' | 'empty' | 'error' | 'invalid'
@@ -735,7 +736,7 @@ Assinaturas mínimas. A implementação pode ter funções auxiliares privadas a
 | Módulo | Exportações |
 |---|---|
 | `state.js` | `getState()` (estado congelado), `setState(patch)`, `subscribe(listener(state, previous)) -> unsubscribe` |
-| `actions.js` | `DEFAULT_CITY`, `SEARCH_MAX_LENGTH` (100, RN-004), `start()` (pede a localização e seleciona a cidade dela ou a padrão, RF-001 a RF-003), `selectCity(city)` (escolher uma cidade que não seja a padrão fecha o aviso de localização, RN-002), `dismissLocationNotice()` (fecha o aviso, RN-002), `retry()`, `search(term)`, `closeSearch()`, `chooseSearchResult(result)` (fecha a lista e seleciona a cidade do item, RF-008), `selectDay(localDate \| null)`, `setScale(scale)`, `refreshIfStale(nowMs)` |
+| `actions.js` | `DEFAULT_CITY`, `SEARCH_MAX_LENGTH` (100, RN-004), `start()` (pede a localização e seleciona a cidade dela ou a padrão, RF-001 a RF-003), `selectCity(city)` (escolher uma cidade que não seja a padrão fecha o aviso de localização, RN-002), `dismissLocationNotice()` (fecha o aviso, RN-002), `retry()`, `search(term)`, `closeSearch()`, `chooseSearchResult(result)` (fecha a lista e seleciona a cidade do item, RF-008), `selectDay(localDate \| null)`, `setScale(scale)`, `refreshIfStale(nowMs)` (com os dados exibidos há 10 min ou mais, nova consulta com os dados antigos visíveis; uma falha vira o estado `error`, RF-014), `tick(nowMs)` (muda `minute` só quando o minuto vira, para os blocos recalcularem as janelas de tempo) |
 | `messages.js` | `MESSAGES` (catálogo congelado, seção 7.3), `weatherErrorMessage(code)` (código desconhecido ou ausente → mensagem de `provider_unavailable`) |
 | `services/api.js` | `fetchWeather(lat, lon)`, `searchCities(q)`, `reverseGeocode(lat, lon)`, todas devolvendo `{ ok: true, data } \| { ok: false, error }` |
 | `services/cache.js` | `roundCoord(value)` (2 casas, sem "-0.00"), `cacheKey(lat, lon)`, `get(key, nowMs) -> { value, storedAt } \| null`, `set(key, value, nowMs)` |
@@ -840,7 +841,8 @@ Abaixo de 600 px, tudo fica empilhado em uma coluna. A partir de 600 px, se o ca
 | "Ainda carregando…" (RN-012) | `setTimeout` de 3 s em `actions.js`, que muda o status para `slow` |
 | Tempo limite de 15 s (RN-012) | No backend (httpx). O `api.js` tem uma trava de segurança de 17 s com `AbortController`, tratada como `provider_timeout` |
 | Pedidos idênticos (RF-015) | `api.js` guarda as promessas em andamento por URL e devolve a mesma promessa |
-| Retorno à página (RF-014) | `visibilitychange` → `refreshIfStale(Date.now())`. Se `fetchedAt` passou de 10 min: status `refreshing`, nova consulta e dados antigos visíveis |
+| Retorno à página (RF-014) | `visibilitychange` → `refreshIfStale(Date.now())`. Se `fetchedAt` passou de 10 min: status `refreshing`, nova consulta e dados antigos visíveis. Uma falha da nova consulta segue o RF-013: mensagem e "Tentar novamente" |
+| Passagem do tempo (RN-026, RN-034, RN-047) | O `main.js` chama `tick(Date.now())` na virada de cada minuto (`setTimeout` até o próximo minuto cheio) e ao voltar à página. O `tick` muda `minute` no estado, e cada bloco recalcula a janela com o relógio: o minuto, a hora ou o dia que passou sai da tela sem consulta, mesmo com a página parada. Os limites de minuto, hora e dia caem sempre num minuto cheio, porque os fusos têm deslocamento múltiplo de 15 min |
 | Aba selecionada após atualização ou meia-noite (feature 3, categoria 8) | Mantém `selectedDay` se ele ainda estiver em `visibleDays`. Se não, a tela volta para "Hoje". O dia ativo é derivado por `activeDay` a cada desenho, nas abas e no card, sem mudar o estado: um dia que virou passado nunca volta a ser visível |
 | Coordenadas do `/api/weather` | Arredondadas a 2 casas, iguais à chave do cache (RN-010, P-008). O marcador do mapa usa as coordenadas originais |
 
@@ -998,7 +1000,7 @@ Cada fatia é pequena, verificável e depende só das anteriores. As tarefas de 
 | 9 | Hora a hora | `ui/hourly.js`, `logic/chart-math.js`, `hourlyAltText` | Feature 4 (RF-033 a RF-038) |
 | 10 | Por minuto | `ui/minutely.js`, `minuteWindow`, `minuteMarks`, `minuteSummary` | Feature 5 (RF-039 a RF-045) |
 | 11 | Mapa | `ui/map.js` | Feature 6 (RF-046 a RF-052) |
-| 12 | Robustez, desempenho e acessibilidade | RF-014 (retorno à página), concorrência, tempos de resposta, privacidade, revisão de teclado e de 360 px | Categorias 7 e 8, RNF-001, RNF-002, RNF-022, RNF-026, P-023, P-024 |
+| 12 | Robustez, desempenho e acessibilidade | RF-014 (retorno à página, `refreshIfStale`), passagem do tempo (`tick`), concorrência, tempos de resposta, privacidade, revisão de teclado e de 360 px | Categorias 7 e 8, RNF-001, RNF-002, RNF-022, RNF-026, P-023, P-024 |
 | 13 | Fechamento | CAs restantes de ponta a ponta, fumaça com o provedor real, README e release `v0.1.0` | Todos os CA |
 
 **Modelo de pedido para cada fatia** (use com `/costar`):

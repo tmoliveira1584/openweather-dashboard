@@ -2,8 +2,8 @@
  * Fluxos da aplicação: a única camada que muda o estado (arquitetura, seções 2.2 e 6.6).
  *
  * Até aqui: `selectCity` e `retry` (fatia 6a), busca e escala (fatia 6b), localização inicial
- * e aviso de localização (fatia 6c) e aba de dia (fatia 8). O `refreshIfStale` entra na
- * fatia 12.
+ * e aviso de localização (fatia 6c), aba de dia (fatia 8) e retorno à página e passagem do
+ * tempo (fatia 12).
  */
 
 import { MESSAGES } from './messages.js';
@@ -15,6 +15,7 @@ import { getState, setState } from './state.js';
 export const LOCATION_TIMEOUT_MS = 10_000; // prazo da localização, a partir do pedido (RN-002)
 export const SLOW_AFTER_MS = 3_000; // "Ainda carregando…" (RN-012)
 export const SEARCH_MAX_LENGTH = 100; // o campo não aceita mais caracteres (RN-004)
+const MINUTE_MS = 60_000;
 const SEARCH_MIN_LENGTH = 2; // sem os espaços das pontas (RN-004)
 const SCALES = new Set(['c', 'f']);
 const SEARCH_IDLE = Object.freeze({ status: 'idle', results: [], truncated: false, message: null });
@@ -119,6 +120,34 @@ export function retry() {
   if (weatherStatus !== 'error' || !city) return Promise.resolve();
   setState({ weatherStatus: 'loading', weatherError: null });
   return loadWeather(city, selectionId);
+}
+
+/**
+ * Retorno à página (RF-014): com os dados exibidos há 10 min ou mais, faz uma nova consulta
+ * da cidade selecionada. Os dados antigos continuam visíveis com "Atualizando…" (status
+ * `refreshing`) até a resposta. Uma falha segue o RF-013: mensagem e "Tentar novamente". A
+ * aba de dia selecionada é mantida se o dia ainda existir (feature 3, categoria 8). Sem dados
+ * exibidos, com consulta em andamento ou com dados recentes, não faz nada.
+ * @param {number} nowMs o momento atual, em ms
+ * @returns {Promise<void>} termina quando a consulta termina
+ */
+export function refreshIfStale(nowMs) {
+  const { city, selectionId, weatherStatus, fetchedAt } = getState();
+  if (!city || weatherStatus !== 'ready' || fetchedAt == null) return Promise.resolve();
+  if (nowMs - fetchedAt < cache.CACHE_TTL_MS) return Promise.resolve();
+  setState({ weatherStatus: 'refreshing' });
+  return loadWeather(city, selectionId);
+}
+
+/**
+ * Passagem do tempo: muda `minute` no estado só quando o minuto vira. Os blocos se redesenham
+ * e recalculam as janelas com o relógio, então o minuto, a hora ou o dia que passou sai da
+ * tela sem consulta (RN-026, RN-034, RN-047, arquitetura, seção 7.4).
+ * @param {number} nowMs o momento atual, em ms
+ */
+export function tick(nowMs) {
+  const minute = Math.floor(nowMs / MINUTE_MS);
+  if (minute !== getState().minute) setState({ minute });
 }
 
 async function loadWeather(city, selectionId) {

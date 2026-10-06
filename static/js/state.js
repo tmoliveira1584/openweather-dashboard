@@ -20,6 +20,7 @@ const initialState = Object.freeze({
   weatherStatus: 'idle', // 'slow' = mais de 3 s ("Ainda carregando…", RN-012)
   weatherError: null, // código da seção 6.4 | 'server_unreachable' | null
   fetchedAt: null, // ms do recebimento, para RF-014
+  minute: null, // minuto do relógio (ms / 60 000): muda a cada minuto, para redesenhar as janelas
   locationNotice: false, // aviso de cidade padrão (RF-003, RN-002)
   search: Object.freeze({ status: 'idle', results: [], truncated: false, message: null }),
   // status: 'idle' | 'loading' | 'open' | 'empty' | 'error'

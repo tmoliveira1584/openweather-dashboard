@@ -1,4 +1,5 @@
-"""Testes de segurança: a chave e a localização nunca vazam (RNF-004, P-001, P-006, guardrail 13).
+"""Testes de segurança: a chave e a localização nunca vazam (RNF-004, RNF-005, P-001, P-006,
+P-007, guardrail 13).
 
 Cada cenário passa por todas as rotas, com sucesso e com falhas do provedor, e confere as
 respostas, os cabeçalhos e todo o log capturado em nível DEBUG.
@@ -65,7 +66,8 @@ def test_rnf_004_key_never_appears_in_responses_or_log(
 def test_p_006_log_has_no_query_string_nor_coordinates(
     make_mock_app, fake_provider, caplog, failures
 ):
-    """P-006: o log não traz query string, coordenadas, termo de busca nem os z/x/y das tiles."""
+    """P-006, RNF-005: o log não traz query string, coordenadas, termo de busca nem os z/x/y
+    das tiles."""
     fake_provider.overrides.update(failures)
 
     _, log = call_every_route(make_mock_app, fake_provider, caplog)
@@ -74,6 +76,21 @@ def test_p_006_log_has_no_query_string_nor_coordinates(
     assert len(access) == len(PATHS)
     for forbidden in ("?", "lat", LAT, LON, "-18.9", "Santa", "/6/23/35"):
         assert forbidden not in log, forbidden
+
+
+@pytest.mark.parametrize("failures", FAILURES.values(), ids=FAILURES.keys())
+def test_rnf_005_responses_set_no_cookie_and_are_not_stored(
+    make_mock_app, fake_provider, caplog, failures
+):
+    """RNF-005, P-007: nenhuma rota grava cookie no navegador, e toda resposta do `/api`, com
+    as coordenadas consultadas, sai com `Cache-Control: no-store`."""
+    fake_provider.overrides.update(failures)
+
+    responses, _ = call_every_route(make_mock_app, fake_provider, caplog)
+
+    for response in responses:
+        assert "set-cookie" not in response.headers
+        assert response.headers["cache-control"] == "no-store"
 
 
 def test_p_001_http_libraries_do_not_log_urls_even_in_debug(make_mock_app, fake_provider, caplog):

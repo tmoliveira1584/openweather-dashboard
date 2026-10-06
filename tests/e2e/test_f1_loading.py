@@ -11,6 +11,7 @@ import pytest
 from playwright.sync_api import Page, expect
 
 from tests.e2e.clock import open_paused
+from tests.e2e.visibility import leave_page, return_to_page
 from tests.e2e.weather_api import TOKYO, UBERLANDIA
 
 # Blocos de dados da tela (seção 7.1) e um elemento do conteúdo de cada um.
@@ -260,3 +261,130 @@ def test_p_021_block_missing_from_answer_shows_unavailable_and_others_keep_data(
         expect(block).to_have_attribute("data-block-state", "unavailable")
         expect(block.locator(".block-state")).to_have_text(message)
         expect(block.get_by_role("button")).to_have_count(0)
+
+
+# ---------- Retorno à página (fatia 12) ----------
+
+TEN_MINUTES_MS = 600_000
+
+
+def updated_view(weather_views) -> dict:
+    """Resposta da nova consulta: a captura de Uberlândia medida às 16:51, com 23°."""
+    view = weather_views["uberlandia"]
+    current = {**view["current"], "time_label": "16:51", "temp": {"c": "23°", "f": "73°"}}
+    return {**view, "current": current}
+
+
+def open_and_leave(page: Page, weather_api, away_ms: int) -> None:
+    """Abre a página com o relógio parado, recebe os dados e fica `away_ms` em segundo plano.
+    Os pedidos seguintes ficam pendentes (`weather_api.hold`)."""
+    weather_api.hold = True
+    open_paused(page)
+    weather_api.release(0)
+    expect_all(page, "ready")
+    leave_page(page)
+    page.clock.run_for(away_ms)
+
+
+def test_rf_014_return_after_10_minutes_refreshes_with_old_data_visible(
+    page: Page, weather_api, weather_views
+):
+    """RF-014, feature 1 (categoria 8): de volta à página depois de 10 min, os dados antigos
+    continuam visíveis com "Atualizando…" enquanto uma nova consulta é feita. Depois, a tela
+    é atualizada."""
+    open_and_leave(page, weather_api, TEN_MINUTES_MS)
+
+    return_to_page(page)
+
+    expect_all(page, "refreshing")
+    expect(page.get_by_text("Atualizando…", exact=True)).to_have_count(len(BLOCKS))
+    for selector, content in BLOCKS.items():
+        expect(page.locator(selector)).to_have_attribute("aria-busy", "true")
+        expect(page.locator(content)).to_be_visible()
+    expect(page.locator(".current-time")).to_have_text("16:41")
+    weather_api.wait_for_held(2)
+
+    weather_api.release(1, updated_view(weather_views))
+
+    expect_all(page, "ready")
+    expect(page.get_by_text("Atualizando…")).to_have_count(0)
+    expect(page.locator(".current-time")).to_have_text("16:51")
+    expect(page.locator(".current-temp")).to_have_text("23°")
+    assert len(weather_api.urls) == 2
+
+
+def test_rf_014_return_before_10_minutes_keeps_the_data_without_query(page: Page, weather_api):
+    """RF-014, RN-010: de volta à página antes de 10 min, nada é consultado e os blocos
+    continuam prontos."""
+    open_and_leave(page, weather_api, TEN_MINUTES_MS - 1_000)
+
+    return_to_page(page)
+    page.wait_for_timeout(300)
+
+    assert block_states(page) == dict.fromkeys(BLOCKS, "ready")
+    assert len(weather_api.urls) == 1
+
+
+def test_rf_014_leaving_the_page_does_not_query(page: Page, weather_api):
+    """RF-014: a nova consulta acontece na volta à página, não enquanto ela está em segundo
+    plano, e só uma vez por volta."""
+    open_and_leave(page, weather_api, 3 * TEN_MINUTES_MS)
+    leave_page(page)
+    page.wait_for_timeout(300)
+    assert len(weather_api.urls) == 1
+
+    return_to_page(page)
+    return_to_page(page)
+    weather_api.release(1)
+
+    expect_all(page, "ready")
+    assert len(weather_api.urls) == 2
+
+
+def test_rf_014_refresh_keeps_the_selected_day(page: Page, weather_api):
+    """RF-014, feature 3 (categoria 8): com a aba "Qui" selecionada, a atualização mantém o
+    mesmo dia selecionado, porque ele ainda existe."""
+    open_and_leave(page, weather_api, 0)
+    page.locator(".day-tab", has_text="Qui").click()
+    page.clock.run_for(TEN_MINUTES_MS)
+
+    return_to_page(page)
+    weather_api.release(1)
+
+    expect_all(page, "ready")
+    expect(page.locator('.day-tab[aria-selected="true"]')).to_contain_text("Qui")
+    expect(page.locator(".current-time")).to_have_text("Qui, 08/10")
+
+
+def test_rf_014_refresh_failure_shows_message_and_retry(page: Page, weather_api):
+    """RF-014, RF-013: se a nova consulta falhar, os blocos mostram a mensagem do spec e
+    "Tentar novamente", que consulta de novo."""
+    open_and_leave(page, weather_api, TEN_MINUTES_MS)
+
+    return_to_page(page)
+    weather_api.release(1, (502, "provider_unavailable"))
+
+    expect_all(page, "error")
+    expect(page.get_by_text("O serviço de clima está indisponível no momento.")).to_have_count(
+        len(BLOCKS)
+    )
+    page.get_by_role("button", name="Tentar novamente").first.click()
+    weather_api.release(2)
+    expect_all(page, "ready")
+    assert len(weather_api.urls) == 3
+
+
+def test_rf_014_page_without_data_does_not_refresh(page: Page, weather_api):
+    """RF-014: sem dados exibidos (consulta com erro), voltar à página não consulta nada; quem
+    consulta de novo é o "Tentar novamente" (RF-013)."""
+    weather_api.queue = [(502, "provider_unavailable")]
+    open_paused(page)
+    expect_all(page, "error")
+    leave_page(page)
+    page.clock.run_for(TEN_MINUTES_MS)
+
+    return_to_page(page)
+    page.wait_for_timeout(300)
+
+    expect_all(page, "error")
+    assert len(weather_api.urls) == 1
