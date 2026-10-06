@@ -1,13 +1,12 @@
 /**
  * Ponto de entrada do frontend (arquitetura, seção 5.1).
  *
- * Versão provisória: monta o cabeçalho (fatia 6b), aplica os estados de bloco (carregando,
- * erro, indisponível) aos blocos de dados do esqueleto da fatia 5 e seleciona a cidade padrão
- * direto. Cada bloco passa a ter o próprio `ui/<bloco>.js` nas fatias 7 a 11, e o fluxo de
- * localização (`actions.start()`) substitui a seleção direta na fatia 6c.
+ * Monta o cabeçalho, aplica os estados de bloco (carregando, erro, indisponível) aos blocos de
+ * dados do esqueleto da fatia 5 e inicia o fluxo de localização (`start`). Cada bloco passa a
+ * ter o próprio `ui/<bloco>.js` nas fatias 7 a 11.
  */
 
-import { DEFAULT_CITY, retry, selectCity } from './actions.js';
+import { retry, start } from './actions.js';
 import { MESSAGES } from './messages.js';
 import { getState, subscribe } from './state.js';
 import { blockState, renderBlockState } from './ui/dom.js';
@@ -37,4 +36,4 @@ function mountDataBlocks() {
 
 mountHeader(document.querySelector('.app-header'));
 mountDataBlocks();
-selectCity(DEFAULT_CITY);
+start();

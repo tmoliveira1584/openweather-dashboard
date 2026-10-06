@@ -1,8 +1,9 @@
-"""`/api/geo/search` simulado no navegador com `page.route`, para os testes da busca.
+"""`/api/geo/search` e `/api/geo/reverse` simulados no navegador com `page.route`, para os
+testes da busca e da localização.
 
-As respostas são o `CitySearchResult` montado pelo próprio backend (`build_search_result`), a
-partir da captura real de "Santa Maria" ou de cidades públicas descritas aqui, para que o
-contrato simulado nunca se afaste do real.
+As respostas são o `CitySearchResult` e o `ReverseResult` montados como o próprio backend faz
+(`build_search_result`), a partir da captura real de "Santa Maria" ou de cidades públicas
+descritas aqui, para que o contrato simulado nunca se afaste do real.
 """
 
 import json
@@ -17,6 +18,7 @@ from app.schemas.provider import GeoResult
 
 FIXTURES_DIR = Path(__file__).parent.parent / "fixtures"
 SEARCH_URL = re.compile(r"/api/geo/search\?")
+REVERSE_URL = re.compile(r"/api/geo/reverse\?")
 
 # Itens no formato da geocodificação direta do provedor (cidades públicas, P-006).
 CURITIBA = {
@@ -49,6 +51,12 @@ def search_result(raw: list[dict]) -> dict:
     return build_search_result(cities).model_dump(mode="json")
 
 
+def reverse_result(raw: list[dict]) -> dict:
+    """`ReverseResult` que o `/api/geo/reverse` devolveria: a primeira cidade ou `null`."""
+    results = search_result(raw)["results"]
+    return {"result": results[0] if results else None}
+
+
 def _santa_maria() -> list[dict]:
     path = FIXTURES_DIR / "geo_direct_santa_maria.json"
     return json.loads(path.read_text(encoding="utf-8"))
@@ -63,6 +71,8 @@ class GeoApi:
       "Tóquio" (1 cidade).
     - Com `hold = True`, os pedidos ficam pendentes em `held` até `release(i)`.
     - `terms` guarda o termo de cada pedido recebido, para contar as buscas.
+    - Geocodificação reversa: responde com `reverse_answer` (itens do provedor ou
+      `(status, código)`; por padrão, Tóquio) e guarda as coordenadas em `reverse_coords`.
     """
 
     def __init__(self, page: Page):
@@ -75,7 +85,19 @@ class GeoApi:
         self.terms: list[str] = []
         self.held: list[Route] = []
         self.hold = False
+        self.reverse_answer: object = [TOKYO]
+        self.reverse_coords: list[tuple[str, str]] = []
         page.route(SEARCH_URL, self._handle)
+        page.route(REVERSE_URL, self._handle_reverse)
+
+    def _handle_reverse(self, route: Route) -> None:
+        query = parse_qs(urlparse(route.request.url).query)
+        self.reverse_coords.append((query["lat"][0], query["lon"][0]))
+        if isinstance(self.reverse_answer, tuple):
+            status, code = self.reverse_answer
+            route.fulfill(status=status, json={"error": code})
+        else:
+            route.fulfill(json=reverse_result(self.reverse_answer))
 
     def _handle(self, route: Route) -> None:
         self.terms.append(parse_qs(urlparse(route.request.url).query)["q"][0])

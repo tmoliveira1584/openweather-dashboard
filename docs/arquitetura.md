@@ -420,7 +420,7 @@ openweather-dashboard/
 │   └── js/
 │       ├── main.js                   # ponto de entrada: monta os blocos e inicia o fluxo de localização
 │       ├── state.js                  # estado único: getState, setState, subscribe
-│       ├── actions.js                # selectCity, retry, search, selectDay, setScale, refreshIfStale
+│       ├── actions.js                # start, selectCity, retry, search, selectDay, setScale, refreshIfStale
 │       ├── messages.js               # todos os textos fixos da interface (seção 7.3)
 │       ├── services/
 │       │   ├── api.js                # chamadas ao /api: tempo limite, "Ainda carregando…", erros
@@ -734,7 +734,7 @@ Assinaturas mínimas. A implementação pode ter funções auxiliares privadas a
 | Módulo | Exportações |
 |---|---|
 | `state.js` | `getState()` (estado congelado), `setState(patch)`, `subscribe(listener(state, previous)) -> unsubscribe` |
-| `actions.js` | `DEFAULT_CITY`, `SEARCH_MAX_LENGTH` (100, RN-004), `start()`, `selectCity(city)`, `retry()`, `search(term)`, `closeSearch()`, `chooseSearchResult(result)` (fecha a lista e seleciona a cidade do item, RF-008), `selectDay(localDate \| null)`, `setScale(scale)`, `refreshIfStale(nowMs)` |
+| `actions.js` | `DEFAULT_CITY`, `SEARCH_MAX_LENGTH` (100, RN-004), `start()` (pede a localização e seleciona a cidade dela ou a padrão, RF-001 a RF-003), `selectCity(city)` (escolher uma cidade que não seja a padrão fecha o aviso de localização, RN-002), `dismissLocationNotice()` (fecha o aviso, RN-002), `retry()`, `search(term)`, `closeSearch()`, `chooseSearchResult(result)` (fecha a lista e seleciona a cidade do item, RF-008), `selectDay(localDate \| null)`, `setScale(scale)`, `refreshIfStale(nowMs)` |
 | `messages.js` | `MESSAGES` (catálogo congelado, seção 7.3), `weatherErrorMessage(code)` (código desconhecido ou ausente → mensagem de `provider_unavailable`) |
 | `services/api.js` | `fetchWeather(lat, lon)`, `searchCities(q)`, `reverseGeocode(lat, lon)`, todas devolvendo `{ ok: true, data } \| { ok: false, error }` |
 | `services/cache.js` | `roundCoord(value)` (2 casas, sem "-0.00"), `cacheKey(lat, lon)`, `get(key, nowMs) -> { value, storedAt } \| null`, `set(key, value, nowMs)` |

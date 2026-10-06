@@ -1,7 +1,8 @@
 """Feature 1, carregamento dos dados: estados dos blocos, erros, cache e respostas antigas.
 
-A página abre com a cidade padrão (o `main.js` provisório da fatia 6a). O `/api/weather` é
-simulado com `page.route` (ver `weather_api.py`) e o tempo, com `page.clock`.
+A página abre com a cidade padrão: sem permissão concedida, o Chrome do Playwright nega a
+localização na hora (ver `test_f1_location.py`). O `/api/weather` é simulado com `page.route`
+(ver `weather_api.py`) e o tempo, com `page.clock`.
 """
 
 import re

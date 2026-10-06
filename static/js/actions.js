@@ -1,15 +1,18 @@
 /**
  * Fluxos da aplicação: a única camada que muda o estado (arquitetura, seções 2.2 e 6.6).
  *
- * Até aqui: `selectCity` e `retry` (fatia 6a), busca e escala (fatia 6b). Os demais fluxos
- * (`start`, `selectDay`, `refreshIfStale`) entram nas fatias 6c, 8 e 12.
+ * Até aqui: `selectCity` e `retry` (fatia 6a), busca e escala (fatia 6b), localização inicial
+ * e aviso de localização (fatia 6c). Os demais fluxos (`selectDay`, `refreshIfStale`) entram
+ * nas fatias 8 e 12.
  */
 
 import { MESSAGES } from './messages.js';
-import { fetchWeather, searchCities } from './services/api.js';
+import { fetchWeather, reverseGeocode, searchCities } from './services/api.js';
 import * as cache from './services/cache.js';
+import { requestLocation } from './services/location.js';
 import { getState, setState } from './state.js';
 
+export const LOCATION_TIMEOUT_MS = 10_000; // prazo da localização, a partir do pedido (RN-002)
 export const SLOW_AFTER_MS = 3_000; // "Ainda carregando…" (RN-012)
 export const SEARCH_MAX_LENGTH = 100; // o campo não aceita mais caracteres (RN-004)
 const SEARCH_MIN_LENGTH = 2; // sem os espaços das pontas (RN-004)
@@ -26,9 +29,64 @@ export const DEFAULT_CITY = Object.freeze({
 });
 
 /**
+ * Abertura da página: pede a localização e seleciona a cidade dela ou a cidade padrão
+ * (RF-001 a RF-003, RN-001, RN-002).
+ * - Localização obtida no prazo: o nome vem da geocodificação reversa, ou "Sua localização"
+ *   se ela falhar ou não trouxer um nome (RF-002, RN-009).
+ * - Negada, indisponível ou sem resposta em 10 s: cidade padrão com o aviso de localização.
+ * - Localização que chega depois do prazo: substitui a cidade padrão, se ela ainda estiver
+ *   selecionada (RN-003).
+ * - A busca funciona com o pedido pendente, e a cidade escolhida nela prevalece (P-009).
+ * @returns {Promise<void>} termina quando a primeira consulta de clima termina
+ */
+export async function start() {
+  const location = await requestLocation({
+    timeoutMs: LOCATION_TIMEOUT_MS,
+    onLate: applyLateLocation,
+  });
+  if (getState().city) return; // a busca já escolheu uma cidade (P-009)
+  if (location.status === 'ok') return selectLocation(location);
+  setState({ locationNotice: true });
+  return selectCity(DEFAULT_CITY);
+}
+
+/**
+ * Localização tardia: substitui a cidade padrão. Se o usuário já escolheu outra cidade, ela é
+ * descartada (RN-003).
+ */
+function applyLateLocation(location) {
+  if (getState().city?.source === 'default') selectLocation(location);
+}
+
+/**
+ * Seleciona a coordenada do dispositivo com o nome da geocodificação reversa (RF-002, RN-009).
+ * Se outra cidade for escolhida enquanto o nome é buscado, a localização é descartada
+ * (RN-003, P-009).
+ */
+async function selectLocation({ lat, lon }) {
+  const { selectionId } = getState();
+  const result = await reverseGeocode(lat, lon);
+  if (getState().selectionId !== selectionId) return;
+  const place = result.ok ? result.data.result : null;
+  return selectCity({
+    lat,
+    lon,
+    headerLabel: place?.header_label || MESSAGES.location.unnamed,
+    markerLabel: place?.marker_label || MESSAGES.location.unnamed,
+    source: 'geolocation',
+  });
+}
+
+/** Fecha o aviso de localização. A cidade selecionada continua a mesma (RN-002). */
+export function dismissLocationNotice() {
+  if (getState().locationNotice) setState({ locationNotice: false });
+}
+
+/**
  * Torna `city` a cidade selecionada e obtém o clima dela (RF-004, RF-005, RN-013).
  * Com dado válido no cache, ele aparece na hora, sem consulta e sem carregamento (RN-010,
- * RNF-002). Sem cache, o status fica `loading` até a resposta.
+ * RNF-002). Sem cache, o status fica `loading` até a resposta. Escolher uma cidade que não
+ * seja a padrão fecha o aviso de localização (RN-002).
  * @param {import('./state.js').City} city
  * @returns {Promise<void>} termina quando a consulta termina
  */
@@ -36,6 +94,7 @@ export function selectCity(city) {
   const selectionId = getState().selectionId + 1;
   const cached = cache.get(cache.cacheKey(city.lat, city.lon), Date.now());
   const common = { city, selectionId, selectedDay: null, weatherError: null };
+  if (city.source !== 'default') common.locationNotice = false;
   if (cached) {
     setState({
       ...common,

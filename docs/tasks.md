@@ -11,11 +11,11 @@ Lista de tarefas que leva a aplicação de zero a 100% dos requisitos, uma fatia
 
 | Item | Valor |
 |---|---|
-| Fatia atual | 6c — Localização inicial e cidade padrão (não iniciada) |
-| Próxima tarefa | T-6c.1 |
+| Fatia atual | 7 — Condições atuais (não iniciada) |
+| Próxima tarefa | T-7.1 |
 | Concluídas, ainda sem commit | — |
-| Último commit de implementação | Fatia 6b, commit `feat(ui): buscar cidades e alternar a escala no cabeçalho` de 2026-10-06 (o hash é registrado aqui no início da fatia 6c). Fatia 6a: `f442956`. Fatia 5: `ecc8bf0`. Fatia 4: `4ee7d59`. Fatia 3: `8f56a1a`. Fatia 2: `8fb0ce7`. Fatia 1: `b5ff9c1`. Fatia 0: `880fa41` |
-| IDs fechados | 69 de 217 (31,8%) |
+| Último commit de implementação | Fatia 6c, commit `feat(ui): iniciar pela localização do usuário ou pela cidade padrão` de 2026-10-06 (o hash é registrado aqui no início da fatia 7). Fatia 6b: `30b078a`. Fatia 6a: `f442956`. Fatia 5: `ecc8bf0`. Fatia 4: `4ee7d59`. Fatia 3: `8f56a1a`. Fatia 2: `8fb0ce7`. Fatia 1: `b5ff9c1`. Fatia 0: `880fa41` |
+| IDs fechados | 81 de 217 (37,3%) |
 
 ## Como usar
 
@@ -41,7 +41,7 @@ Lista de tarefas que leva a aplicação de zero a 100% dos requisitos, uma fatia
 | 5 | Estrutura da tela | 1 | Concluída |
 | 6a | Estado, cache e chamadas ao backend | 13 | Concluída |
 | 6b | Cabeçalho, busca e seletor de escala | 24 | Concluída |
-| 6c | Localização inicial e cidade padrão | 12 | Pendente |
+| 6c | Localização inicial e cidade padrão | 12 | Concluída |
 | 7 | Condições atuais | 23 | Pendente |
 | 8 | Previsão diária | 25 | Pendente |
 | 9 | Hora a hora | 23 | Pendente |
@@ -49,7 +49,7 @@ Lista de tarefas que leva a aplicação de zero a 100% dos requisitos, uma fatia
 | 11 | Mapa | 24 | Pendente |
 | 12 | Robustez, desempenho e acessibilidade | 15 | Pendente |
 | 13 | Fechamento | 4 | Pendente |
-| | **Total** | **217** | **31,8%** |
+| | **Total** | **217** | **37,3%** |
 
 ---
 
@@ -164,13 +164,13 @@ Arquitetura: seções 6.3, 6.5, 7.3 e 7.4. Testes em `tests/e2e/test_f1_search.p
 
 Arquitetura: seções 2.2 e 7.4. Testes em `tests/e2e/test_f1_location.py`, com permissões e geolocalização simuladas e `page.clock` para o prazo de 10 s.
 
-- [ ] **T-6c.1** `services/location.js`: `requestLocation({ timeoutMs, onLate })` com `setTimeout` próprio de 10 s e as opções da seção 7.4. Recurso ausente ou contexto inseguro → `unavailable`. (P-005)
-- [ ] **T-6c.2** `actions.start()`: localização obtida → geocodificação reversa → `header_label` ou "Sua localização" → `selectCity`. Indisponível → `DEFAULT_CITY` (Uberlândia) com o aviso. Substitui o `main.js` provisório da 6a. (RF-001 a RF-003, RN-001, RN-009)
-- [ ] **T-6c.3** Localização tardia: aplicada se a cidade ainda for a padrão, descartada se o usuário já escolheu outra. (RN-003)
-- [ ] **T-6c.4** Aviso de localização no cabeçalho: pode ser fechado e some quando outra cidade é escolhida. (RN-002)
-- [ ] **T-6c.5** Busca funcionando com o pedido de localização pendente, e a cidade escolhida prevalece. (P-009)
-- [ ] **T-6c.6** Testes de ponta a ponta: CA-001, CA-002, CA-003, os dois casos de localização tardia e a falha da geocodificação reversa.
-- [ ] **T-6c.7** Definição de pronto + commit.
+- [x] **T-6c.1** `services/location.js`: `requestLocation({ timeoutMs, onLate })` com `setTimeout` próprio de 10 s e as opções da seção 7.4. Recurso ausente ou contexto inseguro → `unavailable`. (P-005)
+- [x] **T-6c.2** `actions.start()`: localização obtida → geocodificação reversa → `header_label` ou "Sua localização" → `selectCity`. Indisponível → `DEFAULT_CITY` (Uberlândia) com o aviso. Substitui o `main.js` provisório da 6a. (RF-001 a RF-003, RN-001, RN-009)
+- [x] **T-6c.3** Localização tardia: aplicada se a cidade ainda for a padrão, descartada se o usuário já escolheu outra. (RN-003)
+- [x] **T-6c.4** Aviso de localização no cabeçalho: pode ser fechado e some quando outra cidade é escolhida. (RN-002)
+- [x] **T-6c.5** Busca funcionando com o pedido de localização pendente, e a cidade escolhida prevalece. (P-009)
+- [x] **T-6c.6** Testes de ponta a ponta: CA-001, CA-002, CA-003, os dois casos de localização tardia e a falha da geocodificação reversa.
+- [x] **T-6c.7** Definição de pronto + commit.
 
 **Fecha:** RF-001, RF-002, RF-003, RN-001, RN-002, RN-003, RN-009, CA-001, CA-002, CA-003, P-005, P-009
 
@@ -294,4 +294,5 @@ Arquitetura: seções 9 e 11.
 | D-17 | 2026-10-06 | **Textos e dependências da fatia 6a.** (1) O indicador de carregamento é um ícone animado com o nome "Carregando…" para leitores de tela. O spec não dá texto ao indicador (só o "Ainda carregando…" depois de 3 s), e o nome fica no `messages.js` como os demais textos. (2) O `MESSAGES` já traz todos os textos fixos do spec, também os das fatias 6b a 11, para que exista uma única cópia deles. (3) O `DEFAULT_CITY` fica no `actions.js`, onde o `start()` da 6c o usa, com os rótulos "Uberlândia, BR" e "Uberlândia" vindos do `messages.js`. Por isso o `actions.js` passa a poder importar o `messages.js` (seção 5.2 da arquitetura atualizada), que também vai fornecer "Sua localização" na 6c |
 | D-18 | 2026-10-06 | **Resposta de uma cidade anterior.** Ela é descartada da tela (P-012), mas, se for de sucesso, vai para o cache. Assim, voltar a essa cidade em menos de 10 min não gera outra consulta (P-010, RNF-003). O diagrama da seção 2.2 dava a entender que a gravação no cache vinha depois do descarte, e foi ajustado |
 | D-19 | 2026-10-06 | **Cabeçalho e busca (fatia 6b).** (1) Contratos: o estado da busca ganhou o status `invalid` (termo vazio ou com 1 caractere, sem consulta), separado de `error` (falha da busca), e o `actions.js` passou a exportar `SEARCH_MAX_LENGTH` e `chooseSearchResult(result)`, que fecha a lista e seleciona a cidade, para a conversão do item em `City` ficar fora da `ui/`. Seções 6.5 e 6.6 da arquitetura atualizadas. (2) Textos fora do spec, no `messages.js` como na D-17: o título "Previsão do tempo" (do print) e os nomes para leitores de tela da lupa ("Buscar"), da lista ("Cidades encontradas") e do seletor ("Escala de temperatura"). (3) O nome longo da cidade aparece completo, em mais linhas, ao passar o cursor ou focar (a cidade é focável). O `title` foi descartado porque não aparece com o foco. (4) Comportamentos que o spec não detalha: o Esc fecha a lista sem apagar o termo; sair da busca pelo Tab também fecha a lista, como clicar fora; editar o termo apaga a mensagem anterior; e confirmar de novo o termo com a lista dele aberta não repete a busca, como com a busca em andamento (RF-015). (5) A mensagem da busca (termo inválido, nenhum resultado ou falha) abre abaixo do campo, no lugar da lista, com `role="status"` |
+| D-20 | 2026-10-06 | **Localização inicial (fatia 6c).** (1) Contrato: o `actions.js` passou a exportar `dismissLocationNotice()`, que fecha o aviso de localização, e o `selectCity` fecha o aviso quando a cidade escolhida não é a padrão (RN-002). Seção 6.6 da arquitetura atualizada. (2) O aviso passou para dentro do `<header>`, como última linha, abaixo da busca, porque é o `header.js` que o desenha (seção 5.1). Ele ganhou um botão de fechar com o nome "Fechar aviso" para leitores de tela, que não está no spec e fica no `messages.js`, como na D-17. (3) Enquanto o pedido de localização está pendente (até 10 s), o cabeçalho fica sem cidade e os blocos mostram o indicador de carregamento, sem consulta de clima. (4) A localização que chega no prazo depois de o usuário escolher uma cidade pela busca também é descartada ("a cidade escolhida prevalece", feature 1, categoria 2), assim como a que chega enquanto o nome é buscado na geocodificação reversa e outra cidade é escolhida. (5) Testes: sem permissão concedida, o Chrome do Playwright nega a localização na hora, por isso os testes das fatias anteriores continuam abrindo com a cidade padrão. O usuário que não responde e a localização tardia usam um `navigator.geolocation` falso (`tests/e2e/location.py`). Dois testes da busca passaram a esperar a lista abrir antes das setas, porque falhavam de vez em quando com o passo assíncrono a mais na abertura da página |
 | L-01 | 2026-10-04 | **Limitação:** os testes são feitos só no Google Chrome instalado. Edge, Firefox e Safari não são testados, nem em computador nem em celular. O RNF-006 continua no spec como meta, mas a compatibilidade com outros navegadores não é verificada no MVP |

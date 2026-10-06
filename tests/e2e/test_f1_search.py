@@ -1,7 +1,8 @@
 """Feature 1, cabeçalho e busca de cidade: cidade selecionada, campo, lista e teclado.
 
-A página abre com a cidade padrão (o `main.js` provisório da fatia 6a). O `/api/weather` e o
-`/api/geo/search` são simulados com `page.route` (ver `weather_api.py` e `geo_api.py`).
+A página abre com a cidade padrão: sem permissão concedida, o Chrome do Playwright nega a
+localização na hora (ver `test_f1_location.py`). O `/api/weather` e o `/api/geo/search` são
+simulados com `page.route` (ver `weather_api.py` e `geo_api.py`).
 """
 
 import re
@@ -404,6 +405,7 @@ def test_rnf_007_highlighted_option_is_not_shown_only_by_color(page: Page, weath
     """RNF-007, P-018: a opção destacada tem negrito e barra lateral, além da cor."""
     page.goto("/")
     run_search(page, "Curitiba")
+    expect(page.get_by_role("listbox")).to_be_visible()
     search_box(page).press("ArrowDown")
 
     styles = page.locator('[role="option"]').evaluate_all(
@@ -422,6 +424,7 @@ def test_rnf_007_escape_closes_the_list_and_keeps_focus(page: Page, weather_api,
     page.goto("/")
     box = search_box(page)
     run_search(page, "Curitiba")
+    expect(page.get_by_role("listbox")).to_be_visible()
     box.press("ArrowDown")
 
     box.press("Escape")

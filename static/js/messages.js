@@ -43,13 +43,15 @@ export const MESSAGES = deepFreeze({
     scales: { c: '°C', f: '°F' },
   },
 
-  // Cidade padrão e localização (feature 1: RN-001, RN-009, categoria 2).
+  // Cidade padrão e localização (feature 1: RN-001, RN-002, RN-009, categoria 2). O nome do
+  // botão que fecha o aviso não está no spec: é o nome para leitores de tela (D-20).
   defaultCity: { headerLabel: 'Uberlândia, BR', markerLabel: 'Uberlândia' },
   location: {
     notice:
       'Não foi possível usar sua localização. Mostrando Uberlândia, BR. ' +
       'Use a busca para escolher outra cidade.',
     unnamed: 'Sua localização',
+    closeNotice: 'Fechar aviso',
   },
 
   // Busca de cidade (feature 1: RNF-007, categoria 1 e 4). Os nomes da lupa e da lista não

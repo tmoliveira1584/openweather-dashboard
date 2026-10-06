@@ -1,5 +1,6 @@
 /**
- * Cabeçalho (arquitetura, seção 5.1): título, seletor °C/°F, cidade selecionada e busca.
+ * Cabeçalho (arquitetura, seção 5.1): título, seletor °C/°F, cidade selecionada, busca e aviso
+ * de localização.
  *
  * Usa a estrutura do `index.html` e preenche os textos pelo `messages.js` e pelo estado. As
  * regras da busca ficam em `actions.js`; aqui ficam só o desenho e os eventos. A opção
@@ -9,6 +10,7 @@
 import {
   chooseSearchResult,
   closeSearch,
+  dismissLocationNotice,
   SEARCH_MAX_LENGTH,
   search,
   setScale,
@@ -30,6 +32,7 @@ export function mount(root) {
     mountScale(root.querySelector('.scale-toggle')),
     mountCity(root.querySelector('.city')),
     mountSearch(root.querySelector('.search')),
+    mountNotice(root.querySelector('.location-notice')),
   ];
   const render = (state, previous) => {
     for (const renderPart of parts) renderPart(state, previous);
@@ -175,5 +178,22 @@ function mountSearch(form) {
     input.setAttribute('aria-expanded', String(open));
     form.setAttribute('aria-busy', String(status === 'loading'));
     setText(message, WITH_MESSAGE.has(status) ? state.search.message : null);
+  };
+}
+
+/**
+ * Aviso de localização, com o botão que o fecha (RF-003, RN-002). O texto só entra quando o
+ * aviso aparece, e só uma vez, para que leitores de tela o anunciem sem repetir
+ * (`role="status"`).
+ */
+function mountNotice(notice) {
+  const text = notice.querySelector('.location-notice-text');
+  const close = notice.querySelector('.location-notice-close');
+  close.setAttribute('aria-label', MESSAGES.location.closeNotice);
+  close.addEventListener('click', () => dismissLocationNotice());
+  return (state) => {
+    const message = state.locationNotice ? MESSAGES.location.notice : '';
+    if (text.textContent !== message) setText(text, message);
+    notice.hidden = !state.locationNotice;
   };
 }

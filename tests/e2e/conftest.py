@@ -1,4 +1,4 @@
-"""Fixtures dos testes de ponta a ponta: `/api/weather` e `/api/geo/search` simulados (ver
+"""Fixtures dos testes de ponta a ponta: `/api/weather` e `/api/geo/*` simulados (ver
 `weather_api.py` e `geo_api.py`)."""
 
 import pytest
@@ -22,5 +22,5 @@ def weather_api(page: Page, weather_views) -> WeatherApi:
 
 @pytest.fixture
 def geo_api(page: Page) -> GeoApi:
-    """Simulação do `/api/geo/search` registrada na página do teste."""
+    """Simulação do `/api/geo/search` e do `/api/geo/reverse` registrada na página do teste."""
     return GeoApi(page)

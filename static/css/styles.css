@@ -241,11 +241,49 @@ button {
   cursor: progress;
 }
 
+/* Aviso de localização: linha inteira do cabeçalho, abaixo da busca. A lista da busca abre
+   por cima dele (feature 1, categoria 2). */
 .location-notice {
-  margin-top: var(--space-3);
-  padding: var(--space-2) var(--space-3);
+  display: flex;
+  flex-basis: 100%;
+  align-items: flex-start;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-2) var(--space-2) var(--space-3);
   border-radius: var(--radius-card);
   background: var(--color-surface);
+  color: var(--color-text);
+  font-size: 0.875rem;
+}
+
+.location-notice-text {
+  flex: 1;
+  min-width: 0;
+  align-self: center;
+}
+
+.location-notice-close {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-card);
+  background: transparent;
+}
+
+.location-notice-close:hover {
+  background: var(--color-surface-soft);
+}
+
+.location-notice-close svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.25;
+  stroke-linecap: round;
 }
 
 /* ---------- Painel principal ---------- */

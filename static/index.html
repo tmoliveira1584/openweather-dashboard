@@ -49,9 +49,17 @@
       </div>
       <p class="search-message" role="status"></p>
     </form>
-  </header>
 
-  <p class="location-notice" role="status" hidden></p>
+    <!-- Aviso de localização: última linha do cabeçalho, abaixo da busca (RF-003, RN-002). -->
+    <div class="location-notice" hidden>
+      <p class="location-notice-text" role="status"></p>
+      <button type="button" class="location-notice-close">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="m6 6 12 12M18 6 6 18"/>
+        </svg>
+      </button>
+    </div>
+  </header>
 
   <main class="dashboard">
     <nav class="day-tabs" aria-label="Dias da previsão">
