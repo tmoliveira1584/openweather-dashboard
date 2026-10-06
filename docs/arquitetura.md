@@ -282,6 +282,7 @@ Cada decisão registra o contexto, a escolha e as alternativas descartadas. Uma 
   - O Leaflet é simples e já traz zoom pelo teclado, limites de zoom, atribuição e carregamento só da área visível (RN-048, P-019, RNF-023).
   - O CARTO Voyager é gratuito com atribuição, não usa chave e tem o visual mais próximo do print.
   - Copiar os arquivos evita usar um segundo gerenciador de pacotes (npm).
+- **Situação em 2026-10-06:** o CARTO passou a exigir chave de API e devolve tiles só com a marca d'água. A decisão foi mantida no MVP como limitação aceita (L-02, seção 13).
 - **Alternativas descartadas:** MapLibre GL com OpenFreeMap (idêntico ao print, mas mais pesado e com API mais complexa); OpenStreetMap padrão (visual mais carregado); CDN em tempo de execução (dependência externa a mais e versão menos controlada).
 
 ### ADR-007 — Gráficos em SVG próprio
@@ -799,15 +800,17 @@ Abaixo de 600 px, tudo fica empilhado em uma coluna. A partir de 600 px, se o ca
 
 | Item | Decisão |
 |---|---|
+| Criação | O mapa é criado na primeira cidade selecionada. Antes dela (pedido de localização pendente), o bloco mostra só o fundo, sem tiles. Sem o Leaflet carregado, o bloco mostra "Mapa indisponível no momento." e os demais blocos seguem (P-021) |
 | Mapa base | `https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png`, subdomínios `abcd` |
-| Atribuição | `© OpenStreetMap contributors © CARTO · Dados de precipitação © OpenWeather`, com links. Ela fica no canto inferior direito e o painel por minuto no canto inferior esquerdo, então os dois não se sobrepõem (RNF-025) |
+| Atribuição | `© OpenStreetMap contributors © CARTO · Dados de precipitação © OpenWeather`, com links que abrem em outra aba. É um controle próprio no canto inferior direito, montado com `el()` a partir dos trechos do `messages.js`, sem o prefixo "Leaflet". O painel por minuto fica no canto inferior esquerdo, 24 px acima da borda, então os dois não se sobrepõem (RNF-025) |
 | Camada de chuva | `/api/tiles/precipitation/{z}/{x}/{y}.png`, opacidade 0,6 (RN-049) |
-| Zoom | Inicial 6, mínimo 3, máximo 10 (RN-048) |
-| Falha do mapa base (RF-051) | Contar `tileload` e `tileerror` da camada base na vista atual. No evento `load`, se houver 0 `tileload` e pelo menos 1 `tileerror`, mostrar "Mapa indisponível no momento." |
+| Zoom | Inicial 6, mínimo 3, máximo 10 (RN-048). Botões "Aproximar" e "Afastar" (nomes do `messages.js`), roda do mouse, duplo clique e teclado (+ e −) |
+| Marcador | Círculo próprio (`divIcon`) com o `marker_label` num rótulo fixo acima dele (`tooltip` permanente). O rótulo recebe um elemento com o texto por `textContent`, nunca uma string, porque o Leaflet trata strings como HTML (P-003). O marcador não é interativo nem focável |
+| Falha do mapa base (RF-051) | Contar `tileload` e `tileerror` da camada base a cada ciclo de carregamento (do `loading` ao `load`). No `load`, se houver 0 `tileload` e pelo menos 1 `tileerror`, cobrir o mapa com "Mapa indisponível no momento.". Um ciclo seguinte com alguma tile carregada (por exemplo, na troca de cidade) tira a mensagem |
 | Falha da camada de chuva (RF-052) | No primeiro `tileerror` da camada de chuva, mostrar a faixa "Camada de chuva indisponível no momento.". A faixa some no próximo `load` sem erro |
-| Dois dedos (RN-052) | Em telas de toque, `dragging` começa desligado. `touchstart` com 2 toques liga, `touchend` desliga. Com 1 toque, mostra "Use dois dedos para mover o mapa." por 1,5 s |
-| Descrição acessível | `aria-label` "Mapa de precipitação centrado em {marker_label}" (RNF-024) |
-| Troca de cidade | `setView([lat, lon], 6)` e o marcador é movido (RF-048) |
+| Dois dedos (RN-052) | Em telas de toque (`pointer: coarse`), o arrasto (`dragging`) fica desligado e o `touchZoom` ligado. Um dedo rola a página (`touch-action: pan-x pan-y` do Leaflet), e dois dedos movem e aproximam o mapa: o `touchZoom` do Leaflet acompanha o ponto médio dos dois dedos, e o arrasto dele ignora toques múltiplos, por isso não precisa ser ligado. Quando um único dedo tenta mover o mapa (o toque é cancelado porque a página rolou, ou ele se move mais de 10 px), aparece "Use dois dedos para mover o mapa." por 1,5 s |
+| Descrição acessível | `aria-label` "Mapa de precipitação centrado em {marker_label}" (RNF-024). O contêiner do mapa é focável: as setas movem o mapa e + e − mudam o zoom (teclado do Leaflet) |
+| Troca de cidade | `setView([lat, lon], 6)` sem animação, o marcador é movido e o rótulo e a descrição são trocados (RF-048). A troca de escala e os dados de clima não mexem no mapa, e interagir com ele não chama nenhuma ação (RN-051) |
 
 ### 7.3 Catálogo de mensagens (`static/js/messages.js`)
 
@@ -1068,7 +1071,7 @@ Configuração do `pyproject.toml` (criada na fatia 0):
 |---|---|---|
 | One Call 4.0 é recente (lançada em junho de 2026) e a documentação tem lacunas | Formato real diferente do documentado | As capturas da T-0.8 já mostraram três diferenças (data do dia, alertas fora da previsão diária e primeiro minuto), registradas no ADR-013 e em `tests/fixtures/README.md`. Ainda não se sabe se `timeline/1min` sem cobertura responde 404 ou lista vazia, e o cliente trata os dois casos. O cliente fica isolado em `clients/openweather.py`, o pacote (`merge_onecall`) isola a paginação, e o view model protege o frontend |
 | Cota de 1.000 chamadas por dia, com 5 por consulta de clima mais 1 por alerta | Erro `provider_rate_limited` depois de cerca de 200 consultas no dia (menos em cidades com alertas) | Cache de 10 min, testes sem internet (`page.route` e `MockTransport`), fumaça `live` só manual e limite diário de chamadas configurado na conta do provedor |
-| Termos de uso do CARTO | Bloqueio das tiles do mapa base | Uso acadêmico leve, com atribuição. Plano B: OpenStreetMap padrão (troca de uma URL em `ui/map.js`) |
+| **L-02:** o CARTO passou a exigir chave de API (conferido em 2026-10-06, na fatia 11) | Todos os estilos respondem 200 com uma tile só com a marca d'água "API KEY REQUIRED", sem ruas, cidades nem fronteiras. O mapa mostra a marca d'água, a camada de chuva e o marcador, e a mensagem "Mapa indisponível" não aparece, porque as tiles carregam | Limitação aceita no MVP ([tasks.md](tasks.md), L-02). Plano B: OpenStreetMap padrão, sem chave (troca da URL e da atribuição em `ui/map.js`, com um ADR novo) |
 | Cache de tiles de terceiros no navegador | Fica no disco uma região visitada (escala regional), fora do controle da aplicação | `/api` usa `no-store`. As tiles do CARTO seguem os cabeçalhos do CARTO, que mostram a região e não a posição exata. Limitação aceita |
 | Leaflet copiado não recebe atualização automática | Correções de segurança manuais | Versão e SHA-256 registrados em `static/vendor/README.md` |
 | **L-01:** testes feitos só no Chrome. Edge, Firefox e Safari não são testados, nem em computador nem em celular | O RNF-006 não é verificado fora do Chrome. Diferenças de comportamento nesses navegadores podem passar despercebidas | Limitação aceita no MVP ([tasks.md](tasks.md), L-01). O código usa só APIs padrão do navegador (ES2022, `fetch`, geolocalização) e o Leaflet, que é compatível com os quatro navegadores |

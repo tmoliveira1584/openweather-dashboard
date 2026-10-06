@@ -11,9 +11,18 @@ from playwright.sync_api import Page, expect
 
 @pytest.fixture
 def api_requests(page: Page) -> list[str]:
-    """URLs de todos os pedidos da página ao `/api`, também os que não chegam a ser simulados."""
+    """URLs dos pedidos da página ao `/api`, também os que não chegam a ser simulados.
+
+    As tiles da camada de chuva (`/api/tiles/...`) ficam de fora: o mapa as pede conforme a
+    área visível, não são consulta de clima, e a escala não mexe no mapa (RN-051, fatia 11).
+    """
     urls: list[str] = []
-    page.on("request", lambda request: urls.append(request.url) if "/api/" in request.url else None)
+
+    def record(request) -> None:
+        if "/api/" in request.url and "/api/tiles/" not in request.url:
+            urls.append(request.url)
+
+    page.on("request", record)
     return urls
 
 

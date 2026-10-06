@@ -289,12 +289,29 @@ def test_rnf_020_chart_is_one_tab_stop_and_arrows_announce_each_minute(
 
 
 def test_rnf_020_tab_reaches_the_chart(page: Page, weather_api):
-    """RNF-020, P-023: o gráfico entra na ordem do Tab, logo depois do bloco hora a hora."""
+    """RNF-020, P-023: o gráfico entra na ordem do Tab depois do bloco hora a hora e do mapa,
+    na ordem do documento: o mapa, os botões de zoom e os links das atribuições (fatia 11)."""
     open_with(page, weather_api)
     page.locator(".hourly-point").first.focus()
 
-    page.keyboard.press("Tab")
+    stops = []
+    for _ in range(7):
+        page.keyboard.press("Tab")
+        stops.append(
+            page.evaluate(
+                "() => document.activeElement.getAttribute('aria-label') "
+                "|| document.activeElement.textContent.trim()"
+            )
+        )
 
+    assert stops[:-1] == [
+        "Mapa de precipitação centrado em Uberlândia",
+        "Aproximar",
+        "Afastar",
+        "OpenStreetMap",
+        "CARTO",
+        "OpenWeather",
+    ]
     expect(chart(page)).to_be_focused()
 
 

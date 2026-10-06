@@ -732,6 +732,79 @@ button {
   overflow: hidden;
   border-radius: var(--radius-panel);
   background: #e8eef1; /* visto enquanto as tiles não chegam */
+  font-family: var(--font-family); /* no lugar da fonte do Leaflet */
+}
+
+/* Foco do teclado (RF-049): por dentro, porque o mapa corta o que passa da borda. */
+.map:focus-visible {
+  outline: 3px solid var(--color-accent);
+  outline-offset: -3px;
+}
+
+/* Marcador da cidade: alvo com anel e centro na cor de destaque, como no print (RF-046). */
+.map-marker {
+  border: 3px solid var(--color-accent);
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--color-accent) 0 3px, var(--color-surface) 3.5px);
+  box-shadow: 0 1px 4px rgb(0 0 0 / 0.35);
+}
+
+/* Rótulo fixo acima do marcador, com o nome da cidade (RF-046, RN-050). */
+.map-marker-label {
+  padding: 2px var(--space-2);
+  color: var(--color-text);
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+/* Avisos sobre o mapa: acima das camadas do Leaflet e sem bloquear o mapa (RF-052, RN-052). */
+.map-notice {
+  position: absolute;
+  z-index: 1000;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-card);
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-align: center;
+  pointer-events: none;
+}
+
+/* Faixa no alto, centralizada entre os botões de zoom e a borda direita. */
+.map-rain-unavailable {
+  top: var(--space-3);
+  right: var(--space-3);
+  left: 56px;
+  width: fit-content;
+  margin-inline: auto;
+  background: var(--color-surface);
+  color: var(--color-text);
+  box-shadow: 0 2px 8px rgb(0 0 0 / 0.2);
+}
+
+.map-hint {
+  top: 50%;
+  left: 50%;
+  max-width: calc(100% - 2 * var(--space-6));
+  transform: translate(-50%, -50%);
+  background: rgb(28 25 23 / 0.8);
+  color: var(--color-on-page);
+}
+
+/*
+ * Mapa base fora do ar (RF-051): a mensagem cobre o mapa, os controles e a atribuição. Ela
+ * fica no alto, fora do canto do painel por minuto, que continua visível.
+ */
+.map-unavailable {
+  inset: 0;
+  z-index: 1001;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: var(--space-8) var(--space-4);
+  border-radius: 0;
+  background: inherit;
+  color: var(--color-text);
+  pointer-events: auto;
 }
 
 /* Abaixo de 600 px, o painel fica abaixo do mapa (RNF-021). */

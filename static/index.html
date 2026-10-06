@@ -12,10 +12,7 @@
   <script type="module" src="/js/main.js"></script>
 </head>
 <body>
-  <!--
-    Esqueleto da tela (fatia 5). O nome do mapa abaixo é provisório e sai na fatia 11, quando o
-    mapa passa a ser montado pelo static/js/ui/map.js (guardrail 10).
-  -->
+  <!-- Esqueleto da tela (fatia 5). Os blocos são preenchidos pelos módulos de static/js/ui/. -->
   <!-- Cabeçalho: estrutura só. Os textos vêm do messages.js e do estado (ui/header.js). -->
   <header class="app-header">
     <h1 class="app-title"></h1>
@@ -175,7 +172,11 @@
     </div>
 
     <div class="map-section">
-      <div class="map" id="map" role="region" aria-label="Mapa de precipitação centrado em Uberlândia"></div>
+      <!--
+        Mapa de precipitação: o Leaflet é montado aqui pelo ui/map.js, que também põe a descrição
+        do mapa e os avisos de falha (RNF-024).
+      -->
+      <div class="map" id="map" role="region"></div>
 
       <!--
         Previsão por minuto: estrutura só. Os marcos, as barras, o resumo e a legenda são

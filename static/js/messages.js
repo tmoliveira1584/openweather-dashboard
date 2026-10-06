@@ -127,12 +127,24 @@ export const MESSAGES = deepFreeze({
     },
   },
 
-  // Mapa de precipitação (feature 6: RNF-024, categorias 3, 4 e 10).
+  // Mapa de precipitação (feature 6: RNF-024, categorias 3, 4 e 10). Os nomes dos botões de
+  // zoom não estão no spec: substituem os textos em inglês do Leaflet (P-016, D-25). A
+  // atribuição é a da seção 7.2 da arquitetura, em trechos: texto ou link (P-019).
   map: {
     label: (place) => `Mapa de precipitação centrado em ${place}`,
     unavailable: 'Mapa indisponível no momento.',
     rainUnavailable: 'Camada de chuva indisponível no momento.',
     twoFingers: 'Use dois dedos para mover o mapa.',
+    zoomIn: 'Aproximar',
+    zoomOut: 'Afastar',
+    attribution: [
+      '© ',
+      { text: 'OpenStreetMap', href: 'https://www.openstreetmap.org/copyright' },
+      ' contributors © ',
+      { text: 'CARTO', href: 'https://carto.com/attributions' },
+      ' · Dados de precipitação © ',
+      { text: 'OpenWeather', href: 'https://openweathermap.org/' },
+    ],
   },
 });
 
