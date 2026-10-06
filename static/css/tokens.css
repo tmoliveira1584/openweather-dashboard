@@ -48,4 +48,5 @@
   /* Medidas mínimas */
   --page-min-width: 360px; /* sem rolagem horizontal da página a partir daqui (P-024) */
   --map-min-height: 300px; /* abaixo de 600 px (feature 6, categoria 10) */
+  --hour-column: 72px; /* largura de cada hora na previsão hora a hora (seção 7.1) */
 }

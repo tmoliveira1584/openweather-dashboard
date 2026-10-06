@@ -5,11 +5,14 @@
  * `Date.now()` (guardrail 9). Datas e horas no fuso da cidade: `(ts + offset)` lido em UTC
  * (seção 7.5).
  *
- * Até aqui: os dias da previsão diária (fatia 8). As janelas por hora e por minuto entram nas
- * fatias 9 e 10.
+ * Até aqui: os dias da previsão diária (fatia 8) e as horas da previsão hora a hora (fatia
+ * 9). A janela por minuto entra na fatia 10.
  */
 
 export const MAX_DAYS = 8; // "Hoje" mais 7 (RN-027)
+export const MAX_HOURS = 24; // RN-034
+
+const HOUR_SEC = 3600;
 
 /**
  * Data atual da cidade, no formato `AAAA-MM-DD` de `daily[].local_date` (RN-026, P-015).
@@ -55,4 +58,21 @@ export function visibleDays(daily, nowSec, offset) {
 export function activeDay(days, selectedDay, nowSec, offset) {
   if (selectedDay == null || selectedDay === cityToday(nowSec, offset)) return null;
   return days.find((day) => day.local_date === selectedDay) ?? null;
+}
+
+/**
+ * Horas da previsão hora a hora: começa na hora que contém o momento atual, descarta as que
+ * já terminaram, ordena e limita a 24 (RN-034). Com menos de 24 disponíveis, só as
+ * disponíveis; sem previsão hora a hora, nenhuma. Não depende da aba de dia (RF-029).
+ * @template {{ dt: number }} Hour
+ * @param {Hour[] | null} hourly `WeatherView.hourly`
+ * @param {number} nowSec agora, em segundos Unix
+ * @returns {Hour[]}
+ */
+export function hourlyWindow(hourly, nowSec) {
+  if (!hourly) return [];
+  return hourly
+    .filter((hour) => hour.dt + HOUR_SEC > nowSec)
+    .sort((a, b) => a.dt - b.dt)
+    .slice(0, MAX_HOURS);
 }

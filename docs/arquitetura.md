@@ -429,7 +429,7 @@ openweather-dashboard/
 │       ├── logic/                    # funções puras que dependem do relógio (ADR-004)
 │       │   ├── time-window.js        # cityToday, visibleDays, hourlyWindow, minuteWindow, minuteMarks
 │       │   ├── summaries.js          # minuteSummary, hourlyAltText
-│       │   └── chart-math.js         # monotonePath, barHeight, groupRainLabels
+│       │   └── chart-math.js         # scaleY, monotonePath, barHeight, groupRainLabels
 │       └── ui/                       # um módulo por bloco: mount(root)
 │           ├── header.js             # título, seletor °C/°F, cidade, busca, aviso de localização
 │           ├── day-tabs.js
@@ -460,7 +460,7 @@ openweather-dashboard/
 | `app/domain/` | Biblioteca padrão e `app/schemas/` | FastAPI, httpx, I/O, `datetime.now()`, variáveis de ambiente |
 | `app/clients/` | httpx, `asyncio`, `app/config.py`, relógio injetado (só para o `start` da previsão por hora) | FastAPI, `app/domain/` |
 | `app/api/` | FastAPI, `app/clients/`, `app/domain/`, `app/schemas/` | Regra de negócio própria |
-| `static/js/logic/` | Nada além de JavaScript puro | DOM, `fetch`, `Date.now()` (recebe `nowSec` por parâmetro) |
+| `static/js/logic/` | JavaScript puro e `messages.js` (textos dos resumos, como o texto alternativo da curva) | DOM, `fetch`, `Date.now()` (recebe `nowSec` por parâmetro) |
 | `static/js/services/` | `fetch`, `navigator.geolocation`, `messages.js` | DOM |
 | `static/js/actions.js` | `state.js`, `services/`, `messages.js` (rótulos da cidade padrão e "Sua localização") | DOM |
 | `static/js/ui/` | DOM, `state.js`, `actions.js`, `logic/`, `messages.js`, Leaflet (só `map.js`) | `fetch`, `services/` diretamente, regra de negócio |
@@ -739,9 +739,9 @@ Assinaturas mínimas. A implementação pode ter funções auxiliares privadas a
 | `services/api.js` | `fetchWeather(lat, lon)`, `searchCities(q)`, `reverseGeocode(lat, lon)`, todas devolvendo `{ ok: true, data } \| { ok: false, error }` |
 | `services/cache.js` | `roundCoord(value)` (2 casas, sem "-0.00"), `cacheKey(lat, lon)`, `get(key, nowMs) -> { value, storedAt } \| null`, `set(key, value, nowMs)` |
 | `services/location.js` | `requestLocation({ timeoutMs, onLate }) -> Promise<{ status: 'ok', lat, lon } \| { status: 'unavailable' }>` |
-| `logic/time-window.js` | `cityToday(nowSec, offset)`, `visibleDays(daily, nowSec, offset)` (descarta os dias passados e limita a 8, RN-026 e RN-027), `activeDay(days, selectedDay, nowSec, offset)` (o dia selecionado, se ainda estiver entre os visíveis e não for hoje; senão `null` = "Hoje", seção 7.4), `hourlyWindow(hourly, nowSec)`, `minuteWindow(minutely, nowSec)`, `minuteMarks(window)` |
-| `logic/summaries.js` | `minuteSummary(window)`, `hourlyAltText(window, scale)` |
-| `logic/chart-math.js` | `monotonePath(points)`, `barHeight(intensity, maxPx, minPx)`, `groupRainLabels(items, minGapPx)` |
+| `logic/time-window.js` | `cityToday(nowSec, offset)`, `visibleDays(daily, nowSec, offset)` (descarta os dias passados e limita a 8, RN-026 e RN-027), `activeDay(days, selectedDay, nowSec, offset)` (o dia selecionado, se ainda estiver entre os visíveis e não for hoje; senão `null` = "Hoje", seção 7.4), `hourlyWindow(hourly, nowSec)` (descarta as horas que já terminaram e limita a 24, RN-034), `minuteWindow(minutely, nowSec)`, `minuteMarks(window)` |
+| `logic/summaries.js` | `minuteSummary(window)`, `hourlyAltText(window, scale)` (texto alternativo da curva, ou `null` sem nenhuma temperatura, RNF-016) |
+| `logic/chart-math.js` | `scaleY(values, top, bottom)` (a maior temperatura em `top`, a menor em `bottom` e todas iguais no centro; `null` continua `null`, RN-039), `monotonePath(points)` (caminho SVG Fritsch–Carlson pelos pontos `{ x, y }`; um `y` nulo interrompe a curva), `barHeight(intensity, maxPx, minPx)`, `groupRainLabels(items, minGapPx)` (`items` = `{ x, width, value }` de cada etiqueta, em px; devolve `boolean[]` com as visíveis, RN-038) |
 | `ui/dom.js` | `el(tag, { class, text, attrs, on }, children)`, `setText(node, text)`, `setConditionIcon(img, icon, description)` (ícone do provedor com a descrição como texto alternativo; sem código, a imagem fica oculta, RNF-010), `blockState(state, { part, unavailable }) -> { kind, message? }` (seção 6.5), `renderBlockState(block, view, { onRetry })` (`data-block-state`, `aria-busy` e o `.block-state` com indicador, mensagem ou "Tentar novamente") |
 | `ui/*.js` (blocos) | `mount(rootElement)` |
 
@@ -790,7 +790,7 @@ Cores extraídas do print e ajustadas quando necessário para cumprir o contrast
 **Layout** (do print, de cima para baixo):
 1. Cabeçalho numa linha: título, seletor °C/°F, cidade e busca.
 2. Faixa de abas.
-3. Linha com o card principal e os 6 indicadores à esquerda (cerca de 1/3) e a previsão hora a hora à direita (cerca de 2/3). Os dois blocos usam `flex-wrap` com larguras-base de 300 px e 520 px: ficam lado a lado quando cabem e empilham quando não, sem um segundo breakpoint (de 600 px até cerca de 870 px, ficam empilhados e os indicadores continuam em 3 colunas). A curva e os cards por hora ficam no mesmo contêiner de rolagem, para a curva cobrir sempre as mesmas horas dos cards (RF-034, RF-037).
+3. Linha com o card principal e os 6 indicadores à esquerda (cerca de 1/3) e a previsão hora a hora à direita (cerca de 2/3). Os dois blocos usam `flex-wrap` com larguras-base de 300 px e 520 px: ficam lado a lado quando cabem e empilham quando não, sem um segundo breakpoint (de 600 px até cerca de 870 px, ficam empilhados e os indicadores continuam em 3 colunas). A curva e os cards por hora ficam no mesmo contêiner de rolagem, para a curva cobrir sempre as mesmas horas dos cards (RF-034, RF-037). Cada hora ocupa uma coluna de largura fixa (`--hour-column`, 72 px), e o ponto da curva, a etiqueta de chuva e o card de uma hora ficam no centro da coluna dela.
 4. Mapa em largura total, com o painel por minuto sobreposto no canto inferior esquerdo, 24 px acima da borda do mapa, para não cobrir a atribuição do Leaflet (RNF-025).
 
 Abaixo de 600 px, tudo fica empilhado em uma coluna. A partir de 600 px, se o cabeçalho não couber numa linha, a busca desce para a segunda linha.

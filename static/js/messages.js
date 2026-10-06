@@ -91,10 +91,18 @@ export const MESSAGES = deepFreeze({
     unavailable: 'Previsão diária indisponível.',
   },
 
-  // Previsão hora a hora (feature 4: categoria 5).
+  // Previsão hora a hora (feature 4: RNF-016, RF-036, categoria 5). O spec dá o texto
+  // alternativo da curva só para 24 horas com mínima e máxima diferentes; o período com menos
+  // horas e a temperatura estável seguem o mesmo modelo (D-23).
   hourly: {
     title: 'Previsão hora a hora',
     unavailable: 'Previsão hora a hora indisponível para esta cidade.',
+    period: (hours) => (hours === 1 ? 'Na próxima hora' : `Nas próximas ${hours} horas`),
+    altText: (period, min, minAt, max, maxAt) =>
+      `${period}, mínima de ${min} às ${minAt} e máxima de ${max} às ${maxAt}`,
+    steadyText: (period, temp) => `${period}, temperatura estável em ${temp}`,
+    // Ponto da curva: hora, temperatura e, se houver, o volume de chuva (RF-036).
+    point: (hour, temp, rain) => [hour, temp, rain].filter(Boolean).join(' · '),
   },
 
   // Previsão por minuto (feature 5: RF-041, RN-041, RN-044, categoria 5).

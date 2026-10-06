@@ -11,7 +11,7 @@ from playwright.sync_api import Page
 
 from tests.e2e.clock import open_paused
 from tests.e2e.weather_api import TOKYO, UBERLANDIA
-from tests.fakes import CAPTURE_NOW
+from tests.fakes import CAPTURE_HOUR, CAPTURE_NOW
 
 # Mensagens do spec (feature 1) para cada código de erro (arquitetura, seção 7.3).
 SPEC_ERROR_MESSAGES = {
@@ -852,3 +852,225 @@ def test_rf_028_active_day_is_null_for_today_and_for_days_gone(logic_page: Page,
         },
     )
     assert result == [None, None, "2026-10-08", None, None]
+
+
+# ---------- logic/time-window.js: horas ----------
+
+# 08:18 de terça, 06/10/2026, em Uberlândia: o "Dado" do CA-022.
+UBERLANDIA_0818 = UBERLANDIA_MIDNIGHT + 8 * 3600 + 18 * 60
+
+
+def window_labels(page: Page, hourly, now_sec: int) -> list[str]:
+    return evaluate(
+        page,
+        "logic/time-window.js",
+        "return m.hourlyWindow(arg.hourly, arg.now).map((hour) => hour.hour_label);",
+        {"hourly": hourly, "now": now_sec},
+    )
+
+
+def test_rn_034_hourly_window_starts_at_the_hour_containing_now(logic_page: Page, weather_views):
+    """RN-034, CA-022: a janela começa na hora que contém o momento atual da cidade e tem 24
+    horas. Às 16:41, vai das 16:00 às 15:00 do dia seguinte; às 08:18, das 08:00 às 07:00."""
+    hourly = weather_views["uberlandia"]["hourly"]
+
+    at_capture = window_labels(logic_page, hourly, CAPTURE_NOW)
+    at_0818 = window_labels(logic_page, hourly, UBERLANDIA_0818)
+
+    assert (len(at_capture), at_capture[0], at_capture[-1]) == (24, "16:00", "15:00")
+    assert (len(at_0818), at_0818[0], at_0818[-1]) == (24, "08:00", "07:00")
+
+
+def test_rn_034_hour_gone_is_dropped_from_cached_data(logic_page: Page, weather_views):
+    """RN-034, feature 4 (categoria 8): com os mesmos dados em cache, a hora que terminou sai
+    da janela e a seguinte passa a ser a primeira."""
+    hourly = weather_views["uberlandia"]["hourly"]
+
+    last_second = window_labels(logic_page, hourly, CAPTURE_HOUR + 3599)
+    next_hour = window_labels(logic_page, hourly, CAPTURE_HOUR + 3600)
+
+    assert last_second[0] == "16:00"
+    assert next_hour[0] == "17:00"
+
+
+def test_rn_034_fewer_than_24_hours_shows_only_the_available(logic_page: Page, weather_views):
+    """RN-034, feature 4 (categoria 5): perto do fim da previsão, sobram menos de 24 horas;
+    sem previsão hora a hora, nenhuma. As horas saem em ordem mesmo fora de ordem na
+    entrada."""
+    hourly = weather_views["uberlandia"]["hourly"]
+    shuffled = [{"dt": h * 3600, "hour_label": f"h{h}"} for h in (300, 100, 200)]
+
+    near_end = window_labels(logic_page, hourly, hourly[-1]["dt"] - 2 * 3600)
+
+    assert near_end == ["05:00", "06:00", "07:00"]
+    assert window_labels(logic_page, None, CAPTURE_NOW) == []
+    assert window_labels(logic_page, shuffled, 0) == ["h100", "h200", "h300"]
+
+
+# ---------- logic/chart-math.js ----------
+
+NUMBER = re.compile(r"-?\d+(?:\.\d+)?")
+
+
+def path_points(d: str) -> list[list[tuple[float, float]]]:
+    """Subcaminhos de um `d` com `M` e `C`: a lista de pares (x, y) de cada um, incluindo os
+    pontos de controle."""
+    paths = []
+    for part in d.split("M")[1:]:
+        numbers = [float(n) for n in NUMBER.findall(part)]
+        paths.append(list(zip(numbers[::2], numbers[1::2], strict=True)))
+    return paths
+
+
+def scale_y(page: Page, values, top: float, bottom: float):
+    return evaluate(
+        page,
+        "logic/chart-math.js",
+        "return m.scaleY(arg.values, arg.top, arg.bottom);",
+        {"values": values, "top": top, "bottom": bottom},
+    )
+
+
+def monotone_path(page: Page, ys) -> str:
+    """`monotonePath` com os pontos em x = 0,5; 1,5; 2,5…, como as colunas das horas."""
+    points = [{"x": i + 0.5, "y": y} for i, y in enumerate(ys)]
+    return evaluate(page, "logic/chart-math.js", "return m.monotonePath(arg);", points)
+
+
+def test_rn_039_scale_goes_from_min_temperature_to_max(logic_page: Page):
+    """RN-039: a maior temperatura da janela fica no topo da faixa e a menor, na base; as
+    demais, proporcionalmente. A folga fora da faixa fica para as etiquetas. Temperatura
+    ausente não tem posição (P-013)."""
+    assert scale_y(logic_page, [10, 20, 15, None, 12.5], 25, 75) == [75, 25, 50, None, 62.5]
+
+
+def test_rn_039_equal_temperatures_are_a_straight_line_in_the_center(logic_page: Page):
+    """RN-039, CA-026: com todas as temperaturas iguais, todos os pontos ficam no centro da
+    faixa, e a curva é uma linha reta."""
+    ys = scale_y(logic_page, [22.4] * 24, 25, 75)
+    d = monotone_path(logic_page, ys)
+
+    assert ys == [50] * 24
+    assert {y for x, y in path_points(d)[0]} == {50}
+
+
+def test_rn_039_curve_never_goes_beyond_min_or_max(logic_page: Page, weather_views):
+    """RN-039, ADR-007: a curva monotônica (Fritsch–Carlson) passa por todos os pontos e, em
+    cada trecho, os pontos de controle ficam entre as duas temperaturas, então a curva nunca
+    passa da mínima nem da máxima. Vale para as 24 horas da captura e para picos, platôs e
+    viradas bruscas."""
+    capture = [h["temp_value"]["c"] for h in weather_views["uberlandia"]["hourly"][:24]]
+    tricky = [0, 10, 10, 0, 5, 5.1, 0, 0, 9, -3]
+
+    for temps in (capture, tricky):
+        ys = scale_y(logic_page, temps, 25, 75)
+        (points,) = path_points(monotone_path(logic_page, ys))
+        knots = points[::3]
+        assert [y for x, y in knots] == pytest.approx(ys, abs=0.001)
+        for i in range(len(knots) - 1):
+            low, high = sorted((knots[i][1], knots[i + 1][1]))
+            for x, y in points[3 * i : 3 * i + 4]:
+                assert low - 0.001 <= y <= high + 0.001
+                assert knots[i][0] <= x <= knots[i + 1][0]
+
+
+def test_p_013_missing_temperature_breaks_the_curve(logic_page: Page):
+    """P-013: uma hora sem temperatura não ganha ponto inventado; a curva é interrompida e
+    continua na hora seguinte. Um ponto isolado vira só o início de um subcaminho."""
+    d = monotone_path(logic_page, [30, 40, None, 50, None, 60, 70])
+
+    assert [len(points) for points in path_points(d)] == [4, 1, 4]
+    assert path_points(d)[1] == [(3.5, 50)]
+    assert monotone_path(logic_page, []) == ""
+
+
+def group(page: Page, values, xs=None, width=70, gap=4) -> list[bool]:
+    """`groupRainLabels` com uma etiqueta por coluna de 72 px, todas com a mesma largura."""
+    xs = xs or [36 + 72 * i for i in range(len(values))]
+    items = [{"x": x, "width": width, "value": v} for x, v in zip(xs, values, strict=True)]
+    return evaluate(
+        page,
+        "logic/chart-math.js",
+        "return m.groupRainLabels(arg.items, arg.gap);",
+        {"items": items, "gap": gap},
+    )
+
+
+def test_rn_038_overlapping_labels_show_only_the_largest_volume(logic_page: Page):
+    """RN-038: etiquetas de horas vizinhas que ficariam sobrepostas formam um grupo, e só a
+    de maior volume fica visível. Etiquetas afastadas ou estreitas aparecem todas."""
+    assert group(logic_page, [0.42, 0.66, 0.3]) == [False, True, False]
+    assert group(logic_page, [0.42, 0.66], xs=[36, 180]) == [True, True]
+    assert group(logic_page, [0.42, 0.66], width=60) == [True, True]
+    assert group(logic_page, []) == []
+
+
+def test_rn_038_rain_in_many_hours_in_a_row(logic_page: Page):
+    """RN-038, feature 4 (categoria 6): chuva em 9 horas seguidas (a noite de terça da
+    captura). Do maior volume para o menor, cada etiqueta só aparece se não ficar sobre uma
+    já visível: nenhuma visível se sobrepõe, e cada oculta fica no grupo de uma visível de
+    volume maior. Empate: vale a hora mais cedo."""
+    values = [0.68, 1.95, 10.49, 7.92, 9.49, 2.28, 4.22, 2.13, 0.45]
+
+    visible = group(logic_page, values)
+
+    assert visible == [True, False, True, False, True, False, True, False, True]
+    assert group(logic_page, [0.5, 0.5]) == [True, False]
+
+
+# ---------- logic/summaries.js ----------
+
+
+def alt_text(page: Page, window, scale: str = "c"):
+    return evaluate(
+        page,
+        "logic/summaries.js",
+        "return m.hourlyAltText(arg.window, arg.scale);",
+        {"window": window, "scale": scale},
+    )
+
+
+def hour(label: str, celsius: float | None) -> dict:
+    """Hora do view model só com o que o texto alternativo usa."""
+    text = "—" if celsius is None else f"{round(celsius)}°"
+    return {
+        "hour_label": label,
+        "temp": {"c": text, "f": text},
+        "temp_value": {"c": celsius, "f": celsius},
+    }
+
+
+def test_rnf_016_alt_text_gives_min_and_max_with_their_hours(logic_page: Page, weather_views):
+    """RNF-016, RN-040: o texto alternativo da curva diz a mínima e a máxima das 24 horas,
+    com a hora de cada uma, na escala ativa."""
+    window = weather_views["uberlandia"]["hourly"][:24]
+
+    assert alt_text(logic_page, window, "c") == (
+        "Nas próximas 24 horas, mínima de 18° às 06:00 e máxima de 29° às 14:00"
+    )
+    assert alt_text(logic_page, window, "f") == (
+        "Nas próximas 24 horas, mínima de 65° às 06:00 e máxima de 83° às 14:00"
+    )
+
+
+def test_rnf_016_alt_text_with_fewer_hours_ties_and_missing_values(logic_page: Page):
+    """RNF-016, P-013: com menos de 24 horas, o texto diz quantas; no empate, vale a hora mais
+    cedo; e uma hora sem temperatura é ignorada. Sem nenhuma temperatura, não há texto."""
+    window = [hour("10:00", 20), hour("11:00", None), hour("12:00", 25), hour("13:00", 20)]
+
+    assert alt_text(logic_page, window) == (
+        "Nas próximas 4 horas, mínima de 20° às 10:00 e máxima de 25° às 12:00"
+    )
+    assert alt_text(logic_page, [hour("10:00", None)]) is None
+    assert alt_text(logic_page, []) is None
+
+
+def test_rnf_016_alt_text_for_steady_temperature(logic_page: Page):
+    """RNF-016, RN-039, CA-026: com a mesma temperatura em todas as horas, o texto diz que ela
+    está estável, em vez de repetir a mesma mínima e máxima."""
+    assert alt_text(logic_page, [hour(f"{h:02d}:00", 22) for h in range(24)]) == (
+        "Nas próximas 24 horas, temperatura estável em 22°"
+    )
+    assert alt_text(logic_page, [hour("23:00", 22)]) == (
+        "Na próxima hora, temperatura estável em 22°"
+    )

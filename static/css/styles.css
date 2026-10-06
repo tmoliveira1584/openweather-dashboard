@@ -555,15 +555,20 @@ button {
   scrollbar-width: thin;
 }
 
+/* A largura vem só das colunas das horas: a curva cobre exatamente as horas dos cards. */
 .hourly-track {
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
   width: max-content;
-  min-width: 100%;
   padding-bottom: var(--space-1);
 }
 
+/*
+ * As posições da curva, dos pontos e das etiquetas são em % da largura e da altura: cada hora
+ * é uma coluna de --hour-column, e a faixa da curva vai de 25% a 75% da altura (ui/hourly.js).
+ * Acima fica a dica do ponto e, abaixo, as etiquetas de chuva (RN-039).
+ */
 .hourly-chart {
   position: relative;
   height: 160px;
@@ -572,25 +577,32 @@ button {
   background: var(--color-surface-soft);
 }
 
-/* Em absoluto: a largura da faixa vem só dos cards, e a curva acompanha (RF-034). */
 .hourly-curve {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
+  overflow: visible;
 }
 
 .hourly-curve path {
   fill: none;
   stroke: var(--color-curve);
   stroke-width: 2;
+  stroke-linecap: round;
   vector-effect: non-scaling-stroke;
+}
+
+.hourly-rain {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
 }
 
 .rain-label {
   position: absolute;
   bottom: var(--space-2);
-  padding: 2px var(--space-2);
+  padding: 2px var(--space-1);
   border-radius: var(--radius-card) var(--radius-card) 0 0;
   background: var(--color-rain-label-bg);
   font-size: 0.6875rem;
@@ -598,25 +610,97 @@ button {
   white-space: nowrap;
 }
 
+/* Um ponto por hora: a coluna inteira responde ao cursor, e o marcador fica na curva. */
+.hourly-points {
+  position: absolute;
+  inset: 0;
+}
+
+.hourly-point {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+}
+
+.hourly-point:focus-visible {
+  outline: none; /* o foco aparece no marcador */
+}
+
+.hourly-dot {
+  position: absolute;
+  left: 50%;
+  width: 12px;
+  height: 12px;
+  border: 2px solid var(--color-curve);
+  border-radius: 50%;
+  background: var(--color-surface);
+  opacity: 0;
+  transform: translate(-50%, -50%);
+}
+
+.hourly-point.is-active .hourly-dot {
+  opacity: 1;
+}
+
+.hourly-point:focus-visible .hourly-dot {
+  outline: 3px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* Hora, temperatura e chuva do ponto ativo (RF-036). Nas pontas, alinhada à borda. */
+.hourly-tooltip {
+  position: absolute;
+  top: var(--space-2);
+  z-index: 1;
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-card);
+  background: var(--color-text);
+  color: var(--color-surface);
+  font-size: 0.75rem;
+  pointer-events: none;
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+
+.hourly-tooltip[data-align="start"] {
+  transform: none;
+}
+
+.hourly-tooltip[data-align="end"] {
+  transform: translateX(-100%);
+}
+
 .hourly-list {
-  display: flex;
-  gap: var(--space-2);
+  display: grid;
+  grid-auto-columns: var(--hour-column);
+  grid-auto-flow: column;
 }
 
 .hour-card {
   display: flex;
-  flex: 1 0 auto;
-  width: 60px;
   flex-direction: column;
   align-items: center;
   gap: var(--space-1);
-  padding: var(--space-2) var(--space-1);
+  margin-inline: var(--space-1);
+  padding: var(--space-2) 2px;
+  border: 2px solid transparent;
   border-radius: var(--radius-card);
   background: var(--color-tile);
 }
 
+/* O card da hora do ponto ativo é destacado pela borda (RNF-017). */
+.hour-card.is-active {
+  border-color: var(--color-curve);
+}
+
 .hour-label {
   font-size: 0.8125rem;
+  white-space: nowrap;
+}
+
+.hour-weekday {
+  font-size: 0.75rem;
+  font-weight: 700;
 }
 
 .hour-icon {

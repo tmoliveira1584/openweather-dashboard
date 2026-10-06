@@ -13,10 +13,9 @@
 </head>
 <body>
   <!--
-    Esqueleto da tela (fatia 5). Os textos e valores da hora a hora e da previsão por minuto
-    abaixo são provisórios, copiados do exemplo da seção 6.3 da arquitetura. Eles saem nas
-    fatias 9 a 11, quando os blocos passam a ser montados pelos módulos de static/js/ui/
-    (guardrail 10).
+    Esqueleto da tela (fatia 5). Os textos e valores da previsão por minuto abaixo são
+    provisórios, copiados do exemplo da seção 6.3 da arquitetura. Eles saem nas fatias 10 e
+    11, quando os blocos passam a ser montados pelos módulos de static/js/ui/ (guardrail 10).
   -->
   <!-- Cabeçalho: estrutura só. Os textos vêm do messages.js e do estado (ui/header.js). -->
   <header class="app-header">
@@ -153,32 +152,24 @@
         </ul>
       </section>
 
+      <!--
+        Previsão hora a hora: estrutura só. A curva, os pontos, as etiquetas e os cards são
+        desenhados pelo ui/hourly.js, e o título vem do messages.js.
+      -->
       <section class="panel hourly" aria-labelledby="hourly-title">
-        <h2 class="panel-title" id="hourly-title">Previsão hora a hora</h2>
+        <h2 class="panel-title" id="hourly-title"></h2>
         <!-- A curva e os cards rolam juntos: a curva cobre sempre as mesmas horas dos cards (RF-034, RF-037). -->
         <div class="hourly-scroll">
           <div class="hourly-track">
             <div class="hourly-chart">
-              <svg class="hourly-curve" viewBox="0 0 1200 160" preserveAspectRatio="none" aria-hidden="true" focusable="false">
-                <path d="M50 120 C 150 118, 250 116, 350 104 S 550 80, 650 64 S 850 40, 950 44 S 1100 52, 1150 60"/>
+              <svg class="hourly-curve" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+                <path/>
               </svg>
-              <span class="rain-label" style="left: 45.8%">0,21 mm/h</span>
-              <span class="rain-label" style="left: 54.2%">0,19 mm/h</span>
+              <div class="hourly-rain" aria-hidden="true"></div>
+              <div class="hourly-points"></div>
+              <p class="hourly-tooltip" aria-hidden="true" hidden></p>
             </div>
-            <ol class="hourly-list">
-              <li class="hour-card"><span class="hour-label">08:00</span><img class="hour-icon" src="https://openweathermap.org/img/wn/04d@2x.png" alt="Nublado" width="40" height="40"><span class="hour-pop">0%</span><span class="hour-temp">20°</span></li>
-              <li class="hour-card"><span class="hour-label">09:00</span><img class="hour-icon" src="https://openweathermap.org/img/wn/04d@2x.png" alt="Nublado" width="40" height="40"><span class="hour-pop">0%</span><span class="hour-temp">20°</span></li>
-              <li class="hour-card"><span class="hour-label">10:00</span><img class="hour-icon" src="https://openweathermap.org/img/wn/04d@2x.png" alt="Nublado" width="40" height="40"><span class="hour-pop">0%</span><span class="hour-temp">21°</span></li>
-              <li class="hour-card"><span class="hour-label">11:00</span><img class="hour-icon" src="https://openweathermap.org/img/wn/04d@2x.png" alt="Nublado" width="40" height="40"><span class="hour-pop">0%</span><span class="hour-temp">22°</span></li>
-              <li class="hour-card"><span class="hour-label">12:00</span><img class="hour-icon" src="https://openweathermap.org/img/wn/04d@2x.png" alt="Nublado" width="40" height="40"><span class="hour-pop">0%</span><span class="hour-temp">22°</span></li>
-              <li class="hour-card"><span class="hour-label">13:00</span><img class="hour-icon" src="https://openweathermap.org/img/wn/10d@2x.png" alt="Chuva leve" width="40" height="40"><span class="hour-pop">20%</span><span class="hour-temp">25°</span></li>
-              <li class="hour-card"><span class="hour-label">14:00</span><img class="hour-icon" src="https://openweathermap.org/img/wn/10d@2x.png" alt="Chuva leve" width="40" height="40"><span class="hour-pop">21%</span><span class="hour-temp">24°</span></li>
-              <li class="hour-card"><span class="hour-label">15:00</span><img class="hour-icon" src="https://openweathermap.org/img/wn/04d@2x.png" alt="Nublado" width="40" height="40"><span class="hour-pop">0%</span><span class="hour-temp">25°</span></li>
-              <li class="hour-card"><span class="hour-label">16:00</span><img class="hour-icon" src="https://openweathermap.org/img/wn/04d@2x.png" alt="Nublado" width="40" height="40"><span class="hour-pop">12%</span><span class="hour-temp">25°</span></li>
-              <li class="hour-card"><span class="hour-label">17:00</span><img class="hour-icon" src="https://openweathermap.org/img/wn/04d@2x.png" alt="Nublado" width="40" height="40"><span class="hour-pop">10%</span><span class="hour-temp">24°</span></li>
-              <li class="hour-card"><span class="hour-label">18:00</span><img class="hour-icon" src="https://openweathermap.org/img/wn/04n@2x.png" alt="Nublado" width="40" height="40"><span class="hour-pop">5%</span><span class="hour-temp">23°</span></li>
-              <li class="hour-card"><span class="hour-label">19:00</span><img class="hour-icon" src="https://openweathermap.org/img/wn/04n@2x.png" alt="Nublado" width="40" height="40"><span class="hour-pop">0%</span><span class="hour-temp">22°</span></li>
-            </ol>
+            <ol class="hourly-list"></ol>
           </div>
         </div>
       </section>
