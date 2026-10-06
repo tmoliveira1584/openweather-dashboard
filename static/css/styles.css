@@ -1,0 +1,662 @@
+/*
+ * Layout e componentes (arquitetura, seção 7.1). Valores visuais sempre pelos tokens de
+ * tokens.css. Mobile primeiro: as regras base valem abaixo de 600 px, e a media query
+ * (min-width: 600px) monta o layout do print.
+ */
+
+/* ---------- Base ---------- */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+/* O gradiente fica no html, com altura mínima da janela, para cobrir o documento inteiro. */
+html {
+  min-height: 100%;
+  background: var(--color-page-bg);
+  font-family: var(--font-family);
+  color: var(--color-text);
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  padding: var(--space-3);
+  line-height: 1.3;
+}
+
+h1,
+h2,
+p,
+ol,
+ul {
+  margin: 0;
+}
+
+ol,
+ul {
+  padding: 0;
+  list-style: none;
+}
+
+img,
+svg {
+  display: block;
+}
+
+button,
+input {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+:focus-visible {
+  outline: 3px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.panel {
+  min-width: 0; /* deixa os blocos encolherem; quem rola é o conteúdo, nunca a página (P-024) */
+  padding: var(--space-3);
+  border-radius: var(--radius-panel);
+  background: var(--color-surface);
+}
+
+.panel-title {
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+/* ---------- Cabeçalho ---------- */
+
+.app-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3) var(--space-4);
+  color: var(--color-on-page);
+}
+
+.app-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.scale-toggle {
+  display: flex;
+  padding: var(--space-1);
+  border-radius: 999px;
+  background: var(--color-tab);
+}
+
+.scale-option {
+  min-width: 40px;
+  padding: var(--space-1) var(--space-3);
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--color-on-page);
+  font-size: 0.8125rem;
+}
+
+/* Escala ativa: fundo claro e negrito, não só a cor (RNF-028). */
+.scale-option[aria-pressed="true"] {
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-weight: 700;
+}
+
+.city {
+  display: flex;
+  flex-basis: 100%;
+  align-items: center;
+  gap: var(--space-1);
+  min-width: 0;
+  font-weight: 600;
+}
+
+.city-icon {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
+}
+
+/* Nome longo cortado com "…"; o nome completo fica no title (feature 1, categoria 10). */
+.city-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.search {
+  position: relative;
+  display: flex;
+  flex-basis: 100%;
+  align-items: center;
+  min-width: 0;
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+.search-button {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-card);
+  background: transparent;
+}
+
+.search-button svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.25;
+  stroke-linecap: round;
+}
+
+.search-input {
+  flex: 1;
+  min-width: 0;
+  height: 40px;
+  padding: 0 var(--space-3) 0 0;
+  border: 0;
+  border-radius: var(--radius-card);
+  background: transparent;
+}
+
+.search-input::placeholder {
+  color: var(--color-text-muted);
+}
+
+/* A lista abre logo abaixo do campo, na mesma largura (feature 1, categoria 10). */
+.search-results {
+  position: absolute;
+  top: calc(100% + var(--space-1));
+  right: 0;
+  left: 0;
+  z-index: 1100;
+  overflow: hidden;
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.2);
+}
+
+.location-notice {
+  margin-top: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+}
+
+/* ---------- Painel principal ---------- */
+
+.dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-top: var(--space-3);
+}
+
+/* ---------- Faixa de abas ---------- */
+
+/* Rolagem horizontal própria: a faixa nunca alarga a página (RF-032, RNF-015, P-024). */
+.day-tabs {
+  min-width: 0;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: thin;
+}
+
+.day-tabs-list {
+  display: flex;
+  gap: var(--space-2);
+  width: max-content;
+  padding-bottom: var(--space-1);
+}
+
+.day-tab {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-3);
+  border: 2px solid transparent;
+  border-radius: var(--radius-card);
+  background: var(--color-tab);
+  color: var(--color-on-page);
+  white-space: nowrap;
+}
+
+/* Aba ativa: cor de destaque, borda e negrito, não só a cor (RNF-014). */
+.day-tab[aria-selected="true"] {
+  border-color: var(--color-on-page);
+  background: var(--color-accent);
+  font-weight: 700;
+}
+
+.day-tab-label {
+  font-weight: 600;
+}
+
+.day-tab-icon {
+  width: 32px;
+  height: 32px;
+}
+
+/* ---------- Card principal e indicadores ---------- */
+
+/*
+ * Lado a lado quando cabem (cerca de 1/3 e 2/3, como no print); empilhados quando não.
+ * As bases do flex decidem a quebra, sem um segundo breakpoint (seção 7.1).
+ */
+.dashboard-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.current {
+  display: flex;
+  flex: 1 1 300px;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.hourly {
+  display: flex;
+  flex: 2 1 520px;
+  flex-direction: column;
+  gap: var(--space-3);
+  background: var(--color-surface-soft);
+}
+
+/* Fundo provisório no lugar da ilustração da fatia 7 (ADR-012), já com a camada escura (RNF-009). */
+.current-card {
+  position: relative;
+  display: grid;
+  grid-template-areas:
+    "alerts time"
+    "temp   summary";
+  grid-template-columns: auto 1fr;
+  align-content: space-between;
+  gap: var(--space-2);
+  min-height: 200px;
+  padding: var(--space-3) var(--space-4);
+  overflow: hidden;
+  border-radius: var(--radius-card);
+  background:
+    linear-gradient(var(--color-illustration-overlay), var(--color-illustration-overlay)),
+    linear-gradient(160deg, #94a3b8 0%, #475569 60%, #334155 100%);
+  color: var(--color-on-page);
+}
+
+.current-alerts {
+  grid-area: alerts;
+  justify-self: start;
+  align-self: start;
+  padding: var(--space-1) var(--space-2);
+  border-radius: 999px;
+  background: var(--color-accent);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.current-time {
+  grid-area: time;
+  justify-self: end;
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+.current-temp {
+  grid-area: temp;
+  align-self: end;
+  font-size: 3.5rem;
+  font-weight: 300;
+  line-height: 1;
+}
+
+.current-summary {
+  grid-area: summary;
+  align-self: end;
+  justify-self: end;
+  text-align: right;
+}
+
+.current-description {
+  font-size: 1rem;
+}
+
+.current-feels-like {
+  font-size: 0.875rem;
+}
+
+/* 2 colunas abaixo de 600 px e 3 a partir daí (RNF-011). */
+.indicators {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-2);
+}
+
+.indicator {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  min-height: 56px;
+  padding: var(--space-2);
+  border-radius: var(--radius-card);
+  background: var(--color-tile);
+  text-align: center;
+}
+
+.indicator-label {
+  color: var(--color-text-muted);
+  font-size: 0.75rem;
+}
+
+.indicator-value {
+  color: var(--color-text-value);
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+/* ---------- Hora a hora ---------- */
+
+/* A curva e os cards rolam juntos dentro do bloco (RF-034, RF-037). */
+.hourly-scroll {
+  min-width: 0;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: thin;
+}
+
+.hourly-track {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  width: max-content;
+  min-width: 100%;
+  padding-bottom: var(--space-1);
+}
+
+.hourly-chart {
+  position: relative;
+  height: 160px;
+  border: 1px solid #e7e5e4;
+  border-radius: var(--radius-card);
+  background: var(--color-surface-soft);
+}
+
+/* Em absoluto: a largura da faixa vem só dos cards, e a curva acompanha (RF-034). */
+.hourly-curve {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.hourly-curve path {
+  fill: none;
+  stroke: var(--color-curve);
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+}
+
+.rain-label {
+  position: absolute;
+  bottom: var(--space-2);
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-card) var(--radius-card) 0 0;
+  background: var(--color-rain-label-bg);
+  font-size: 0.6875rem;
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+
+.hourly-list {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.hour-card {
+  display: flex;
+  flex: 1 0 auto;
+  width: 60px;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-1);
+  border-radius: var(--radius-card);
+  background: var(--color-tile);
+}
+
+.hour-label {
+  font-size: 0.8125rem;
+}
+
+.hour-icon {
+  width: 40px;
+  height: 40px;
+}
+
+.hour-pop {
+  font-size: 0.8125rem;
+}
+
+.hour-temp {
+  font-size: 1.25rem;
+}
+
+/* ---------- Mapa e previsão por minuto ---------- */
+
+.map-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+/* Abaixo de 600 px: largura total e altura mínima de 300 px (feature 6, categoria 10). */
+.map {
+  position: relative;
+  z-index: 0; /* contexto próprio: as camadas do Leaflet não passam por cima do painel */
+  height: var(--map-min-height);
+  overflow: hidden;
+  border-radius: var(--radius-panel);
+  background: #e8eef1; /* visto enquanto as tiles não chegam */
+}
+
+/* Abaixo de 600 px, o painel fica abaixo do mapa (RNF-021). */
+.minutely {
+  display: grid;
+  grid-template-areas:
+    "title"
+    "marks"
+    "bars"
+    "summary"
+    "legend";
+  gap: var(--space-2);
+  background: var(--color-panel-minute);
+}
+
+.minutely .panel-title {
+  grid-area: title;
+}
+
+.minutely-marks {
+  display: flex;
+  grid-area: marks;
+  justify-content: space-between;
+  gap: var(--space-1);
+}
+
+.mark {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 0;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-card);
+  background: var(--color-tile);
+}
+
+.mark-label {
+  color: var(--color-text-muted);
+  font-size: 0.625rem;
+}
+
+.mark-time {
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+/* As barras afinam com a largura, sem rolagem horizontal (feature 5, categoria 10). */
+.minutely-bars {
+  display: flex;
+  grid-area: bars;
+  align-items: flex-end;
+  gap: 1px;
+  height: 32px;
+}
+
+.bar {
+  flex: 1 1 0;
+  min-width: 1px;
+  height: 60%; /* provisório: a altura por intensidade (RN-042) entra na fatia 10 */
+  border-radius: 1px;
+}
+
+.band-none {
+  background: var(--color-band-none);
+}
+
+.band-light {
+  background: var(--color-band-light);
+}
+
+.band-moderate {
+  background: var(--color-band-moderate);
+}
+
+.band-heavy {
+  background: var(--color-band-heavy);
+}
+
+.band-extreme {
+  background: var(--color-band-extreme);
+}
+
+.minutely-summary {
+  grid-area: summary;
+  font-size: 0.8125rem;
+}
+
+.minutely-legend {
+  display: flex;
+  flex-wrap: wrap;
+  grid-area: legend;
+  gap: var(--space-1) var(--space-3);
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 0.75rem;
+}
+
+.legend-swatch {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+}
+
+/* ---------- A partir de 600 px (breakpoint da seção 7.1) ---------- */
+
+@media (min-width: 600px) {
+  body {
+    padding: var(--space-4);
+  }
+
+  /* Uma linha quando cabe; se faltar espaço, a busca desce e a cidade não é espremida. */
+  .app-title {
+    white-space: nowrap;
+  }
+
+  .city {
+    flex: 0 1 auto;
+    margin-left: auto;
+  }
+
+  .search {
+    flex: 0 1 320px;
+  }
+
+  .dashboard,
+  .dashboard-row {
+    gap: var(--space-4);
+  }
+
+  .current,
+  .hourly {
+    padding: var(--space-4);
+  }
+
+  .indicators {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  /* O painel fica dentro da área do mapa, no canto inferior esquerdo (RNF-021). */
+  .map-section {
+    position: relative;
+    display: block;
+  }
+
+  .map {
+    height: 440px;
+  }
+
+  /*
+   * Sobreposto ao canto inferior esquerdo, 24 px acima da borda: a atribuição do Leaflet
+   * ocupa a faixa de baixo, à direita, e fica sempre visível (RNF-025, P-019).
+   */
+  .minutely {
+    position: absolute;
+    bottom: var(--space-6);
+    left: var(--space-3);
+    z-index: 1;
+    grid-template-areas:
+      "title   legend"
+      "marks   legend"
+      "bars    legend"
+      "summary legend";
+    grid-template-columns: minmax(0, 1fr) auto;
+    column-gap: var(--space-6);
+    width: min(640px, calc(100% - 2 * var(--space-3)));
+    box-shadow: 0 4px 16px rgb(0 0 0 / 0.15);
+  }
+
+  .minutely-legend {
+    flex-direction: column;
+    flex-wrap: nowrap;
+    justify-content: center;
+  }
+}

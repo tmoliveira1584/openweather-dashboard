@@ -11,11 +11,11 @@ Lista de tarefas que leva a aplicação de zero a 100% dos requisitos, uma fatia
 
 | Item | Valor |
 |---|---|
-| Fatia atual | 5 — Estrutura da tela (não iniciada) |
-| Próxima tarefa | T-5.1 |
+| Fatia atual | 6a — Estado, cache e chamadas ao backend (não iniciada) |
+| Próxima tarefa | T-6a.1 |
 | Concluídas, ainda sem commit | — |
-| Último commit de implementação | Fatia 4, commit `feat(api): consultar o provedor e expor as rotas /api` de 2026-10-06 (o hash é registrado aqui no início da fatia 5). Fatia 3: `8f56a1a`. Fatia 2: `8fb0ce7`. Fatia 1: `b5ff9c1`. Fatia 0: `880fa41` |
-| IDs fechados | 31 de 217 (14,3%) |
+| Último commit de implementação | Fatia 5, commit `feat(ui): montar o esqueleto da tela com layout responsivo` de 2026-10-06 (o hash é registrado aqui no início da fatia 6a). Fatia 4: `4ee7d59`. Fatia 3: `8f56a1a`. Fatia 2: `8fb0ce7`. Fatia 1: `b5ff9c1`. Fatia 0: `880fa41` |
+| IDs fechados | 32 de 217 (14,7%) |
 
 ## Como usar
 
@@ -38,7 +38,7 @@ Lista de tarefas que leva a aplicação de zero a 100% dos requisitos, uma fatia
 | 2 | Domínio: regras de clima | 11 | Concluída |
 | 3 | View model | 3 | Concluída |
 | 4 | Cliente e rotas | 4 | Concluída |
-| 5 | Estrutura da tela | 1 | Pendente |
+| 5 | Estrutura da tela | 1 | Concluída |
 | 6a | Estado, cache e chamadas ao backend | 13 | Pendente |
 | 6b | Cabeçalho, busca e seletor de escala | 24 | Pendente |
 | 6c | Localização inicial e cidade padrão | 12 | Pendente |
@@ -49,7 +49,7 @@ Lista de tarefas que leva a aplicação de zero a 100% dos requisitos, uma fatia
 | 11 | Mapa | 24 | Pendente |
 | 12 | Robustez, desempenho e acessibilidade | 15 | Pendente |
 | 13 | Fechamento | 4 | Pendente |
-| | **Total** | **217** | **14,3%** |
+| | **Total** | **217** | **14,7%** |
 
 ---
 
@@ -122,11 +122,11 @@ Arquitetura: seções 6.1, 6.4, 7.6 e ADR-003. Testes em `tests/api/` com `TestC
 
 Arquitetura: seções 7.1 e 8.4. Referência: [print](referencia/referencia_visual.png). Os textos de exemplo desta fatia são provisórios e saem nas fatias 6a a 11, quando os textos passam a vir do `messages.js` e do view model (guardrail 10).
 
-- [ ] **T-5.1** `static/index.html`: esqueleto semântico com cabeçalho, faixa de abas, card principal e 6 indicadores, bloco hora a hora, mapa e painel por minuto. Carregar o `main.js` como módulo e o Leaflet copiado.
-- [ ] **T-5.2** `static/css/tokens.css` com os tokens da seção 7.1.
-- [ ] **T-5.3** `static/css/styles.css`: layout do print com CSS Grid e Flexbox, breakpoint de 600 px, largura mínima de 360 px sem rolagem horizontal da página, faixa de abas com rolagem própria, indicadores em 3/2 colunas, painel por minuto sobreposto ou abaixo do mapa e altura mínima do mapa de 300 px. (RNF-011)
-- [ ] **T-5.4** `tests/e2e/test_layout.py`: larguras de 360, 599, 600 e 1280 px, sem rolagem horizontal da página e com o número certo de colunas nos indicadores.
-- [ ] **T-5.5** Definição de pronto, com conferência visual contra o print, + commit.
+- [x] **T-5.1** `static/index.html`: esqueleto semântico com cabeçalho, faixa de abas, card principal e 6 indicadores, bloco hora a hora, mapa e painel por minuto. Carregar o `main.js` como módulo e o Leaflet copiado.
+- [x] **T-5.2** `static/css/tokens.css` com os tokens da seção 7.1.
+- [x] **T-5.3** `static/css/styles.css`: layout do print com CSS Grid e Flexbox, breakpoint de 600 px, largura mínima de 360 px sem rolagem horizontal da página, faixa de abas com rolagem própria, indicadores em 3/2 colunas, painel por minuto sobreposto ou abaixo do mapa e altura mínima do mapa de 300 px. (RNF-011)
+- [x] **T-5.4** `tests/e2e/test_layout.py`: larguras de 360, 599, 600 e 1280 px, sem rolagem horizontal da página e com o número certo de colunas nos indicadores.
+- [x] **T-5.5** Definição de pronto, com conferência visual contra o print, + commit.
 
 **Fecha:** RNF-011
 
@@ -290,4 +290,5 @@ Arquitetura: seções 9 e 11.
 | D-13 | 2026-10-05 | As regras da fatia 2 usam tipos que a seção 6.6 coloca em `app/schemas/`. Eles foram criados já na fatia 2, na forma mínima: `Alert` e `GeoResult` em `provider.py` (campos opcionais, `extra="ignore"`) e `Scaled`, `CityOption`, `ConditionGroup` e `Band` em `view.py`. As T-3.2 e T-3.3 completam os modelos, inclusive o valor fora do formato virar `None`. O `city_option` exige coordenadas: a T-3.5 descarta os itens da busca que vierem sem `lat` ou `lon` |
 | D-14 | 2026-10-05 | O `daily` do view model traz todos os dias recebidos (até 10), e o limite de 8 a partir de "Hoje" fica só no `visibleDays` do frontend (T-8.1). O corte em 8 a partir do primeiro dia recebido, previsto antes na seção 6.3, deixaria 7 abas em Tóquio nas primeiras horas do dia local: o primeiro dia da 4.0 é a data UTC, que lá já é "ontem" (captura da T-0.8), e o RN-027 pede 8. Seções 6.3 e 6.6 da arquitetura atualizadas |
 | D-15 | 2026-10-05 | Regras do view model que o spec não define, registradas na seção 6.3 da arquitetura: (1) um rótulo com prefixo e valor ausente mantém o prefixo (`"Sensação de —"`, `"Mín. —"`), como o tooltip `"08:18 — —"`; (2) sem `timezone_offset`, os blocos diário, hora a hora e por minuto ficam `null` e a hora do card principal mostra "—", porque não há fuso para achar a hora local nem o "Hoje"; (3) registro de previsão sem `dt` é descartado. A variante `onecall_alerts.json` ficou com 2 alertas (sem o alerta sem vigência, que contaria em todos os dias e impediria o selo oculto do CA-021) |
+| D-16 | 2026-10-06 | **Layout entre 600 px e a largura do print.** Com os indicadores em 3 colunas a partir de 600 px (RNF-011), 1/3 da largura em 600 px daria cards de cerca de 55 px. Por isso, o card principal e a hora a hora usam `flex-wrap` com larguras-base de 300 px e 520 px: ficam lado a lado (cerca de 1/3 e 2/3) quando cabem e empilham quando não, sem um segundo breakpoint. Pelo mesmo motivo, a busca desce para a segunda linha do cabeçalho quando falta espaço. O painel por minuto fica 24 px acima da borda do mapa, para não cobrir a atribuição (RNF-025). Seção 7.1 da arquitetura atualizada |
 | L-01 | 2026-10-04 | **Limitação:** os testes são feitos só no Google Chrome instalado. Edge, Firefox e Safari não são testados, nem em computador nem em celular. O RNF-006 continua no spec como meta, mas a compatibilidade com outros navegadores não é verificada no MVP |

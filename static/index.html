@@ -4,9 +4,188 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>OpenWeather Dashboard</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="/vendor/leaflet-1.9.4/leaflet.css">
+  <link rel="stylesheet" href="/css/tokens.css">
+  <link rel="stylesheet" href="/css/styles.css">
+  <script src="/vendor/leaflet-1.9.4/leaflet.js" defer></script>
+  <script type="module" src="/js/main.js"></script>
 </head>
 <body>
-  <!-- Página mínima da fatia 0. O esqueleto da tela entra na T-5.1. -->
-  <main></main>
+  <!--
+    Esqueleto da tela (fatia 5). Os textos e valores abaixo são provisórios, copiados do
+    exemplo da seção 6.3 da arquitetura. Eles saem nas fatias 6a a 11, quando os blocos
+    passam a ser montados pelos módulos de static/js/ui/ (guardrail 10).
+  -->
+  <header class="app-header">
+    <h1 class="app-title">Previsão do tempo</h1>
+
+    <div class="scale-toggle" role="group" aria-label="Escala de temperatura">
+      <button type="button" class="scale-option" aria-pressed="true">°C</button>
+      <button type="button" class="scale-option" aria-pressed="false">°F</button>
+    </div>
+
+    <p class="city" title="Uberlândia, BR">
+      <svg class="city-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5Z"/>
+      </svg>
+      <span class="city-name">Uberlândia, BR</span>
+    </p>
+
+    <form class="search" role="search">
+      <button type="submit" class="search-button" aria-label="Buscar">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <circle cx="10.5" cy="10.5" r="6.5"/>
+          <path d="m15.5 15.5 5 5"/>
+        </svg>
+      </button>
+      <input class="search-input" type="search" name="q" placeholder="Buscar cidade"
+             aria-label="Buscar cidade" autocomplete="off">
+      <ul class="search-results" hidden></ul>
+    </form>
+  </header>
+
+  <p class="location-notice" role="status" hidden></p>
+
+  <main class="dashboard">
+    <nav class="day-tabs" aria-label="Dias da previsão">
+      <div class="day-tabs-list" role="tablist">
+        <button type="button" class="day-tab" role="tab" aria-selected="true">
+          <span class="day-tab-label">Hoje</span> <span class="day-tab-temp">31°</span>
+          <img class="day-tab-icon" src="https://openweathermap.org/img/wn/10d@2x.png" alt="Chuva leve" width="32" height="32">
+        </button>
+        <button type="button" class="day-tab" role="tab" aria-selected="false" tabindex="-1">
+          <span class="day-tab-label">Qui</span> <span class="day-tab-temp">35°</span>
+          <img class="day-tab-icon" src="https://openweathermap.org/img/wn/01d@2x.png" alt="Céu limpo" width="32" height="32">
+        </button>
+        <button type="button" class="day-tab" role="tab" aria-selected="false" tabindex="-1">
+          <span class="day-tab-label">Sex</span> <span class="day-tab-temp">37°</span>
+          <img class="day-tab-icon" src="https://openweathermap.org/img/wn/01d@2x.png" alt="Céu limpo" width="32" height="32">
+        </button>
+        <button type="button" class="day-tab" role="tab" aria-selected="false" tabindex="-1">
+          <span class="day-tab-label">Sáb</span> <span class="day-tab-temp">35°</span>
+          <img class="day-tab-icon" src="https://openweathermap.org/img/wn/04d@2x.png" alt="Nublado" width="32" height="32">
+        </button>
+        <button type="button" class="day-tab" role="tab" aria-selected="false" tabindex="-1">
+          <span class="day-tab-label">Dom</span> <span class="day-tab-temp">30°</span>
+          <img class="day-tab-icon" src="https://openweathermap.org/img/wn/10d@2x.png" alt="Chuva leve" width="32" height="32">
+        </button>
+        <button type="button" class="day-tab" role="tab" aria-selected="false" tabindex="-1">
+          <span class="day-tab-label">Seg</span> <span class="day-tab-temp">28°</span>
+          <img class="day-tab-icon" src="https://openweathermap.org/img/wn/10d@2x.png" alt="Chuva leve" width="32" height="32">
+        </button>
+        <button type="button" class="day-tab" role="tab" aria-selected="false" tabindex="-1">
+          <span class="day-tab-label">Ter</span> <span class="day-tab-temp">30°</span>
+          <img class="day-tab-icon" src="https://openweathermap.org/img/wn/04d@2x.png" alt="Nublado" width="32" height="32">
+        </button>
+        <button type="button" class="day-tab" role="tab" aria-selected="false" tabindex="-1">
+          <span class="day-tab-label">Qua</span> <span class="day-tab-temp">33°</span>
+          <img class="day-tab-icon" src="https://openweathermap.org/img/wn/02d@2x.png" alt="Poucas nuvens" width="32" height="32">
+        </button>
+      </div>
+    </nav>
+
+    <div class="dashboard-row">
+      <section class="panel current" aria-label="Condições atuais">
+        <div class="current-card" data-condition="clouds">
+          <p class="current-alerts">3 alertas</p>
+          <p class="current-time">08:18</p>
+          <p class="current-temp">20°</p>
+          <div class="current-summary">
+            <p class="current-description">Nublado</p>
+            <p class="current-feels-like">Sensação de 21°</p>
+          </div>
+        </div>
+
+        <ul class="indicators">
+          <li class="indicator">
+            <span class="indicator-label">Vento</span>
+            <span class="indicator-value">4 m/s L</span>
+          </li>
+          <li class="indicator">
+            <span class="indicator-label">Umidade</span>
+            <span class="indicator-value">94%</span>
+          </li>
+          <li class="indicator">
+            <span class="indicator-label">Visibilidade</span>
+            <span class="indicator-value">10 km</span>
+          </li>
+          <li class="indicator">
+            <span class="indicator-label">Pressão</span>
+            <span class="indicator-value">1015 hPa</span>
+          </li>
+          <li class="indicator">
+            <span class="indicator-label">Índice UV</span>
+            <span class="indicator-value">2 UV</span>
+          </li>
+          <li class="indicator">
+            <span class="indicator-label">Ponto de orvalho</span>
+            <span class="indicator-value">19 °C</span>
+          </li>
+        </ul>
+      </section>
+
+      <section class="panel hourly" aria-labelledby="hourly-title">
+        <h2 class="panel-title" id="hourly-title">Previsão hora a hora</h2>
+        <!-- A curva e os cards rolam juntos: a curva cobre sempre as mesmas horas dos cards (RF-034, RF-037). -->
+        <div class="hourly-scroll">
+          <div class="hourly-track">
+            <div class="hourly-chart">
+              <svg class="hourly-curve" viewBox="0 0 1200 160" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+                <path d="M50 120 C 150 118, 250 116, 350 104 S 550 80, 650 64 S 850 40, 950 44 S 1100 52, 1150 60"/>
+              </svg>
+              <span class="rain-label" style="left: 45.8%">0,21 mm/h</span>
+              <span class="rain-label" style="left: 54.2%">0,19 mm/h</span>
+            </div>
+            <ol class="hourly-list">
+              <li class="hour-card"><span class="hour-label">08:00</span><img class="hour-icon" src="https://openweathermap.org/img/wn/04d@2x.png" alt="Nublado" width="40" height="40"><span class="hour-pop">0%</span><span class="hour-temp">20°</span></li>
+              <li class="hour-card"><span class="hour-label">09:00</span><img class="hour-icon" src="https://openweathermap.org/img/wn/04d@2x.png" alt="Nublado" width="40" height="40"><span class="hour-pop">0%</span><span class="hour-temp">20°</span></li>
+              <li class="hour-card"><span class="hour-label">10:00</span><img class="hour-icon" src="https://openweathermap.org/img/wn/04d@2x.png" alt="Nublado" width="40" height="40"><span class="hour-pop">0%</span><span class="hour-temp">21°</span></li>
+              <li class="hour-card"><span class="hour-label">11:00</span><img class="hour-icon" src="https://openweathermap.org/img/wn/04d@2x.png" alt="Nublado" width="40" height="40"><span class="hour-pop">0%</span><span class="hour-temp">22°</span></li>
+              <li class="hour-card"><span class="hour-label">12:00</span><img class="hour-icon" src="https://openweathermap.org/img/wn/04d@2x.png" alt="Nublado" width="40" height="40"><span class="hour-pop">0%</span><span class="hour-temp">22°</span></li>
+              <li class="hour-card"><span class="hour-label">13:00</span><img class="hour-icon" src="https://openweathermap.org/img/wn/10d@2x.png" alt="Chuva leve" width="40" height="40"><span class="hour-pop">20%</span><span class="hour-temp">25°</span></li>
+              <li class="hour-card"><span class="hour-label">14:00</span><img class="hour-icon" src="https://openweathermap.org/img/wn/10d@2x.png" alt="Chuva leve" width="40" height="40"><span class="hour-pop">21%</span><span class="hour-temp">24°</span></li>
+              <li class="hour-card"><span class="hour-label">15:00</span><img class="hour-icon" src="https://openweathermap.org/img/wn/04d@2x.png" alt="Nublado" width="40" height="40"><span class="hour-pop">0%</span><span class="hour-temp">25°</span></li>
+              <li class="hour-card"><span class="hour-label">16:00</span><img class="hour-icon" src="https://openweathermap.org/img/wn/04d@2x.png" alt="Nublado" width="40" height="40"><span class="hour-pop">12%</span><span class="hour-temp">25°</span></li>
+              <li class="hour-card"><span class="hour-label">17:00</span><img class="hour-icon" src="https://openweathermap.org/img/wn/04d@2x.png" alt="Nublado" width="40" height="40"><span class="hour-pop">10%</span><span class="hour-temp">24°</span></li>
+              <li class="hour-card"><span class="hour-label">18:00</span><img class="hour-icon" src="https://openweathermap.org/img/wn/04n@2x.png" alt="Nublado" width="40" height="40"><span class="hour-pop">5%</span><span class="hour-temp">23°</span></li>
+              <li class="hour-card"><span class="hour-label">19:00</span><img class="hour-icon" src="https://openweathermap.org/img/wn/04n@2x.png" alt="Nublado" width="40" height="40"><span class="hour-pop">0%</span><span class="hour-temp">22°</span></li>
+            </ol>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div class="map-section">
+      <div class="map" id="map" role="region" aria-label="Mapa de precipitação centrado em Uberlândia"></div>
+
+      <section class="panel minutely" aria-labelledby="minutely-title">
+        <h2 class="panel-title" id="minutely-title">Previsão por minuto — precipitação</h2>
+        <ol class="minutely-marks">
+          <li class="mark"><span class="mark-label">Agora</span><span class="mark-time">08:18</span></li>
+          <li class="mark"><span class="mark-label">15 min</span><span class="mark-time">08:33</span></li>
+          <li class="mark"><span class="mark-label">30 min</span><span class="mark-time">08:48</span></li>
+          <li class="mark"><span class="mark-label">45 min</span><span class="mark-time">09:03</span></li>
+          <li class="mark"><span class="mark-label">60 min</span><span class="mark-time">09:18</span></li>
+        </ol>
+        <div class="minutely-bars">
+          <span class="bar band-light"></span><span class="bar band-light"></span><span class="bar band-light"></span><span class="bar band-light"></span><span class="bar band-light"></span><span class="bar band-light"></span><span class="bar band-light"></span><span class="bar band-light"></span><span class="bar band-light"></span><span class="bar band-light"></span>
+          <span class="bar band-light"></span><span class="bar band-light"></span><span class="bar band-light"></span><span class="bar band-light"></span><span class="bar band-light"></span><span class="bar band-moderate"></span><span class="bar band-moderate"></span><span class="bar band-moderate"></span><span class="bar band-moderate"></span><span class="bar band-moderate"></span>
+          <span class="bar band-moderate"></span><span class="bar band-moderate"></span><span class="bar band-heavy"></span><span class="bar band-heavy"></span><span class="bar band-heavy"></span><span class="bar band-extreme"></span><span class="bar band-extreme"></span><span class="bar band-heavy"></span><span class="bar band-heavy"></span><span class="bar band-moderate"></span>
+          <span class="bar band-moderate"></span><span class="bar band-moderate"></span><span class="bar band-light"></span><span class="bar band-light"></span><span class="bar band-light"></span><span class="bar band-light"></span><span class="bar band-light"></span><span class="bar band-light"></span><span class="bar band-light"></span><span class="bar band-light"></span>
+          <span class="bar band-light"></span><span class="bar band-light"></span><span class="bar band-light"></span><span class="bar band-light"></span><span class="bar band-none"></span><span class="bar band-none"></span><span class="bar band-none"></span><span class="bar band-none"></span><span class="bar band-none"></span><span class="bar band-none"></span>
+          <span class="bar band-none"></span><span class="bar band-none"></span><span class="bar band-none"></span><span class="bar band-none"></span><span class="bar band-none"></span><span class="bar band-none"></span><span class="bar band-none"></span><span class="bar band-none"></span><span class="bar band-none"></span><span class="bar band-none"></span>
+        </div>
+        <p class="minutely-summary">Chuva agora, parando por volta de 09:02.</p>
+        <ul class="minutely-legend">
+          <li class="legend-item"><span class="legend-swatch band-none"></span>0 mm/h</li>
+          <li class="legend-item"><span class="legend-swatch band-light"></span>até 0,5 mm/h</li>
+          <li class="legend-item"><span class="legend-swatch band-moderate"></span>0,5 a 2,5 mm/h</li>
+          <li class="legend-item"><span class="legend-swatch band-heavy"></span>2,5 a 7,5 mm/h</li>
+          <li class="legend-item"><span class="legend-swatch band-extreme"></span>acima de 7,5 mm/h</li>
+        </ul>
+      </section>
+    </div>
+  </main>
 </body>
 </html>

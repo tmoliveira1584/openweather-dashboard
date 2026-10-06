@@ -1,0 +1,50 @@
+/*
+ * Tokens visuais (arquitetura, seção 7.1). Os valores vêm da tabela da seção: cores do print,
+ * ajustadas quando necessário para cumprir o contraste do spec (RNF-009, RNF-019).
+ *
+ * Breakpoint: 600px. Variáveis CSS não podem ser usadas em @media, por isso o valor é
+ * repetido nas media queries de styles.css. Abaixo dele: 2 colunas de indicadores (RNF-011)
+ * e painel por minuto abaixo do mapa (RNF-021).
+ */
+:root {
+  /* Cores */
+  --color-page-bg: linear-gradient(180deg, #3f5f6d 0%, #6b7f86 55%, #8a6f62 100%);
+  --color-on-page: #ffffff;
+  --color-surface: #ffffff;
+  --color-surface-soft: #faf7f4;
+  --color-tile: #f8ede1;
+  --color-panel-minute: #f5f5f4;
+  --color-tab: rgb(70 98 111 / 0.85); /* #46626f com opacidade 0,85 */
+  --color-accent: #c2410c;
+  --color-curve: #ea580c;
+  --color-rain-label-bg: #d7efec;
+  --color-text: #1c1917;
+  --color-text-value: #0c4a6e;
+  --color-text-muted: #57534e;
+  --color-band-none: #78716c;
+  --color-band-light: #16a34a;
+  --color-band-moderate: #166534;
+  --color-band-heavy: #a16207;
+  --color-band-extreme: #e11d48;
+  --color-illustration-overlay: rgba(15, 23, 42, 0.45);
+
+  /* Fonte: pilha do sistema, sem fontes externas */
+  --font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+
+  /* Raios */
+  --radius-panel: 16px;
+  --radius-card: 10px;
+
+  /* Espaçamento: base de 4 px, sempre em múltiplos de 4 */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+
+  /* Medidas mínimas */
+  --page-min-width: 360px; /* sem rolagem horizontal da página a partir daqui (P-024) */
+  --map-min-height: 300px; /* abaixo de 600 px (feature 6, categoria 10) */
+}

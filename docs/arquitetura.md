@@ -786,10 +786,10 @@ Cores extraídas do print e ajustadas quando necessário para cumprir o contrast
 **Layout** (do print, de cima para baixo):
 1. Cabeçalho numa linha: título, seletor °C/°F, cidade e busca.
 2. Faixa de abas.
-3. Linha com o card principal e os 6 indicadores à esquerda (cerca de 1/3) e a previsão hora a hora à direita (cerca de 2/3).
-4. Mapa em largura total, com o painel por minuto sobreposto no canto inferior esquerdo.
+3. Linha com o card principal e os 6 indicadores à esquerda (cerca de 1/3) e a previsão hora a hora à direita (cerca de 2/3). Os dois blocos usam `flex-wrap` com larguras-base de 300 px e 520 px: ficam lado a lado quando cabem e empilham quando não, sem um segundo breakpoint (de 600 px até cerca de 870 px, ficam empilhados e os indicadores continuam em 3 colunas). A curva e os cards por hora ficam no mesmo contêiner de rolagem, para a curva cobrir sempre as mesmas horas dos cards (RF-034, RF-037).
+4. Mapa em largura total, com o painel por minuto sobreposto no canto inferior esquerdo, 24 px acima da borda do mapa, para não cobrir a atribuição do Leaflet (RNF-025).
 
-Abaixo de 600 px, tudo fica empilhado em uma coluna.
+Abaixo de 600 px, tudo fica empilhado em uma coluna. A partir de 600 px, se o cabeçalho não couber numa linha, a busca desce para a segunda linha.
 
 ### 7.2 Mapa
 
