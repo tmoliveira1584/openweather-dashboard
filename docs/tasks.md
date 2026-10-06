@@ -11,11 +11,11 @@ Lista de tarefas que leva a aplicação de zero a 100% dos requisitos, uma fatia
 
 | Item | Valor |
 |---|---|
-| Fatia atual | 3 — View model (não iniciada) |
-| Próxima tarefa | T-3.1 |
+| Fatia atual | 4 — Cliente e rotas (não iniciada) |
+| Próxima tarefa | T-4.1 |
 | Concluídas, ainda sem commit | — |
-| Último commit de implementação | Fatia 2, commit `feat(domain): aplicar regras de clima, alertas e rótulos de cidade` de 2026-10-05 (o hash é registrado aqui no início da fatia 3). Fatia 1: `b5ff9c1`. Fatia 0: `880fa41` |
-| IDs fechados | 24 de 217 (11,1%) |
+| Último commit de implementação | Fatia 3, commit `feat(domain): montar view model do clima e da busca de cidades` de 2026-10-05 (o hash é registrado aqui no início da fatia 4). Fatia 2: `8fb0ce7`. Fatia 1: `b5ff9c1`. Fatia 0: `880fa41` |
+| IDs fechados | 27 de 217 (12,4%) |
 
 ## Como usar
 
@@ -36,7 +36,7 @@ Lista de tarefas que leva a aplicação de zero a 100% dos requisitos, uma fatia
 | 0 | Setup | 1 | Concluída |
 | 1 | Domínio: formatação, unidades e horas | 12 | Concluída |
 | 2 | Domínio: regras de clima | 11 | Concluída |
-| 3 | View model | 3 | Pendente |
+| 3 | View model | 3 | Concluída |
 | 4 | Cliente e rotas | 4 | Pendente |
 | 5 | Estrutura da tela | 1 | Pendente |
 | 6a | Estado, cache e chamadas ao backend | 13 | Pendente |
@@ -49,7 +49,7 @@ Lista de tarefas que leva a aplicação de zero a 100% dos requisitos, uma fatia
 | 11 | Mapa | 24 | Pendente |
 | 12 | Robustez, desempenho e acessibilidade | 15 | Pendente |
 | 13 | Fechamento | 4 | Pendente |
-| | **Total** | **217** | **11,1%** |
+| | **Total** | **217** | **12,4%** |
 
 ---
 
@@ -97,12 +97,12 @@ Arquitetura: seções 6.3 e 6.6. Testes em `tests/unit/`.
 
 Arquitetura: seções 6.2, 6.3 e 9.2. Testes em `tests/unit/test_view_model.py`.
 
-- [ ] **T-3.1** `clients/openweather.py`, só a função pura `merge_onecall` (seção 6.2, ADR-013): combina as respostas da One Call 4.0 no pacote, une as 2 páginas por hora sem repetir `dt`, descarta `next`/`prev`, deixa o bloco ausente quando a resposta é `None` (404) ou tem `data` vazia e junta em `alerts` o detalhe de cada alerta. Testar com as capturas da T-0.8. Depois, criar os pacotes variantes `onecall_no_minutely.json`, `onecall_partial.json`, `onecall_alerts.json` e `onecall_minutely_bands.json` a partir do pacote de Uberlândia, com a origem e a alteração descritas em `tests/fixtures/README.md`.
-- [ ] **T-3.2** `schemas/provider.py`: modelos do pacote (`OneCallBundle`, seção 6.2) e da geocodificação, com todos os campos opcionais, `extra="ignore"`, e valor fora do formato vira `None` em vez de erro 500.
-- [ ] **T-3.3** `schemas/view.py`: `WeatherView`, `Scaled`, `CitySearchResult`, `ReverseResult` e os `Literal` (`Scale`, `ConditionGroup`, `Band`).
-- [ ] **T-3.4** `view_model.build_weather_view`: blocos `current`, `daily`, `hourly` e `minutely` conforme a tabela de regras da seção 6.3. Descrição com inicial maiúscula e "Sensação de", dia da semana só às 00:00, `"—"` e `null` para ausentes, bloco ausente ou vazio → `null`, `daily` com no máximo 8 dias, data do dia pela data UTC do `dt` (funções de data com `offset = 0`), visibilidade do dia quando houver, selo de "Hoje" pelos IDs de `current.alerts` e selo de cada dia pela vigência (RN-032). Testar contra o exemplo JSON da seção 6.3. (RN-016, RN-035, P-013)
-- [ ] **T-3.5** `view_model.build_search_result`: até 5 itens, `truncated` com exatamente 5, lista vazia sem resultados.
-- [ ] **T-3.6** Definição de pronto + commit.
+- [x] **T-3.1** `clients/openweather.py`, só a função pura `merge_onecall` (seção 6.2, ADR-013): combina as respostas da One Call 4.0 no pacote, une as 2 páginas por hora sem repetir `dt`, descarta `next`/`prev`, deixa o bloco ausente quando a resposta é `None` (404) ou tem `data` vazia e junta em `alerts` o detalhe de cada alerta. Testar com as capturas da T-0.8. Depois, criar os pacotes variantes `onecall_no_minutely.json`, `onecall_partial.json`, `onecall_alerts.json` e `onecall_minutely_bands.json` a partir do pacote de Uberlândia, com a origem e a alteração descritas em `tests/fixtures/README.md`.
+- [x] **T-3.2** `schemas/provider.py`: modelos do pacote (`OneCallBundle`, seção 6.2) e da geocodificação, com todos os campos opcionais, `extra="ignore"`, e valor fora do formato vira `None` em vez de erro 500.
+- [x] **T-3.3** `schemas/view.py`: `WeatherView`, `Scaled`, `CitySearchResult`, `ReverseResult` e os `Literal` (`Scale`, `ConditionGroup`, `Band`).
+- [x] **T-3.4** `view_model.build_weather_view`: blocos `current`, `daily`, `hourly` e `minutely` conforme a tabela de regras da seção 6.3. Descrição com inicial maiúscula e "Sensação de", dia da semana só às 00:00, `"—"` e `null` para ausentes, bloco ausente ou vazio → `null`, `daily` com todos os dias recebidos (o limite de 8 fica no frontend, D-14), data do dia pela data UTC do `dt` (funções de data com `offset = 0`), visibilidade do dia quando houver, selo de "Hoje" pelos IDs de `current.alerts` e selo de cada dia pela vigência (RN-032). Testar contra o exemplo JSON da seção 6.3. (RN-016, RN-035, P-013)
+- [x] **T-3.5** `view_model.build_search_result`: até 5 itens, `truncated` com exatamente 5, lista vazia sem resultados.
+- [x] **T-3.6** Definição de pronto + commit.
 
 **Fecha:** RN-016, RN-035, P-013
 
@@ -191,7 +191,7 @@ Arquitetura: seções 6.3, 7.1 e ADR-012. Testes em `tests/e2e/test_f2_current.p
 
 Arquitetura: seções 6.3, 6.6 e 7.4. Testes em `tests/e2e/test_js_logic.py` e `tests/e2e/test_f3_daily.py`.
 
-- [ ] **T-8.1** `logic/time-window.js`: `cityToday` e `visibleDays`, com testes de virada da meia-noite e de fuso diferente (Tóquio). (RN-026, RN-027)
+- [ ] **T-8.1** `logic/time-window.js`: `cityToday` e `visibleDays` (descarta os dias passados e limita a 8 a partir de "Hoje", D-14), com testes de virada da meia-noite e de fuso diferente (Tóquio). (RN-026, RN-027)
 - [ ] **T-8.2** `ui/day-tabs.js`: aba "Hoje" + dias da semana, máxima e ícone com texto alternativo, padrão ARIA de tablist (setas e Enter), `aria-selected` com destaque além da cor, rolagem própria, aba selecionada trazida para a área visível e mensagem "Previsão diária indisponível.". (RF-024, RF-025, RF-032, RN-028, RN-029, RNF-014, RNF-015)
 - [ ] **T-8.3** `actions.selectDay` e resumo do dia no card principal e nos cards: máxima, "Mín. X°", sensação diurna, data, visibilidade prevista ou "—", ilustração do dia e selo com os alertas do dia. (RF-026 a RF-028, RF-030, RN-030, RN-031, RN-033)
 - [ ] **T-8.4** Troca de cidade volta para "Hoje", dados atualizados mantêm o dia se ele ainda existir, e a escala é mantida. (RF-031, RF-057)
@@ -288,4 +288,6 @@ Arquitetura: seções 9 e 11.
 | D-11 | 2026-10-05 | **Arredondamento na exibição.** O spec pede o "inteiro mais próximo" (RN-014) sem dizer o que fazer no empate, e as capturas reais já trazem um (sensação de 20,5 °C em Tóquio). O `format_number` arredonda o empate para longe do zero (20,5 → "21"; -20,5 → "-21") e parte do texto decimal do valor, não do float binário (2,675 com 2 casas → "2,68"). O `round()` do Python foi descartado porque arredonda o empate para o par (20,5 → "20"). Seção 6.6 da arquitetura atualizada |
 | D-12 | 2026-10-05 | O tipo `Scale` (`Literal["c", "f"]`), usado pelo `format_temp`, foi criado em `app/schemas/view.py` já na fatia 1, que é onde a seção 6.6 o coloca. O restante do view model continua na fatia 3 |
 | D-13 | 2026-10-05 | As regras da fatia 2 usam tipos que a seção 6.6 coloca em `app/schemas/`. Eles foram criados já na fatia 2, na forma mínima: `Alert` e `GeoResult` em `provider.py` (campos opcionais, `extra="ignore"`) e `Scaled`, `CityOption`, `ConditionGroup` e `Band` em `view.py`. As T-3.2 e T-3.3 completam os modelos, inclusive o valor fora do formato virar `None`. O `city_option` exige coordenadas: a T-3.5 descarta os itens da busca que vierem sem `lat` ou `lon` |
+| D-14 | 2026-10-05 | O `daily` do view model traz todos os dias recebidos (até 10), e o limite de 8 a partir de "Hoje" fica só no `visibleDays` do frontend (T-8.1). O corte em 8 a partir do primeiro dia recebido, previsto antes na seção 6.3, deixaria 7 abas em Tóquio nas primeiras horas do dia local: o primeiro dia da 4.0 é a data UTC, que lá já é "ontem" (captura da T-0.8), e o RN-027 pede 8. Seções 6.3 e 6.6 da arquitetura atualizadas |
+| D-15 | 2026-10-05 | Regras do view model que o spec não define, registradas na seção 6.3 da arquitetura: (1) um rótulo com prefixo e valor ausente mantém o prefixo (`"Sensação de —"`, `"Mín. —"`), como o tooltip `"08:18 — —"`; (2) sem `timezone_offset`, os blocos diário, hora a hora e por minuto ficam `null` e a hora do card principal mostra "—", porque não há fuso para achar a hora local nem o "Hoje"; (3) registro de previsão sem `dt` é descartado. A variante `onecall_alerts.json` ficou com 2 alertas (sem o alerta sem vigência, que contaria em todos os dias e impediria o selo oculto do CA-021) |
 | L-01 | 2026-10-04 | **Limitação:** os testes são feitos só no Google Chrome instalado. Edge, Firefox e Safari não são testados, nem em computador nem em celular. O RNF-006 continua no spec como meta, mas a compatibilidade com outros navegadores não é verificada no MVP |

@@ -52,6 +52,24 @@ Base: `https://api.openweathermap.org/data/4.0/onecall/`. Todas as chamadas usam
 | `alert/{id}` | Campos `id`, `sender_name`, `event` (vazio nos 3), `start`, `end`, `description` (lista por idioma) e `tags` |
 | 404 sem cobertura | Não verificado: as duas cidades têm previsão por minuto. O cliente trata 404 e lista vazia do mesmo jeito (ADR-013) |
 
+## Exemplo do contrato
+
+`weather_view_example.json` é o exemplo de `WeatherView` da seção 6.3 da arquitetura, copiado sem alteração. Os testes conferem que os modelos e o view model reproduzem esse contrato.
+
 ## Variantes editadas
 
-Pacotes no formato da seção 6.2 da arquitetura, criados na T-3.1 a partir do pacote de Uberlândia. Ainda não existem.
+Pacotes no formato da seção 6.2 da arquitetura, criados na T-3.1. **Origem comum:** o pacote de Uberlândia montado por `merge_onecall` com as 5 capturas e os 3 detalhes de alerta acima. Cada arquivo parte de uma cópia desse pacote e recebe só a alteração descrita. Foram salvos em JSON indentado com 2 espaços e UTF-8.
+
+| Arquivo | Alteração | Cobre |
+|---|---|---|
+| `onecall_no_minutely.json` | Sem o bloco `minutely` | RF-045, CA-032 |
+| `onecall_partial.json` | Sem os blocos `hourly` e `daily`. Em `current`, sem `visibility`, `feels_like`, `dew_point` e `wind_deg` | RF-023, RF-038, CA-014, CA-025 |
+| `onecall_alerts.json` | `current.alerts` = `urn:oid:teste.a` e `urn:oid:teste.b`, e `alerts` com as vigências abaixo, no fuso de Uberlândia (-10800). As listas `alerts` dos registros por minuto e por hora foram retiradas, para não sobrar ID real | CA-010, CA-021, RN-032 |
+| `onecall_minutely_bands.json` | `precipitation` dos 11 primeiros minutos = 0; 0,3; 0,5; 1,0; 2,5; 5,0; 7,5; 8,0; 12; -1 e ausente (campo retirado). Os demais minutos ficam como na captura | CA-027, CA-028, RN-041, RN-047 |
+
+Vigências de `onecall_alerts.json` (a captura é de segunda, 05/10/2026):
+
+| ID | Início | Fim | Para que serve |
+|---|---|---|---|
+| `urn:oid:teste.a` | quarta 07/10, 18:00 | quinta 08/10, 06:00 | CA-021: conta em "Qua" e "Qui", não em "Sex" |
+| `urn:oid:teste.b` | terça 06/10, 12:00 | quarta 07/10, 00:00 | RN-032: termina às 00:00 e conta só na terça |

@@ -537,9 +537,11 @@ Modeladas em `app/schemas/view.py`. As chaves JSON são em `snake_case`, iguais 
 
 **Convenções do view model:**
 - `Scaled` = objeto `{"c": str, "f": str}` com o texto pronto nas duas escalas.
-- Texto de um valor ausente = `"—"` (P-013). Número ausente = `null`.
+- Texto de um valor ausente = `"—"` (P-013). Número ausente = `null`. Um rótulo com prefixo mantém o prefixo: `"Sensação de —"`, `"Mín. —"` e `"08:18 — —"` (D-15).
+- Pacote sem `timezone_offset`: `daily`, `hourly` e `minutely` = `null` e `current.time_label` = `"—"`. Sem o fuso não há como achar a hora local nem o "Hoje" (P-013, P-015, D-15).
+- Um registro de previsão sem `dt` é descartado, porque não há como posicioná-lo no tempo. Se nenhum sobrar, o bloco vira `null`.
 - Bloco ausente no pacote (`daily`, `hourly` ou `minutely`, por 404 ou lista vazia do endpoint) = `null`, o que leva o frontend a mostrar "indisponível". Lista vazia no pacote também vira `null`.
-- `daily` traz no máximo os 8 primeiros dias a partir do primeiro dia recebido. O recorte de "Hoje" continua no frontend (RN-026, RN-027).
+- `daily` traz todos os dias recebidos, sem corte. O recorte de "Hoje" e o limite de 8 dias a partir dele ficam no `visibleDays` do frontend (RN-026, RN-027). Cortar no backend a partir do primeiro dia recebido tiraria um dia válido quando esse primeiro dia já é passado na cidade (D-14).
 - `alerts_label` = `null` quando não há alertas, e o selo fica oculto (RF-019).
 
 **`WeatherView`** — exemplo com Uberlândia às 08:18 locais:
@@ -734,7 +736,7 @@ Assinaturas mínimas. A implementação pode ter funções auxiliares privadas a
 | `services/api.js` | `fetchWeather(lat, lon)`, `searchCities(q)`, `reverseGeocode(lat, lon)`, todas devolvendo `{ ok: true, data } \| { ok: false, error }` |
 | `services/cache.js` | `cacheKey(lat, lon)`, `get(key, nowMs)`, `set(key, value, nowMs)` |
 | `services/location.js` | `requestLocation({ timeoutMs, onLate }) -> Promise<{ status: 'ok', lat, lon } \| { status: 'unavailable' }>` |
-| `logic/time-window.js` | `cityToday(nowSec, offset)`, `visibleDays(daily, nowSec, offset)`, `hourlyWindow(hourly, nowSec)`, `minuteWindow(minutely, nowSec)`, `minuteMarks(window)` |
+| `logic/time-window.js` | `cityToday(nowSec, offset)`, `visibleDays(daily, nowSec, offset)` (descarta os dias passados e limita a 8, RN-026 e RN-027), `hourlyWindow(hourly, nowSec)`, `minuteWindow(minutely, nowSec)`, `minuteMarks(window)` |
 | `logic/summaries.js` | `minuteSummary(window)`, `hourlyAltText(window, scale)` |
 | `logic/chart-math.js` | `monotonePath(points)`, `barHeight(intensity, maxPx, minPx)`, `groupRainLabels(items, minGapPx)` |
 | `ui/*.js` | `mount(rootElement)` |

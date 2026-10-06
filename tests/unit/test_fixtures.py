@@ -35,3 +35,20 @@ def test_p_001_fixtures_never_contain_appid():
     assert files
     for path in files:
         assert "appid" not in path.read_text(encoding="utf-8").lower(), path.name
+
+
+@pytest.mark.parametrize(
+    ("name", "absent"),
+    [
+        ("onecall_no_minutely.json", {"minutely"}),
+        ("onecall_partial.json", {"hourly", "daily"}),
+        ("onecall_alerts.json", set()),
+        ("onecall_minutely_bands.json", set()),
+    ],
+)
+def test_setup_variant_bundles_have_expected_shape(load_json, name, absent):
+    """Os pacotes variantes têm o formato da seção 6.2, sem os blocos retirados de propósito."""
+    bundle = load_json(name)
+    blocks = {"timezone_offset", "current", "minutely", "hourly", "daily", "alerts"}
+
+    assert bundle.keys() == blocks - absent

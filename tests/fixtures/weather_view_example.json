@@ -1,0 +1,99 @@
+{
+  "timezone_offset": -10800,
+  "current": {
+    "dt": 1791112680,
+    "time_label": "08:18",
+    "temp": {
+      "c": "20°",
+      "f": "69°"
+    },
+    "feels_like": {
+      "c": "Sensação de 21°",
+      "f": "Sensação de 69°"
+    },
+    "description": "Nublado",
+    "condition_group": "clouds",
+    "icon": "04d",
+    "alerts_label": "3 alertas",
+    "indicators": {
+      "wind": {
+        "c": "4 m/s L",
+        "f": "9 mph L"
+      },
+      "humidity": "94%",
+      "visibility": "10 km",
+      "pressure": "1015 hPa",
+      "uvi": "2 UV",
+      "dew_point": {
+        "c": "19 °C",
+        "f": "66 °F"
+      }
+    }
+  },
+  "daily": [
+    {
+      "local_date": "2026-10-08",
+      "weekday_label": "Qui",
+      "date_label": "Qui, 08/10",
+      "max": {
+        "c": "35°",
+        "f": "95°"
+      },
+      "min_label": {
+        "c": "Mín. 21°",
+        "f": "Mín. 71°"
+      },
+      "feels_like": {
+        "c": "Sensação de 36°",
+        "f": "Sensação de 97°"
+      },
+      "description": "Céu limpo",
+      "condition_group": "clear",
+      "icon": "01d",
+      "alerts_label": null,
+      "indicators": {
+        "wind": {
+          "c": "3 m/s NE",
+          "f": "7 mph NE"
+        },
+        "humidity": "40%",
+        "visibility": "—",
+        "pressure": "1012 hPa",
+        "uvi": "9 UV",
+        "dew_point": {
+          "c": "14 °C",
+          "f": "57 °F"
+        }
+      }
+    }
+  ],
+  "hourly": [
+    {
+      "dt": 1791111600,
+      "hour_label": "08:00",
+      "weekday_label": null,
+      "temp": {
+        "c": "20°",
+        "f": "69°"
+      },
+      "temp_value": {
+        "c": 20.4,
+        "f": 68.72
+      },
+      "pop": "21%",
+      "rain_value": 0.21,
+      "rain_label": "0,21 mm/h",
+      "icon": "10d",
+      "description": "Chuva leve"
+    }
+  ],
+  "minutely": [
+    {
+      "dt": 1791112680,
+      "time_label": "08:18",
+      "intensity": 0.3,
+      "band": "light",
+      "tooltip": "08:18 — 0,30 mm/h"
+    }
+  ]
+}
