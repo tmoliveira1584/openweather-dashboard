@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 270" preserveAspectRatio="xMidYMid slice">
+  <!-- Imagem neutra, para código de condição desconhecido (RN-017, ADR-012). Tons médios: o texto
+       branco fica legível sob a camada escura (RNF-009). -->
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#46536a"/>
+      <stop offset="1" stop-color="#76808f"/>
+    </linearGradient>
+  </defs>
+  <rect width="480" height="270" fill="url(#sky)"/>
+  <g fill="#8a94a3" opacity="0.6">
+    <circle cx="380" cy="60" r="90"/>
+    <circle cx="90" cy="230" r="110"/>
+  </g>
+  <path d="M0 200 C 120 170, 250 230, 480 180 V 270 H 0 Z" fill="#5d6879" opacity="0.8"/>
+</svg>

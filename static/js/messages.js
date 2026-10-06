@@ -69,7 +69,11 @@ export const MESSAGES = deepFreeze({
     failed: 'Não foi possível buscar cidades agora. Tente novamente.',
   },
 
-  // Condições atuais (feature 2: RF-020).
+  // Condições atuais (feature 2: RF-020). O nome do bloco é o título da feature 2 no spec e
+  // serve aos leitores de tela (D-21).
+  current: {
+    label: 'Condições atuais',
+  },
   indicators: {
     wind: 'Vento',
     humidity: 'Umidade',

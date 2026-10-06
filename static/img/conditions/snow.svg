@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 270" preserveAspectRatio="xMidYMid slice">
+  <!-- Neve (ADR-012). A neve é cinza-azulada, e não branca, para o texto branco ficar legível
+       sob a camada escura (RNF-009). -->
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#55697c"/>
+      <stop offset="1" stop-color="#8293a3"/>
+    </linearGradient>
+  </defs>
+  <rect width="480" height="270" fill="url(#sky)"/>
+  <g fill="#aebbc7">
+    <circle cx="40" cy="40" r="5"/><circle cx="110" cy="82" r="4"/><circle cx="170" cy="30" r="6"/>
+    <circle cx="230" cy="96" r="4"/><circle cx="290" cy="44" r="5"/><circle cx="350" cy="88" r="6"/>
+    <circle cx="420" cy="36" r="4"/><circle cx="460" cy="100" r="5"/><circle cx="70" cy="140" r="6"/>
+    <circle cx="140" cy="168" r="4"/><circle cx="200" cy="130" r="5"/><circle cx="270" cy="160" r="6"/>
+    <circle cx="330" cy="136" r="4"/><circle cx="390" cy="170" r="5"/><circle cx="450" cy="146" r="4"/>
+    <circle cx="30" cy="196" r="4"/><circle cx="240" cy="200" r="4"/><circle cx="430" cy="204" r="5"/>
+  </g>
+  <path d="M0 222 C 100 202, 200 214, 300 224 S 420 230, 480 214 V 270 H 0 Z" fill="#9aa8b5"/>
+  <path d="M0 246 C 130 230, 250 244, 360 252 S 450 256, 480 248 V 270 H 0 Z" fill="#a9b6c2"/>
+</svg>

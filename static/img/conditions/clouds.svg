@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 270" preserveAspectRatio="xMidYMid slice">
+  <!-- Nublado (ADR-012). Tons médios: o texto branco fica legível sob a camada escura (RNF-009). -->
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#4a5c6d"/>
+      <stop offset="1" stop-color="#7b8996"/>
+    </linearGradient>
+  </defs>
+  <rect width="480" height="270" fill="url(#sky)"/>
+  <g fill="#8f9aa5">
+    <circle cx="70" cy="70" r="46"/>
+    <circle cx="130" cy="52" r="58"/>
+    <circle cx="196" cy="74" r="44"/>
+    <rect x="40" y="70" width="190" height="46" rx="23"/>
+  </g>
+  <g fill="#a7b0b9">
+    <circle cx="300" cy="118" r="52"/>
+    <circle cx="368" cy="96" r="66"/>
+    <circle cx="440" cy="124" r="50"/>
+    <rect x="262" y="120" width="230" height="54" rx="27"/>
+  </g>
+  <g fill="#b3bbc3">
+    <circle cx="110" cy="196" r="50"/>
+    <circle cx="180" cy="176" r="62"/>
+    <circle cx="250" cy="200" r="46"/>
+    <rect x="70" y="196" width="220" height="74"/>
+  </g>
+</svg>

@@ -39,8 +39,8 @@ def _load(name: str):
     return json.loads((FIXTURES_DIR / name).read_text(encoding="utf-8"))
 
 
-def weather_view(city: str) -> dict:
-    """`WeatherView` de "uberlandia" ou "tokyo", como o `/api/weather` devolveria."""
+def bundle(city: str) -> dict:
+    """Pacote da One Call 4.0 de "uberlandia" ou "tokyo", montado com as capturas reais."""
     data = {name: _load(f"onecall4/{city}/{name}.json") for name in ("current", "1min", "1day")}
     pages = [_load(f"onecall4/{city}/1h_p{i}.json") for i in (1, 2)]
     alerts = (
@@ -48,14 +48,23 @@ def weather_view(city: str) -> dict:
         if city == "uberlandia"
         else []
     )
-    bundle = merge_onecall(
+    return merge_onecall(
         current=data["current"],
         minutely=data["1min"],
         hourly_pages=pages,
         daily=data["1day"],
         alerts=alerts,
     )
-    return build_weather_view(OneCallBundle.model_validate(bundle)).model_dump(mode="json")
+
+
+def view_of(raw: dict) -> dict:
+    """`WeatherView` que o `/api/weather` devolveria para o pacote `raw`."""
+    return build_weather_view(OneCallBundle.model_validate(raw)).model_dump(mode="json")
+
+
+def weather_view(city: str) -> dict:
+    """`WeatherView` de "uberlandia" ou "tokyo", como o `/api/weather` devolveria."""
+    return view_of(bundle(city))
 
 
 class WeatherApi:
@@ -63,7 +72,8 @@ class WeatherApi:
 
     - Cada pedido responde com a próxima resposta de `queue` ou, com a fila vazia, com o
       `WeatherView` da cidade (Tóquio com `lat` 35,…; Uberlândia nos demais casos).
-    - Uma resposta é `"ok"`, `"abort"` (o backend não responde) ou `(status, código)`.
+    - Uma resposta é `"ok"`, `"abort"` (o backend não responde), `(status, código)` ou um
+      `WeatherView` (dict) próprio do teste.
     - Com `hold = True`, os pedidos ficam pendentes em `held` até `release(i, resposta)`.
     - `urls` guarda cada pedido recebido, para contar as consultas.
     """
@@ -89,7 +99,9 @@ class WeatherApi:
         return self.views["tokyo" if lat.startswith("35.") else "uberlandia"]
 
     def reply(self, route: Route, answer="ok") -> None:
-        if answer == "abort":
+        if isinstance(answer, dict):
+            route.fulfill(json=answer)
+        elif answer == "abort":
             route.abort()
         elif answer == "ok":
             route.fulfill(json=self.view_for(route.request.url))

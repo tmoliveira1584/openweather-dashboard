@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 270" preserveAspectRatio="xMidYMid slice">
+  <!-- Céu limpo (ADR-012). Tons médios: o texto branco fica legível sob a camada escura (RNF-009). -->
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2c5a85"/>
+      <stop offset="1" stop-color="#6d8fae"/>
+    </linearGradient>
+    <radialGradient id="halo" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#c9a24f" stop-opacity="0.7"/>
+      <stop offset="1" stop-color="#c9a24f" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="480" height="270" fill="url(#sky)"/>
+  <circle cx="340" cy="92" r="110" fill="url(#halo)"/>
+  <circle cx="340" cy="92" r="46" fill="#d6a443"/>
+  <path d="M0 214 C 90 186, 170 200, 250 214 S 400 236, 480 206 V 270 H 0 Z" fill="#3e6a5a"/>
+  <path d="M0 236 C 120 214, 230 230, 330 242 S 440 250, 480 238 V 270 H 0 Z" fill="#2f5547"/>
+</svg>

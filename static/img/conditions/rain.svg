@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 270" preserveAspectRatio="xMidYMid slice">
+  <!-- Chuva (ADR-012). Tons médios: o texto branco fica legível sob a camada escura (RNF-009). -->
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#33475a"/>
+      <stop offset="1" stop-color="#5b6c7b"/>
+    </linearGradient>
+  </defs>
+  <rect width="480" height="270" fill="url(#sky)"/>
+  <g fill="none" stroke="#9db1c6" stroke-width="3" stroke-linecap="round" opacity="0.8">
+    <path d="M60 120 l-14 34 M110 132 l-14 34 M160 118 l-14 34 M210 136 l-14 34 M260 122 l-14 34
+             M310 134 l-14 34 M360 120 l-14 34 M410 132 l-14 34 M460 118 l-14 34
+             M84 186 l-14 34 M134 200 l-14 34 M184 184 l-14 34 M234 202 l-14 34 M284 188 l-14 34
+             M334 200 l-14 34 M384 186 l-14 34 M434 198 l-14 34"/>
+  </g>
+  <g fill="#6c7986">
+    <circle cx="90" cy="54" r="54"/>
+    <circle cx="170" cy="36" r="64"/>
+    <circle cx="250" cy="58" r="50"/>
+    <circle cx="330" cy="40" r="62"/>
+    <circle cx="410" cy="56" r="56"/>
+    <rect x="0" y="0" width="480" height="96"/>
+  </g>
+  <path d="M0 252 C 120 240, 240 262, 360 248 S 450 244, 480 250 V 270 H 0 Z" fill="#2c3b49"/>
+</svg>

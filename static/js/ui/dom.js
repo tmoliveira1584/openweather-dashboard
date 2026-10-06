@@ -34,6 +34,27 @@ export function setText(node, text) {
   node.textContent = text ?? '';
 }
 
+// Ícones de condição do provedor: exceção ao guardrail 2 (arquitetura, seção 8.4).
+const ICON_BASE_URL = 'https://openweathermap.org/img/wn/';
+
+/**
+ * Mostra o ícone de condição do provedor com a descrição como texto alternativo (RNF-010).
+ * Sem código de ícone, a imagem fica oculta. O código entra codificado na URL (P-003).
+ * @param {HTMLImageElement} img
+ * @param {string | null} icon código do ícone (ex.: `10d`)
+ * @param {string} description
+ */
+export function setConditionIcon(img, icon, description) {
+  img.hidden = !icon;
+  img.alt = icon ? description : '';
+  if (!icon) {
+    img.removeAttribute('src');
+    return;
+  }
+  const src = `${ICON_BASE_URL}${encodeURIComponent(icon)}@2x.png`;
+  if (img.getAttribute('src') !== src) img.src = src;
+}
+
 /**
  * @typedef {{ kind: 'loading' | 'slow' | 'error' | 'unavailable' | 'refreshing' | 'ready',
  *             message?: string }} BlockView

@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 270" preserveAspectRatio="xMidYMid slice">
+  <!-- Tempestade (ADR-012). Tons escuros: o texto branco fica legível sob a camada escura (RNF-009). -->
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1f2937"/>
+      <stop offset="1" stop-color="#3d4858"/>
+    </linearGradient>
+  </defs>
+  <rect width="480" height="270" fill="url(#sky)"/>
+  <g fill="none" stroke="#7d8fa3" stroke-width="3" stroke-linecap="round" opacity="0.7">
+    <path d="M50 130 l-16 38 M120 142 l-16 38 M190 128 l-16 38 M380 140 l-16 38 M450 126 l-16 38
+             M80 198 l-16 38 M150 210 l-16 38 M410 206 l-16 38"/>
+  </g>
+  <path d="M276 92 L 236 172 H 268 L 244 246 L 316 148 H 282 L 306 92 Z" fill="#d9a93a"/>
+  <g fill="#4b5667">
+    <circle cx="80" cy="50" r="58"/>
+    <circle cx="170" cy="30" r="66"/>
+    <circle cx="260" cy="56" r="54"/>
+    <circle cx="340" cy="36" r="64"/>
+    <circle cx="420" cy="52" r="58"/>
+    <rect x="0" y="0" width="480" height="98"/>
+  </g>
+</svg>

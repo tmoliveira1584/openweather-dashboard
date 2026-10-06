@@ -11,11 +11,11 @@ Lista de tarefas que leva a aplicação de zero a 100% dos requisitos, uma fatia
 
 | Item | Valor |
 |---|---|
-| Fatia atual | 7 — Condições atuais (não iniciada) |
-| Próxima tarefa | T-7.1 |
+| Fatia atual | 8 — Previsão diária (não iniciada) |
+| Próxima tarefa | T-8.1 |
 | Concluídas, ainda sem commit | — |
-| Último commit de implementação | Fatia 6c, commit `feat(ui): iniciar pela localização do usuário ou pela cidade padrão` de 2026-10-06 (o hash é registrado aqui no início da fatia 7). Fatia 6b: `30b078a`. Fatia 6a: `f442956`. Fatia 5: `ecc8bf0`. Fatia 4: `4ee7d59`. Fatia 3: `8f56a1a`. Fatia 2: `8fb0ce7`. Fatia 1: `b5ff9c1`. Fatia 0: `880fa41` |
-| IDs fechados | 81 de 217 (37,3%) |
+| Último commit de implementação | Fatia 7, commit `feat(ui): exibir as condições atuais com ilustrações e indicadores` de 2026-10-06 (o hash é registrado aqui no início da fatia 8). Fatia 6c: `38d51e0`. Fatia 6b: `30b078a`. Fatia 6a: `f442956`. Fatia 5: `ecc8bf0`. Fatia 4: `4ee7d59`. Fatia 3: `8f56a1a`. Fatia 2: `8fb0ce7`. Fatia 1: `b5ff9c1`. Fatia 0: `880fa41` |
+| IDs fechados | 104 de 217 (47,9%) |
 
 ## Como usar
 
@@ -42,14 +42,14 @@ Lista de tarefas que leva a aplicação de zero a 100% dos requisitos, uma fatia
 | 6a | Estado, cache e chamadas ao backend | 13 | Concluída |
 | 6b | Cabeçalho, busca e seletor de escala | 24 | Concluída |
 | 6c | Localização inicial e cidade padrão | 12 | Concluída |
-| 7 | Condições atuais | 23 | Pendente |
+| 7 | Condições atuais | 23 | Concluída |
 | 8 | Previsão diária | 25 | Pendente |
 | 9 | Hora a hora | 23 | Pendente |
 | 10 | Por minuto | 22 | Pendente |
 | 11 | Mapa | 24 | Pendente |
 | 12 | Robustez, desempenho e acessibilidade | 15 | Pendente |
 | 13 | Fechamento | 4 | Pendente |
-| | **Total** | **217** | **37,3%** |
+| | **Total** | **217** | **47,9%** |
 
 ---
 
@@ -178,12 +178,12 @@ Arquitetura: seções 2.2 e 7.4. Testes em `tests/e2e/test_f1_location.py`, com 
 
 Arquitetura: seções 6.3, 7.1 e ADR-012. Testes em `tests/e2e/test_f2_current.py`.
 
-- [ ] **T-7.1** 7 ilustrações SVG próprias em `static/img/conditions/` e a camada escura sobre elas. Se a imagem falhar, fundo neutro com texto legível. (RF-017, RNF-009)
-- [ ] **T-7.2** `ui/current.js`, card principal na aba "Hoje": temperatura, descrição (até 2 linhas), sensação, hora local, selo de alertas (oculto sem alertas) e ícone com texto alternativo. (RF-016, RF-018, RF-019)
-- [ ] **T-7.3** Seis cards de indicadores, com rótulos do `messages.js`, "Calmo" e "—" para ausentes. (RF-020 a RF-023)
-- [ ] **T-7.4** Escala ativa: o bloco escolhe o texto `c` ou `f` e redesenha ao trocar a escala ou ao chegar dado novo, com vento em m/s ou mph. (RF-056, RF-058)
-- [ ] **T-7.5** Testes de ponta a ponta: CA-009 a CA-015 e CA-039 a CA-043.
-- [ ] **T-7.6** Definição de pronto, com conferência visual, + commit.
+- [x] **T-7.1** 7 ilustrações SVG próprias em `static/img/conditions/` e a camada escura sobre elas. Se a imagem falhar, fundo neutro com texto legível. (RF-017, RNF-009)
+- [x] **T-7.2** `ui/current.js`, card principal na aba "Hoje": temperatura, descrição (até 2 linhas), sensação, hora local, selo de alertas (oculto sem alertas) e ícone com texto alternativo. (RF-016, RF-018, RF-019)
+- [x] **T-7.3** Seis cards de indicadores, com rótulos do `messages.js`, "Calmo" e "—" para ausentes. (RF-020 a RF-023)
+- [x] **T-7.4** Escala ativa: o bloco escolhe o texto `c` ou `f` e redesenha ao trocar a escala ou ao chegar dado novo, com vento em m/s ou mph. (RF-056, RF-058)
+- [x] **T-7.5** Testes de ponta a ponta: CA-009 a CA-015 e CA-039 a CA-043.
+- [x] **T-7.6** Definição de pronto, com conferência visual, + commit.
 
 **Fecha:** RF-016, RF-017, RF-018, RF-019, RF-020, RF-021, RF-022, RF-023, RF-056, RF-058, RNF-009, CA-009, CA-010, CA-011, CA-012, CA-013, CA-014, CA-015, CA-039, CA-040, CA-041, CA-042, CA-043
 
@@ -295,4 +295,5 @@ Arquitetura: seções 9 e 11.
 | D-18 | 2026-10-06 | **Resposta de uma cidade anterior.** Ela é descartada da tela (P-012), mas, se for de sucesso, vai para o cache. Assim, voltar a essa cidade em menos de 10 min não gera outra consulta (P-010, RNF-003). O diagrama da seção 2.2 dava a entender que a gravação no cache vinha depois do descarte, e foi ajustado |
 | D-19 | 2026-10-06 | **Cabeçalho e busca (fatia 6b).** (1) Contratos: o estado da busca ganhou o status `invalid` (termo vazio ou com 1 caractere, sem consulta), separado de `error` (falha da busca), e o `actions.js` passou a exportar `SEARCH_MAX_LENGTH` e `chooseSearchResult(result)`, que fecha a lista e seleciona a cidade, para a conversão do item em `City` ficar fora da `ui/`. Seções 6.5 e 6.6 da arquitetura atualizadas. (2) Textos fora do spec, no `messages.js` como na D-17: o título "Previsão do tempo" (do print) e os nomes para leitores de tela da lupa ("Buscar"), da lista ("Cidades encontradas") e do seletor ("Escala de temperatura"). (3) O nome longo da cidade aparece completo, em mais linhas, ao passar o cursor ou focar (a cidade é focável). O `title` foi descartado porque não aparece com o foco. (4) Comportamentos que o spec não detalha: o Esc fecha a lista sem apagar o termo; sair da busca pelo Tab também fecha a lista, como clicar fora; editar o termo apaga a mensagem anterior; e confirmar de novo o termo com a lista dele aberta não repete a busca, como com a busca em andamento (RF-015). (5) A mensagem da busca (termo inválido, nenhum resultado ou falha) abre abaixo do campo, no lugar da lista, com `role="status"` |
 | D-20 | 2026-10-06 | **Localização inicial (fatia 6c).** (1) Contrato: o `actions.js` passou a exportar `dismissLocationNotice()`, que fecha o aviso de localização, e o `selectCity` fecha o aviso quando a cidade escolhida não é a padrão (RN-002). Seção 6.6 da arquitetura atualizada. (2) O aviso passou para dentro do `<header>`, como última linha, abaixo da busca, porque é o `header.js` que o desenha (seção 5.1). Ele ganhou um botão de fechar com o nome "Fechar aviso" para leitores de tela, que não está no spec e fica no `messages.js`, como na D-17. (3) Enquanto o pedido de localização está pendente (até 10 s), o cabeçalho fica sem cidade e os blocos mostram o indicador de carregamento, sem consulta de clima. (4) A localização que chega no prazo depois de o usuário escolher uma cidade pela busca também é descartada ("a cidade escolhida prevalece", feature 1, categoria 2), assim como a que chega enquanto o nome é buscado na geocodificação reversa e outra cidade é escolhida. (5) Testes: sem permissão concedida, o Chrome do Playwright nega a localização na hora, por isso os testes das fatias anteriores continuam abrindo com a cidade padrão. O usuário que não responde e a localização tardia usam um `navigator.geolocation` falso (`tests/e2e/location.py`). Dois testes da busca passaram a esperar a lista abrir antes das setas, porque falhavam de vez em quando com o passo assíncrono a mais na abertura da página |
+| D-21 | 2026-10-06 | **Condições atuais (fatia 7).** (1) A ilustração do grupo de condição é o fundo do card principal, escolhida no CSS pelo `data-condition` do card, sob a camada escura. Se ela não carregar, sobra a cor neutra do novo token `--color-illustration-fallback` (`#475569`), com a mesma camada (feature 2, categoria 9; seção 7.1 da arquitetura atualizada). Ela é decorativa: a condição chega aos leitores de tela pela descrição e pelo texto alternativo do ícone (RNF-010). (2) As 7 ilustrações usam só tons médios e escuros, para o texto branco manter 4,5:1 sob a camada (RNF-009). O teste mede o contraste nos pixels do card renderizado, sem o texto: entre 4,87:1 (nublado) e 7,53:1 (neutra); sem a camada, a neve daria 1,96:1. (3) O card mostra o ícone do provedor acima da descrição, que o print não tem, porque a T-7.2 e o RNF-010 pedem o ícone com texto alternativo. O `dom.js` passou a exportar `setConditionIcon(img, icon, description)`, que as abas e a hora a hora também vão usar (seção 6.6 da arquitetura atualizada). (4) Textos e estrutura: o nome do bloco para leitores de tela é "Condições atuais", o título da feature 2 no spec, e fica no `messages.js` como na D-17. Os indicadores ganharam ícones decorativos, como no print. O bloco passou a ser montado pelo `ui/current.js`, que também desenha o estado dele, e saiu da lista provisória do `main.js`. (5) Testes: os cenários dos critérios de aceite partem do pacote real de Uberlândia com campos de `current` trocados e passam pelo view model do backend (`bundle` e `view_of` em `tests/e2e/weather_api.py`), cuja simulação passou a aceitar um `WeatherView` próprio do teste |
 | L-01 | 2026-10-04 | **Limitação:** os testes são feitos só no Google Chrome instalado. Edge, Firefox e Safari não são testados, nem em computador nem em celular. O RNF-006 continua no spec como meta, mas a compatibilidade com outros navegadores não é verificada no MVP |

@@ -742,7 +742,7 @@ Assinaturas mínimas. A implementação pode ter funções auxiliares privadas a
 | `logic/time-window.js` | `cityToday(nowSec, offset)`, `visibleDays(daily, nowSec, offset)` (descarta os dias passados e limita a 8, RN-026 e RN-027), `hourlyWindow(hourly, nowSec)`, `minuteWindow(minutely, nowSec)`, `minuteMarks(window)` |
 | `logic/summaries.js` | `minuteSummary(window)`, `hourlyAltText(window, scale)` |
 | `logic/chart-math.js` | `monotonePath(points)`, `barHeight(intensity, maxPx, minPx)`, `groupRainLabels(items, minGapPx)` |
-| `ui/dom.js` | `el(tag, { class, text, attrs, on }, children)`, `setText(node, text)`, `blockState(state, { part, unavailable }) -> { kind, message? }` (seção 6.5), `renderBlockState(block, view, { onRetry })` (`data-block-state`, `aria-busy` e o `.block-state` com indicador, mensagem ou "Tentar novamente") |
+| `ui/dom.js` | `el(tag, { class, text, attrs, on }, children)`, `setText(node, text)`, `setConditionIcon(img, icon, description)` (ícone do provedor com a descrição como texto alternativo; sem código, a imagem fica oculta, RNF-010), `blockState(state, { part, unavailable }) -> { kind, message? }` (seção 6.5), `renderBlockState(block, view, { onRetry })` (`data-block-state`, `aria-busy` e o `.block-state` com indicador, mensagem ou "Tentar novamente") |
 | `ui/*.js` (blocos) | `mount(rootElement)` |
 
 ---
@@ -776,6 +776,7 @@ Cores extraídas do print e ajustadas quando necessário para cumprir o contrast
 | `--color-band-heavy` | `#a16207` | 2,5 a 7,5 mm/h. O amarelo do print (`#facc15`) dá só 1,4:1 e reprova no RNF-019 | 4,5:1 |
 | `--color-band-extreme` | `#e11d48` | Acima de 7,5 mm/h | 4,3:1 |
 | `--color-illustration-overlay` | `rgba(15, 23, 42, 0.45)` | Camada sobre a ilustração do card principal | Garante ≥ 4,5:1 com texto branco (RNF-009) |
+| `--color-illustration-fallback` | `#475569` | Fundo do card principal quando a ilustração não carrega (feature 2, categoria 9), sob a mesma camada | 11,5:1 com texto branco, já com a camada |
 
 | Outro token | Valor |
 |---|---|

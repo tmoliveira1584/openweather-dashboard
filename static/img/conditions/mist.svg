@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 270" preserveAspectRatio="xMidYMid slice">
+  <!-- Névoa (ADR-012). Tons médios: o texto branco fica legível sob a camada escura (RNF-009). -->
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#5f6b75"/>
+      <stop offset="1" stop-color="#8b949b"/>
+    </linearGradient>
+  </defs>
+  <rect width="480" height="270" fill="url(#sky)"/>
+  <path d="M0 190 L 60 150 L 120 182 L 190 130 L 270 186 L 340 144 L 420 178 L 480 156 V 270 H 0 Z"
+        fill="#6f7a83"/>
+  <g fill="none" stroke="#a3abb1" stroke-width="10" stroke-linecap="round" opacity="0.85">
+    <path d="M40 70 H 220 M270 70 H 440"/>
+    <path d="M90 108 H 360 M400 108 H 460"/>
+    <path d="M20 146 H 140 M190 146 H 420"/>
+    <path d="M60 184 H 300 M340 184 H 470"/>
+    <path d="M10 222 H 180 M230 222 H 400"/>
+  </g>
+</svg>

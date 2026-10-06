@@ -367,7 +367,11 @@ button {
   background: var(--color-surface-soft);
 }
 
-/* Fundo provisório no lugar da ilustração da fatia 7 (ADR-012), já com a camada escura (RNF-009). */
+/*
+ * A ilustração do grupo de condição é o fundo do card, sob a camada escura que garante o
+ * contraste do texto branco (ADR-012, RNF-009). Se ela não carregar, sobra a cor neutra, com
+ * a mesma camada por cima (feature 2, categoria 9).
+ */
 .current-card {
   position: relative;
   display: grid;
@@ -381,21 +385,68 @@ button {
   padding: var(--space-3) var(--space-4);
   overflow: hidden;
   border-radius: var(--radius-card);
-  background:
+  background-color: var(--color-illustration-fallback);
+  background-image:
     linear-gradient(var(--color-illustration-overlay), var(--color-illustration-overlay)),
-    linear-gradient(160deg, #94a3b8 0%, #475569 60%, #334155 100%);
+    var(--illustration, none);
+  background-position: center;
+  background-size: cover;
   color: var(--color-on-page);
 }
 
+/* Uma ilustração por grupo de condição (RN-017). */
+.current-card[data-condition="thunderstorm"] {
+  --illustration: url("/img/conditions/thunderstorm.svg");
+}
+
+.current-card[data-condition="rain"] {
+  --illustration: url("/img/conditions/rain.svg");
+}
+
+.current-card[data-condition="snow"] {
+  --illustration: url("/img/conditions/snow.svg");
+}
+
+.current-card[data-condition="mist"] {
+  --illustration: url("/img/conditions/mist.svg");
+}
+
+.current-card[data-condition="clear"] {
+  --illustration: url("/img/conditions/clear.svg");
+}
+
+.current-card[data-condition="clouds"] {
+  --illustration: url("/img/conditions/clouds.svg");
+}
+
+.current-card[data-condition="neutral"] {
+  --illustration: url("/img/conditions/neutral.svg");
+}
+
+/* O selo diz a quantidade em texto, além da cor (RNF-010, P-018). */
 .current-alerts {
+  display: flex;
   grid-area: alerts;
+  align-items: center;
   justify-self: start;
   align-self: start;
+  gap: var(--space-1);
   padding: var(--space-1) var(--space-2);
   border-radius: 999px;
   background: var(--color-accent);
   font-size: 0.75rem;
   font-weight: 700;
+}
+
+.current-alerts-icon {
+  flex: none;
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.25;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .current-time {
@@ -414,14 +465,26 @@ button {
 }
 
 .current-summary {
+  display: flex;
   grid-area: summary;
+  flex-direction: column;
+  align-items: flex-end;
   align-self: end;
   justify-self: end;
+  min-width: 0;
   text-align: right;
 }
 
+.current-icon {
+  width: 48px;
+  height: 48px;
+  margin-bottom: calc(-1 * var(--space-1));
+}
+
+/* Descrição longa: quebra em mais linhas, sem cortar o texto (feature 2, categoria 10). */
 .current-description {
   font-size: 1rem;
+  overflow-wrap: anywhere;
 }
 
 .current-feels-like {
@@ -449,8 +512,22 @@ button {
 }
 
 .indicator-label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
   color: var(--color-text-muted);
   font-size: 0.75rem;
+}
+
+.indicator-icon {
+  flex: none;
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .indicator-value {
