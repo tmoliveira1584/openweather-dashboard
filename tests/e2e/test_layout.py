@@ -1,7 +1,8 @@
 """Estrutura da tela nas larguras de referência: 360, 599, 600 e 1280 px (fatia 5).
 
-O breakpoint é 600 px (arquitetura, seção 7.1). Os testes usam o esqueleto estático do
-index.html e continuam valendo quando os blocos passarem a ser montados pelo JavaScript.
+O breakpoint é 600 px (arquitetura, seção 7.1). Os testes usam o esqueleto do index.html com
+o `/api/weather` simulado e continuam valendo quando os blocos passarem a ser montados pelo
+JavaScript.
 """
 
 import pytest
@@ -22,9 +23,15 @@ PAGE_SCROLL_JS = """() => ({
 })"""
 
 
+@pytest.fixture(autouse=True)
+def _weather_ready(weather_api):
+    """O `/api/weather` responde, e os blocos mostram o conteúdo em vez do estado de erro."""
+
+
 def open_at(page: Page, width: int) -> None:
     page.set_viewport_size({"width": width, "height": 900})
     page.goto("/")
+    page.locator('.current[data-block-state="ready"]').wait_for(state="attached")
 
 
 @pytest.mark.parametrize("width", WIDTHS)

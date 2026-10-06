@@ -11,11 +11,11 @@ Lista de tarefas que leva a aplicação de zero a 100% dos requisitos, uma fatia
 
 | Item | Valor |
 |---|---|
-| Fatia atual | 6a — Estado, cache e chamadas ao backend (não iniciada) |
-| Próxima tarefa | T-6a.1 |
+| Fatia atual | 6b — Cabeçalho, busca e seletor de escala (não iniciada) |
+| Próxima tarefa | T-6b.1 |
 | Concluídas, ainda sem commit | — |
-| Último commit de implementação | Fatia 5, commit `feat(ui): montar o esqueleto da tela com layout responsivo` de 2026-10-06 (o hash é registrado aqui no início da fatia 6a). Fatia 4: `4ee7d59`. Fatia 3: `8f56a1a`. Fatia 2: `8fb0ce7`. Fatia 1: `b5ff9c1`. Fatia 0: `880fa41` |
-| IDs fechados | 32 de 217 (14,7%) |
+| Último commit de implementação | Fatia 6a, commit `feat(ui): carregar o clima com cache e estados de carregamento e erro` de 2026-10-06 (o hash é registrado aqui no início da fatia 6b). Fatia 5: `ecc8bf0`. Fatia 4: `4ee7d59`. Fatia 3: `8f56a1a`. Fatia 2: `8fb0ce7`. Fatia 1: `b5ff9c1`. Fatia 0: `880fa41` |
+| IDs fechados | 45 de 217 (20,7%) |
 
 ## Como usar
 
@@ -39,7 +39,7 @@ Lista de tarefas que leva a aplicação de zero a 100% dos requisitos, uma fatia
 | 3 | View model | 3 | Concluída |
 | 4 | Cliente e rotas | 4 | Concluída |
 | 5 | Estrutura da tela | 1 | Concluída |
-| 6a | Estado, cache e chamadas ao backend | 13 | Pendente |
+| 6a | Estado, cache e chamadas ao backend | 13 | Concluída |
 | 6b | Cabeçalho, busca e seletor de escala | 24 | Pendente |
 | 6c | Localização inicial e cidade padrão | 12 | Pendente |
 | 7 | Condições atuais | 23 | Pendente |
@@ -49,7 +49,7 @@ Lista de tarefas que leva a aplicação de zero a 100% dos requisitos, uma fatia
 | 11 | Mapa | 24 | Pendente |
 | 12 | Robustez, desempenho e acessibilidade | 15 | Pendente |
 | 13 | Fechamento | 4 | Pendente |
-| | **Total** | **217** | **14,7%** |
+| | **Total** | **217** | **20,7%** |
 
 ---
 
@@ -134,15 +134,15 @@ Arquitetura: seções 7.1 e 8.4. Referência: [print](referencia/referencia_visu
 
 Arquitetura: seções 6.5, 6.6, 7.3 e 7.4. Testes de lógica em `tests/e2e/test_js_logic.py` (`page.evaluate`) e de interface em `tests/e2e/test_f1_loading.py`.
 
-- [ ] **T-6a.1** `messages.js`: objeto `MESSAGES` com os textos fixos copiados literalmente do spec e a tradução dos códigos de erro da seção 7.3. (RNF-008, P-022)
-- [ ] **T-6a.2** `state.js`: `getState`, `setState` e `subscribe`, com o estado inicial da seção 6.5.
-- [ ] **T-6a.3** `services/cache.js`: `cacheKey` com 2 casas, `get` e `set` com `nowMs`, validade de 10 min, só respostas de sucesso. (RN-010, RN-011, P-010)
-- [ ] **T-6a.4** `services/api.js`: `fetchWeather` (coordenadas arredondadas a 2 casas), `searchCities` e `reverseGeocode`, retorno `{ ok, data | error }`, `server_unreachable`, trava de 17 s e promessas em andamento compartilhadas por URL.
-- [ ] **T-6a.5** `actions.js`: `selectCity` (incrementa `selectionId`, status `loading`, consulta o cache, `slow` após 3 s, descarta resposta antiga, grava no cache) e `retry` (refaz só a consulta que falhou). (RF-004, RN-012, P-012)
-- [ ] **T-6a.6** `ui/dom.js`: `el()`, `setText()` e os estados de bloco (carregando, "Ainda carregando…", erro com "Tentar novamente", indisponível, "Atualizando…"), aplicados aos blocos da fatia 5. (RF-005, RF-013, P-020)
-- [ ] **T-6a.7** `main.js` provisório: monta os blocos e seleciona a cidade padrão direto (a localização entra na 6c).
-- [ ] **T-6a.8** Testes de ponta a ponta com `page.route` e `page.clock`: carregamento, "Ainda carregando…", cada código de erro com sua mensagem e "Tentar novamente", acerto de cache sem consulta, erro que não vai para o cache e resposta de cidade antiga descartada. (CA-008, P-004)
-- [ ] **T-6a.9** Definição de pronto + commit.
+- [x] **T-6a.1** `messages.js`: objeto `MESSAGES` com os textos fixos copiados literalmente do spec e a tradução dos códigos de erro da seção 7.3. (RNF-008, P-022)
+- [x] **T-6a.2** `state.js`: `getState`, `setState` e `subscribe`, com o estado inicial da seção 6.5.
+- [x] **T-6a.3** `services/cache.js`: `cacheKey` com 2 casas, `get` e `set` com `nowMs`, validade de 10 min, só respostas de sucesso. (RN-010, RN-011, P-010)
+- [x] **T-6a.4** `services/api.js`: `fetchWeather` (coordenadas arredondadas a 2 casas), `searchCities` e `reverseGeocode`, retorno `{ ok, data | error }`, `server_unreachable`, trava de 17 s e promessas em andamento compartilhadas por URL.
+- [x] **T-6a.5** `actions.js`: `selectCity` (incrementa `selectionId`, status `loading`, consulta o cache, `slow` após 3 s, descarta resposta antiga, grava no cache) e `retry` (refaz só a consulta que falhou). (RF-004, RN-012, P-012)
+- [x] **T-6a.6** `ui/dom.js`: `el()`, `setText()` e os estados de bloco (carregando, "Ainda carregando…", erro com "Tentar novamente", indisponível, "Atualizando…"), aplicados aos blocos da fatia 5. (RF-005, RF-013, P-020)
+- [x] **T-6a.7** `main.js` provisório: monta os blocos e seleciona a cidade padrão direto (a localização entra na 6c).
+- [x] **T-6a.8** Testes de ponta a ponta com `page.route` e `page.clock`: carregamento, "Ainda carregando…", cada código de erro com sua mensagem e "Tentar novamente", acerto de cache sem consulta, erro que não vai para o cache e resposta de cidade antiga descartada. (CA-008, P-004)
+- [x] **T-6a.9** Definição de pronto + commit.
 
 **Fecha:** RF-004, RF-005, RF-013, RN-010, RN-011, RN-012, RNF-008, CA-008, P-004, P-010, P-012, P-020, P-022
 
@@ -291,4 +291,6 @@ Arquitetura: seções 9 e 11.
 | D-14 | 2026-10-05 | O `daily` do view model traz todos os dias recebidos (até 10), e o limite de 8 a partir de "Hoje" fica só no `visibleDays` do frontend (T-8.1). O corte em 8 a partir do primeiro dia recebido, previsto antes na seção 6.3, deixaria 7 abas em Tóquio nas primeiras horas do dia local: o primeiro dia da 4.0 é a data UTC, que lá já é "ontem" (captura da T-0.8), e o RN-027 pede 8. Seções 6.3 e 6.6 da arquitetura atualizadas |
 | D-15 | 2026-10-05 | Regras do view model que o spec não define, registradas na seção 6.3 da arquitetura: (1) um rótulo com prefixo e valor ausente mantém o prefixo (`"Sensação de —"`, `"Mín. —"`), como o tooltip `"08:18 — —"`; (2) sem `timezone_offset`, os blocos diário, hora a hora e por minuto ficam `null` e a hora do card principal mostra "—", porque não há fuso para achar a hora local nem o "Hoje"; (3) registro de previsão sem `dt` é descartado. A variante `onecall_alerts.json` ficou com 2 alertas (sem o alerta sem vigência, que contaria em todos os dias e impediria o selo oculto do CA-021) |
 | D-16 | 2026-10-06 | **Layout entre 600 px e a largura do print.** Com os indicadores em 3 colunas a partir de 600 px (RNF-011), 1/3 da largura em 600 px daria cards de cerca de 55 px. Por isso, o card principal e a hora a hora usam `flex-wrap` com larguras-base de 300 px e 520 px: ficam lado a lado (cerca de 1/3 e 2/3) quando cabem e empilham quando não, sem um segundo breakpoint. Pelo mesmo motivo, a busca desce para a segunda linha do cabeçalho quando falta espaço. O painel por minuto fica 24 px acima da borda do mapa, para não cobrir a atribuição (RNF-025). Seção 7.1 da arquitetura atualizada |
+| D-17 | 2026-10-06 | **Textos e dependências da fatia 6a.** (1) O indicador de carregamento é um ícone animado com o nome "Carregando…" para leitores de tela. O spec não dá texto ao indicador (só o "Ainda carregando…" depois de 3 s), e o nome fica no `messages.js` como os demais textos. (2) O `MESSAGES` já traz todos os textos fixos do spec, também os das fatias 6b a 11, para que exista uma única cópia deles. (3) O `DEFAULT_CITY` fica no `actions.js`, onde o `start()` da 6c o usa, com os rótulos "Uberlândia, BR" e "Uberlândia" vindos do `messages.js`. Por isso o `actions.js` passa a poder importar o `messages.js` (seção 5.2 da arquitetura atualizada), que também vai fornecer "Sua localização" na 6c |
+| D-18 | 2026-10-06 | **Resposta de uma cidade anterior.** Ela é descartada da tela (P-012), mas, se for de sucesso, vai para o cache. Assim, voltar a essa cidade em menos de 10 min não gera outra consulta (P-010, RNF-003). O diagrama da seção 2.2 dava a entender que a gravação no cache vinha depois do descarte, e foi ajustado |
 | L-01 | 2026-10-04 | **Limitação:** os testes são feitos só no Google Chrome instalado. Edge, Firefox e Safari não são testados, nem em computador nem em celular. O RNF-006 continua no spec como meta, mas a compatibilidade com outros navegadores não é verificada no MVP |

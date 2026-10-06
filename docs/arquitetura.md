@@ -177,8 +177,8 @@ sequenceDiagram
             DOM-->>BE: view model com textos pt-BR nas duas escalas
             BE-->>API: 200 WeatherView (Cache-Control no-store)
             API-->>ACT: ok + view model
-            ACT->>ACT: descarta se selectionId mudou (P-012)
-            ACT->>CA: set (só respostas de sucesso)
+            ACT->>CA: set (só respostas de sucesso, também as de uma cidade anterior)
+            ACT->>ACT: descarta da tela se selectionId mudou (P-012)
         else qualquer chamada com chave inválida, cota, provedor fora ou 15 s sem resposta
             CL-->>BE: ProviderError(código)
             BE-->>API: 502 ou 504 com o código do erro
@@ -462,7 +462,7 @@ openweather-dashboard/
 | `app/api/` | FastAPI, `app/clients/`, `app/domain/`, `app/schemas/` | Regra de negócio própria |
 | `static/js/logic/` | Nada além de JavaScript puro | DOM, `fetch`, `Date.now()` (recebe `nowSec` por parâmetro) |
 | `static/js/services/` | `fetch`, `navigator.geolocation`, `messages.js` | DOM |
-| `static/js/actions.js` | `state.js`, `services/` | DOM |
+| `static/js/actions.js` | `state.js`, `services/`, `messages.js` (rótulos da cidade padrão e "Sua localização") | DOM |
 | `static/js/ui/` | DOM, `state.js`, `actions.js`, `logic/`, `messages.js`, Leaflet (só `map.js`) | `fetch`, `services/` diretamente, regra de negócio |
 
 **Testabilidade:** `app/domain/` e `static/js/logic/` são puros e recebem tudo por parâmetro. São os principais alvos dos testes de unidade.
@@ -732,15 +732,17 @@ Assinaturas mínimas. A implementação pode ter funções auxiliares privadas a
 
 | Módulo | Exportações |
 |---|---|
-| `state.js` | `getState()`, `setState(patch)`, `subscribe(listener) -> unsubscribe` |
-| `actions.js` | `start()`, `selectCity(city)`, `retry()`, `search(term)`, `closeSearch()`, `selectDay(localDate \| null)`, `setScale(scale)`, `refreshIfStale(nowMs)` |
+| `state.js` | `getState()` (estado congelado), `setState(patch)`, `subscribe(listener(state, previous)) -> unsubscribe` |
+| `actions.js` | `DEFAULT_CITY`, `start()`, `selectCity(city)`, `retry()`, `search(term)`, `closeSearch()`, `selectDay(localDate \| null)`, `setScale(scale)`, `refreshIfStale(nowMs)` |
+| `messages.js` | `MESSAGES` (catálogo congelado, seção 7.3), `weatherErrorMessage(code)` (código desconhecido ou ausente → mensagem de `provider_unavailable`) |
 | `services/api.js` | `fetchWeather(lat, lon)`, `searchCities(q)`, `reverseGeocode(lat, lon)`, todas devolvendo `{ ok: true, data } \| { ok: false, error }` |
-| `services/cache.js` | `cacheKey(lat, lon)`, `get(key, nowMs)`, `set(key, value, nowMs)` |
+| `services/cache.js` | `roundCoord(value)` (2 casas, sem "-0.00"), `cacheKey(lat, lon)`, `get(key, nowMs) -> { value, storedAt } \| null`, `set(key, value, nowMs)` |
 | `services/location.js` | `requestLocation({ timeoutMs, onLate }) -> Promise<{ status: 'ok', lat, lon } \| { status: 'unavailable' }>` |
 | `logic/time-window.js` | `cityToday(nowSec, offset)`, `visibleDays(daily, nowSec, offset)` (descarta os dias passados e limita a 8, RN-026 e RN-027), `hourlyWindow(hourly, nowSec)`, `minuteWindow(minutely, nowSec)`, `minuteMarks(window)` |
 | `logic/summaries.js` | `minuteSummary(window)`, `hourlyAltText(window, scale)` |
 | `logic/chart-math.js` | `monotonePath(points)`, `barHeight(intensity, maxPx, minPx)`, `groupRainLabels(items, minGapPx)` |
-| `ui/*.js` | `mount(rootElement)` |
+| `ui/dom.js` | `el(tag, { class, text, attrs, on }, children)`, `setText(node, text)`, `blockState(state, { part, unavailable }) -> { kind, message? }` (seção 6.5), `renderBlockState(block, view, { onRetry })` (`data-block-state`, `aria-busy` e o `.block-state` com indicador, mensagem ou "Tentar novamente") |
+| `ui/*.js` (blocos) | `mount(rootElement)` |
 
 ---
 
