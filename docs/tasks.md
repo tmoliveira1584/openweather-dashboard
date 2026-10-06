@@ -11,11 +11,11 @@ Lista de tarefas que leva a aplicação de zero a 100% dos requisitos, uma fatia
 
 | Item | Valor |
 |---|---|
-| Fatia atual | 4 — Cliente e rotas (não iniciada) |
-| Próxima tarefa | T-4.1 |
+| Fatia atual | 5 — Estrutura da tela (não iniciada) |
+| Próxima tarefa | T-5.1 |
 | Concluídas, ainda sem commit | — |
-| Último commit de implementação | Fatia 3, commit `feat(domain): montar view model do clima e da busca de cidades` de 2026-10-05 (o hash é registrado aqui no início da fatia 4). Fatia 2: `8fb0ce7`. Fatia 1: `b5ff9c1`. Fatia 0: `880fa41` |
-| IDs fechados | 27 de 217 (12,4%) |
+| Último commit de implementação | Fatia 4, commit `feat(api): consultar o provedor e expor as rotas /api` de 2026-10-06 (o hash é registrado aqui no início da fatia 5). Fatia 3: `8f56a1a`. Fatia 2: `8fb0ce7`. Fatia 1: `b5ff9c1`. Fatia 0: `880fa41` |
+| IDs fechados | 31 de 217 (14,3%) |
 
 ## Como usar
 
@@ -37,7 +37,7 @@ Lista de tarefas que leva a aplicação de zero a 100% dos requisitos, uma fatia
 | 1 | Domínio: formatação, unidades e horas | 12 | Concluída |
 | 2 | Domínio: regras de clima | 11 | Concluída |
 | 3 | View model | 3 | Concluída |
-| 4 | Cliente e rotas | 4 | Pendente |
+| 4 | Cliente e rotas | 4 | Concluída |
 | 5 | Estrutura da tela | 1 | Pendente |
 | 6a | Estado, cache e chamadas ao backend | 13 | Pendente |
 | 6b | Cabeçalho, busca e seletor de escala | 24 | Pendente |
@@ -49,7 +49,7 @@ Lista de tarefas que leva a aplicação de zero a 100% dos requisitos, uma fatia
 | 11 | Mapa | 24 | Pendente |
 | 12 | Robustez, desempenho e acessibilidade | 15 | Pendente |
 | 13 | Fechamento | 4 | Pendente |
-| | **Total** | **217** | **12,4%** |
+| | **Total** | **217** | **14,3%** |
 
 ---
 
@@ -110,11 +110,11 @@ Arquitetura: seções 6.2, 6.3 e 9.2. Testes em `tests/unit/test_view_model.py`.
 
 Arquitetura: seções 6.1, 6.4, 7.6 e ADR-003. Testes em `tests/api/` com `TestClient` e `httpx.MockTransport`.
 
-- [ ] **T-4.1** `clients/openweather.py`: `OpenWeatherClient(http, api_key, clock)` com `weather`, `geocode` (`limit=5`), `reverse` (`limit=1`) e `tile`, tempo limite de 15 s por chamada e `ProviderError` com os códigos da seção 6.4 (401/403, 429, outros erros, JSON inválido, `TimeoutException`, `ConnectError`). O `weather` faz as 5 chamadas em paralelo do ADR-013 (`units=metric`, `lang=pt_br`, `start` da previsão por hora pelo relógio injetado), trata 404 numa previsão como bloco ausente, busca numa segunda rodada o detalhe de cada alerta distinto (404 → alerta sem vigência), aplica a precedência de erros da seção 6.4 e devolve o pacote de `merge_onecall`. (RN-012, RN-059)
-- [ ] **T-4.2** `api/routes.py`: as 4 rotas, com validação antes de chamar o provedor (lat/lon, termo de 2 a 100 caracteres sem os espaços das pontas, z/x/y), `400 invalid_request` no lugar do 422 e `Cache-Control: no-store`. (RN-004)
-- [ ] **T-4.3** Tratadores de exceção em `main.py`: formato `{"error": "<código>"}`, 502/504, sem repassar o corpo do provedor. (P-004)
-- [ ] **T-4.4** Testes de segurança: com uma chave falsa de teste, ela não aparece em nenhuma resposta, cabeçalho ou log (`caplog`), e o log não contém query string nem coordenadas. Os links `next`/`prev` de uma resposta simulada do provedor não aparecem na resposta do `/api/weather` nem no log (guardrail 13). (RNF-004, P-001, P-006)
-- [ ] **T-4.5** Definição de pronto + commit.
+- [x] **T-4.1** `clients/openweather.py`: `OpenWeatherClient(http, api_key, clock)` com `weather`, `geocode` (`limit=5`), `reverse` (`limit=1`) e `tile`, tempo limite de 15 s por chamada e `ProviderError` com os códigos da seção 6.4 (401/403, 429, outros erros, JSON inválido, `TimeoutException`, `ConnectError`). O `weather` faz as 5 chamadas em paralelo do ADR-013 (`units=metric`, `lang=pt_br`, `start` da previsão por hora pelo relógio injetado), trata 404 numa previsão como bloco ausente, busca numa segunda rodada o detalhe de cada alerta distinto (404 → alerta sem vigência), aplica a precedência de erros da seção 6.4 e devolve o pacote de `merge_onecall`. (RN-012, RN-059)
+- [x] **T-4.2** `api/routes.py`: as 4 rotas, com validação antes de chamar o provedor (lat/lon, termo de 2 a 100 caracteres sem os espaços das pontas, z/x/y), `400 invalid_request` no lugar do 422 e `Cache-Control: no-store`. (RN-004)
+- [x] **T-4.3** Tratadores de exceção em `main.py`: formato `{"error": "<código>"}`, 502/504, sem repassar o corpo do provedor. (P-004)
+- [x] **T-4.4** Testes de segurança: com uma chave falsa de teste, ela não aparece em nenhuma resposta, cabeçalho ou log (`caplog`), e o log não contém query string nem coordenadas. Os links `next`/`prev` de uma resposta simulada do provedor não aparecem na resposta do `/api/weather` nem no log (guardrail 13). (RNF-004, P-001, P-006)
+- [x] **T-4.5** Definição de pronto + commit.
 
 **Fecha:** RN-059, RNF-004, P-001, P-006
 
@@ -281,7 +281,7 @@ Arquitetura: seções 9 e 11.
 | D-04 | 2026-10-05 | O log próprio registra o modelo da rota (ex.: `/api/tiles/precipitation/{z}/{x}/{y}.png`) em vez do caminho real, porque os `z/x/y` das tiles revelam a área vista no mapa (P-006). Sem rota encontrada, registra o caminho sem a query string. Seção 7.6 da arquitetura atualizada |
 | D-05 | 2026-10-05 | `pythonpath = ["."]` na configuração do pytest, para o comando `pytest` (sem `python -m`) importar o pacote `app`. Seção 11 da arquitetura atualizada |
 | D-06 | 2026-10-05 | Um commit por fatia, no fim dela. O `tasks.md` é atualizado a cada tarefa concluída, para que uma nova sessão saiba onde continuar mesmo com o trabalho ainda sem commit |
-| D-07 | 2026-10-05 | O Starlette 1.7 emite `StarletteDeprecationWarning` ao usar o `TestClient` com o `httpx` e sugere o `httpx2`. O aviso fica visível e não é filtrado; adotar o `httpx2` exigiria um ADR (guardrail 1). Rever na fatia 4 se atrapalhar |
+| D-07 | 2026-10-05 | O Starlette 1.7 emite `StarletteDeprecationWarning` ao usar o `TestClient` com o `httpx` e sugere o `httpx2`. O aviso fica visível e não é filtrado; adotar o `httpx2` exigiria um ADR (guardrail 1). Revisto na fatia 4: os testes de API usam o `TestClient` sem problema, e o aviso continua só como aviso |
 | D-08 | 2026-10-05 | `.gitattributes` com `static/vendor/** -text`: os arquivos de terceiros ficam byte a byte como foram baixados, sem a conversão de fim de linha do `core.autocrlf`, para que o SHA-256 de `static/vendor/README.md` continue conferindo. O `LICENSE` do Leaflet (BSD-2-Clause) também foi copiado |
 | D-09 | 2026-10-05 | **Troca da One Call API 3.0 pela 4.0** (ADR-013). A 3.0 foi descontinuada e não aceita novas assinaturas, e uma chave só com a 4.0 recebe 401 nela. Ela tinha sido mantida como "risco aceito" sem verificar se ainda era possível assiná-la. Mudanças: spec (serviços externos, glossário, RF-004, RF-027, RF-030, RF-039, RN-018, RN-027, RN-031, RN-032, RN-043, RN-047, RNF-003, CA-017, CA-021, casos de borda, dependências e premissas das features 1 a 5), arquitetura (seções 1, 2, 4, 5, 6, 7.6, 8.4, 9.2, 10 e 13, ADR-007 e o novo ADR-013), README, CLAUDE.md, `requisitos.md`, `.env.example` e as tarefas T-0.8, T-2.3, T-3.1, T-3.2, T-3.4, T-4.1, T-4.4, T-8.3 e T-10.1. As tarefas T-0.1 a T-0.7 não mudaram. Cada consulta de clima passa a custar 5 chamadas na cota |
 | D-10 | 2026-10-05 | **Ajustes depois das capturas reais da 4.0** (T-0.10). (1) A previsão diária não traz alertas: o selo de cada dia volta à regra original da vigência (RF-030, RN-032, CA-021 e o caso das 00:00 voltam ao texto anterior à D-09), com o detalhe de cada alerta buscado numa segunda rodada (+1 chamada por alerta, opção escolhida entre três). (2) O `dt` de cada dia é 00:00 UTC da data do dia: a data do dia é a data UTC do `dt`, sem somar o fuso. (3) A previsão por minuto começa no minuto seguinte ao da consulta: RF-039, RN-043 e o "Dado" do CA-029 contam a partir do primeiro minuto da janela. (4) RN-018 volta a contar todos os alertas da resposta, inclusive os futuros. Achados detalhados em `tests/fixtures/README.md` |

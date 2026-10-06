@@ -440,6 +440,7 @@ openweather-dashboard/
 │           └── dom.js                # utilitários: el(), setText(), estados de bloco
 ├── tests/
 │   ├── conftest.py                   # fixtures: carregar JSON, app com cliente simulado, servidor para e2e
+│   ├── fakes.py                      # chave falsa e provedor simulado com as capturas reais (FakeProvider)
 │   ├── fixtures/                     # respostas reais por endpoint + pacotes variantes (seção 9.2)
 │   ├── unit/                         # pytest: app/domain
 │   ├── api/                          # pytest + TestClient + httpx.MockTransport

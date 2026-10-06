@@ -7,6 +7,7 @@ import httpx
 import pytest
 from fastapi.testclient import TestClient
 
+from app.clients.openweather import OpenWeatherClient
 from app.config import API_KEY_VAR, ConfigError
 from app.logging_setup import ACCESS_LOGGER
 from app.main import create_app
@@ -26,7 +27,7 @@ def test_setup_mock_app_skips_settings(monkeypatch, make_mock_app):
     app = make_mock_app(lambda request: httpx.Response(200, json={}))
 
     with TestClient(app):
-        assert isinstance(app.state.client, httpx.AsyncClient)
+        assert isinstance(app.state.client, OpenWeatherClient)
         assert not hasattr(app.state, "http")
 
 

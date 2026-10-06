@@ -1,10 +1,10 @@
-"""Fixtures compartilhadas: chave falsa, JSON das fixtures, app simulado e servidor para e2e.
+"""Fixtures compartilhadas: chave falsa, JSON das fixtures, provedor e app simulados e servidor
+para e2e.
 
 Nenhum teste usa a internet nem a cota: o provedor é simulado com httpx.MockTransport e,
 nos testes de ponta a ponta, o navegador só alcança o servidor local e imagens falsas.
 """
 
-import base64
 import json
 import re
 import socket
@@ -17,19 +17,15 @@ import httpx
 import pytest
 import uvicorn
 
+from app.clients.openweather import OpenWeatherClient
 from app.config import API_KEY_VAR
 from app.main import create_app
+from tests.fakes import CAPTURE_NOW, FAKE_KEY, TRANSPARENT_PNG, FakeProvider
 
 TESTS_DIR = Path(__file__).parent
 FIXTURES_DIR = TESTS_DIR / "fixtures"
 E2E_DIR = TESTS_DIR / "e2e"
 
-FAKE_KEY = "chave-falsa-de-teste"
-
-# PNG transparente de 1x1, no lugar das tiles do CARTO e dos ícones do OpenWeatherMap.
-TRANSPARENT_PNG = base64.b64decode(
-    "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII="
-)
 FAKE_IMAGE_URL = re.compile(
     r"^https://([a-d]\.)?basemaps\.cartocdn\.com/|^https://openweathermap\.org/img/wn/"
 )
@@ -61,17 +57,24 @@ def load_json():
 
 
 @pytest.fixture
+def fake_provider(load_json):
+    """Provedor simulado com as capturas reais (ver `FakeProvider`)."""
+    return FakeProvider(load_json)
+
+
+@pytest.fixture
 def make_mock_app():
     """Fábrica de apps com o provedor simulado: make_mock_app(handler) -> FastAPI.
 
-    `handler` recebe um httpx.Request e devolve um httpx.Response.
+    `handler` recebe um httpx.Request e devolve um httpx.Response. O cliente usa a chave
+    falsa e o relógio parado no momento das capturas.
     """
     clients = []
 
-    def make(handler):
+    def make(handler, clock=lambda: CAPTURE_NOW):
         http = httpx.AsyncClient(transport=httpx.MockTransport(handler))
         clients.append(http)
-        return create_app(client=http)
+        return create_app(client=OpenWeatherClient(http, FAKE_KEY, clock=clock))
 
     yield make
     for http in clients:
@@ -86,7 +89,8 @@ def _provider_must_not_be_called(request: httpx.Request) -> httpx.Response:
 def live_server():
     """Backend numa thread, em porta livre, para os testes de ponta a ponta. Devolve a URL."""
     http = httpx.AsyncClient(transport=httpx.MockTransport(_provider_must_not_be_called))
-    config = uvicorn.Config(create_app(client=http), log_level="warning", access_log=False)
+    app = create_app(client=OpenWeatherClient(http, FAKE_KEY))
+    config = uvicorn.Config(app, log_level="warning", access_log=False)
     server = uvicorn.Server(config)
 
     sock = socket.socket()
