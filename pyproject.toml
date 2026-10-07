@@ -1,4 +1,4 @@
-# Só configuração de ferramentas (pytest e ruff). O projeto não é um pacote instalável.
+# Só configuração de ferramentas (pytest, ruff e coverage). O projeto não é um pacote instalável.
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -12,3 +12,12 @@ addopts = "-m 'not live' --browser-channel chrome"
 [tool.ruff]
 line-length = 100
 target-version = "py313"
+
+[tool.coverage.run]
+# coverage run -m pytest: mede app/, inclusive o backend que os testes e2e sobem numa thread.
+source = ["app"]
+branch = true
+
+[tool.coverage.report]
+show_missing = true
+skip_empty = true

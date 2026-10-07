@@ -41,6 +41,7 @@ Define **como** o produto especificado em [spec.md](spec.md) é construído: sta
 | Gráficos | SVG gerado pelo próprio JavaScript, sem biblioteca |
 | Testes | pytest 9.1.1 e pytest-playwright 0.9.0 (Playwright 1.63.0) usando o **Google Chrome instalado** |
 | Qualidade de código | ruff 0.16.10 (lint e formatação do Python) |
+| Cobertura de código | coverage 7.16.2 no Python (ADR-014). No JavaScript, a cobertura do próprio Chrome pelo CDP, sem dependência ([plano-testes.md](plano-testes.md), fase 1) |
 | Armazenamento | Nenhum: sem banco de dados, arquivos ou cache no servidor. O cache fica só na memória do navegador (ADR-005) |
 | Plataforma alvo | Duas versões mais recentes de Chrome, Edge, Firefox e Safari (RNF-006). Os testes são feitos só no Chrome (limitação L-01, seção 13) |
 | Endereço local | `http://127.0.0.1:8000` (só a própria máquina) |
@@ -346,6 +347,12 @@ Cada decisão registra o contexto, a escolha e as alternativas descartadas. Uma 
   - Mostrar o selo só na aba "Hoje": dispensa chamadas extras, mas corta o RF-030.
   - Previsão de 15 em 15 minutos: não é usada por nenhuma feature.
 
+### ADR-014 — Cobertura do Python com coverage.py
+- **Contexto:** a fase 1 da etapa de Testes ([plano-testes.md](plano-testes.md)) mede quanto do código a suíte executa. O Python não traz essa medição pronta, e o guardrail 1 (seção 8.4) exige um ADR para qualquer dependência nova.
+- **Decisão:** `coverage==7.16.2` só no `requirements-dev.txt`, configurado no `pyproject.toml` (`[tool.coverage.*]`, fonte `app/`). Roda com `coverage run -m pytest`, que mede também o backend que os testes de ponta a ponta sobem numa thread. O JavaScript é medido pelo próprio Chrome, com a cobertura do protocolo de depuração (CDP) que o Playwright já acessa, sem dependência nova (plugin `tests/js_coverage.py`, opção `--js-coverage`).
+- **Por quê:** é a ferramenta padrão do Python (o `pytest-cov` usa ela por baixo), é um pacote só, sem dependências indiretas, e não entra na execução da aplicação.
+- **Alternativas descartadas:** `pytest-cov` (dois pacotes, sem ganho real aqui); script próprio com `sys.monitoring` (reinventa a ferramenta e deixa os números menos confiáveis para o relatório); módulo `trace` da biblioteca padrão (lento e com relatório pobre).
+
 ---
 
 ## 4. Conformidade com a constitution
@@ -442,6 +449,7 @@ openweather-dashboard/
 ├── tests/
 │   ├── conftest.py                   # fixtures: carregar JSON, app com cliente simulado, servidor para e2e
 │   ├── fakes.py                      # chave falsa e provedor simulado com as capturas reais (FakeProvider)
+│   ├── js_coverage.py                # opção --js-coverage: cobertura do JavaScript pelo Chrome (ADR-014)
 │   ├── fixtures/                     # respostas reais por endpoint + pacotes variantes (seção 9.2)
 │   ├── unit/                         # pytest: app/domain
 │   ├── api/                          # pytest + TestClient + httpx.MockTransport
@@ -1041,6 +1049,7 @@ pytest -m "not e2e"           # unidade e API (rápidos)
 pytest -m e2e                 # ponta a ponta no Chrome instalado
 pytest                        # todos, menos os "live"
 pytest -m live                # fumaça com o provedor real (usa a cota)
+coverage run -m pytest --js-coverage && coverage report   # cobertura do Python e do JavaScript (ADR-014)
 ruff check . && ruff format --check .
 
 # 5. Atualizar o ambiente depois de mudar os requirements
@@ -1052,6 +1061,7 @@ conda env update -f environment.yml --prune
 Configuração do `pyproject.toml` (criada na fatia 0):
 - `[tool.pytest.ini_options]`: `testpaths = ["tests"]`, `pythonpath = ["."]` (para o comando `pytest` importar o pacote `app`), `markers = ["e2e", "live"]`, `addopts = "-m 'not live' --browser-channel chrome"`
 - `[tool.ruff]`: `line-length = 100`, `target-version = "py313"`
+- `[tool.coverage.run]` e `[tool.coverage.report]`: fonte `app/`, com ramos e linhas sem execução (ADR-014, acrescentado na etapa de Testes)
 
 ---
 

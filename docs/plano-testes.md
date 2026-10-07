@@ -4,6 +4,7 @@ Plano da etapa de Testes do SDLC, que começa depois da implementação e da ver
 
 - **Precedência:** [constitution.md](constitution.md) > [spec.md](spec.md) > [arquitetura.md](arquitetura.md) > este arquivo. A estratégia de testes da implementação continua na seção 9 da arquitetura. Este plano não a repete: ele aponta para ela.
 - **Retomada:** toda sessão da etapa de Testes começa pelo bloco "Onde paramos" abaixo, como o [tasks.md](tasks.md) fez na implementação.
+- **Resultados:** ao fim de cada fase, antes do commit dela, o resultado entra numa seção nova do [relatorio-testes.md](relatorio-testes.md): números de antes e depois, o que foi feito, o que se aprendeu, as verificações e o parecer.
 
 ## Onde paramos
 
@@ -11,10 +12,10 @@ Plano da etapa de Testes do SDLC, que começa depois da implementação e da ver
 
 | Item | Valor |
 |---|---|
-| Fase atual | 1 — Cobertura de código (não iniciada) |
-| Próxima tarefa | TS-1.1 |
+| Fase atual | 1 — Cobertura de código (concluída) · próxima: 2 — Revisão dos testes pela IA |
+| Próxima tarefa | TS-2.1 |
 | Concluídas, ainda sem commit | — |
-| Último commit da etapa | — |
+| Último commit da etapa | Fase 1: `test(testes): medir a cobertura e fechar as lacunas da fase 1` |
 | Defeitos registrados | 0 |
 
 ## 1. Objetivo
@@ -75,12 +76,14 @@ Cada fase tem objetivo, uso dos testes existentes, tarefas, entregável e crité
 - **Objetivo:** medir quanto do código a suíte executa e achar trechos nunca exercitados.
 - **Uso dos testes existentes:** a suíte atual é o que roda durante a medição. A cobertura mede esses 839 testes.
 - **Tarefas:**
-  - [ ] **TS-1.1** Decidir como medir o Python. O `pytest-cov` é a ferramenta comum, mas acrescentar dependência exige um ADR novo (guardrail 1 da arquitetura). Registrar o ADR ou a alternativa escolhida.
-  - [ ] **TS-1.2** Medir o JavaScript pelo próprio Chrome, com a cobertura do protocolo de depuração (CDP) que o Playwright já acessa, sem dependência nova.
-  - [ ] **TS-1.3** Listar os trechos sem cobertura, por arquivo, e classificar cada um: falta de teste, código morto ou tratamento defensivo.
-  - [ ] **TS-1.4** Escrever os testes que faltam e remover o código morto confirmado.
+  - [x] **TS-1.1** Decidir como medir o Python. O `pytest-cov` é a ferramenta comum, mas acrescentar dependência exige um ADR novo (guardrail 1 da arquitetura). Registrar o ADR ou a alternativa escolhida. → `coverage==7.16.2` ([ADR-014](arquitetura.md#adr-014--cobertura-do-python-com-coveragepy)).
+  - [x] **TS-1.2** Medir o JavaScript pelo próprio Chrome, com a cobertura do protocolo de depuração (CDP) que o Playwright já acessa, sem dependência nova. → plugin `tests/js_coverage.py`, opção `--js-coverage`.
+  - [x] **TS-1.3** Listar os trechos sem cobertura, por arquivo, e classificar cada um: falta de teste, código morto ou tratamento defensivo.
+  - [x] **TS-1.4** Escrever os testes que faltam e remover o código morto confirmado.
 - **Entregável:** números de cobertura por arquivo, antes e depois, e os testes novos.
 - **Conclusão:** metas de cobertura da seção 4 atingidas ou com desvios justificados.
+
+- **Resultado:** [relatorio-testes.md](relatorio-testes.md#fase-1--cobertura-de-código-2026-10-07).
 
 ### Fase 2 — Revisão dos testes pela IA
 
@@ -127,7 +130,7 @@ Cada fase tem objetivo, uso dos testes existentes, tarefas, entregável e crité
 - **Uso dos testes existentes:** os resultados da suíte de 2026-10-06 são a linha de base, e o relatório compara com o fim da etapa.
 - **Tarefas:**
   - [ ] **TS-6.1** Rodar a suíte completa e, uma vez, a fumaça `pytest -m live`.
-  - [ ] **TS-6.2** Escrever `docs/relatorio-testes.md`: linha de base, cobertura, revisão, exploratórios, mutação, defeitos, limitações e o que a IA fez em cada fase.
+  - [ ] **TS-6.2** Consolidar o [relatorio-testes.md](relatorio-testes.md), que já traz uma seção por fase: resumo da etapa, comparação entre a linha de base e o fim, defeitos, limitações e o que a IA fez em cada fase.
   - [ ] **TS-6.3** Atualizar o README com os novos números e, se houve correção no produto, publicar a versão `v0.1.1` (tag enviada ao GitHub só com confirmação).
 - **Entregável:** relatório final e README atualizado.
 - **Conclusão:** critérios de saída da seção 4 atendidos.
@@ -146,3 +149,5 @@ Cada fase tem objetivo, uso dos testes existentes, tarefas, entregável e crité
 |---|---|---|
 | DT-01 | 2026-10-07 | A etapa de Testes tem um plano próprio, fora do [tasks.md](tasks.md), que continua sendo o plano da implementação. Sem testes manuais: tudo é automatizado ou feito pela IA |
 | DT-02 | 2026-10-07 | Um commit por fase, no fim dela, com o tipo `test` ou `docs` e o escopo `testes`. Os prompts da etapa são registrados no [prompts-costar.md](prompts-costar.md) com a etapa "Testes" |
+| DT-03 | 2026-10-07 | Cobertura do Python com `coverage==7.16.2`, só para desenvolvimento ([ADR-014](arquitetura.md#adr-014--cobertura-do-python-com-coveragepy)). Cobertura do JavaScript pelo V8 do Chrome via CDP, sem dependência nova, com as linhas parciais como medida complementar de ramos. As metas da seção 4 foram mantidas |
+| DT-04 | 2026-10-07 | O resultado de cada fase é registrado no [relatorio-testes.md](relatorio-testes.md), numa seção didática por fase, criada no fim da fase e incluída no commit dela. A fase 6 consolida esse documento em vez de escrevê-lo do zero |

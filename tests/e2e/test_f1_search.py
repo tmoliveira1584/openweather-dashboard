@@ -328,6 +328,27 @@ def test_rf_015_repeated_confirmations_make_a_single_search(page: Page, weather_
     expect(page.get_by_role("option")).to_have_count(5)
 
 
+def test_rf_015_late_answer_of_a_replaced_search_is_discarded(page: Page, weather_api, geo_api):
+    """RF-015, feature 1 (categoria 7): uma busca diferente substitui a que está em andamento.
+    Se a resposta da antiga chegar depois, ela é descartada e a lista fica com a mais nova."""
+    geo_api.hold = True
+    page.goto("/")
+    box = search_box(page)
+
+    box.fill("Santa Maria")
+    box.press("Enter")
+    box.fill("Curitiba")
+    box.press("Enter")
+    geo_api.release(1)
+    expect(page.get_by_role("option")).to_have_count(2)
+
+    geo_api.release(0)
+    page.wait_for_timeout(300)
+    assert geo_api.terms == ["Santa Maria", "Curitiba"]
+    expect(page.get_by_role("option")).to_have_count(2)
+    expect(page.get_by_role("option").first).to_contain_text("Curitiba")
+
+
 def test_p_003_markup_in_term_and_results_is_shown_as_text(page: Page, weather_api, geo_api):
     """P-003, RN-004, feature 1 (categoria 1): um termo com marcação, como "<b>Rio</b>", é
     enviado e exibido como texto, e os resultados também, sem criar elementos."""

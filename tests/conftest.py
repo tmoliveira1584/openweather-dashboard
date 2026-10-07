@@ -26,6 +26,9 @@ TESTS_DIR = Path(__file__).parent
 FIXTURES_DIR = TESTS_DIR / "fixtures"
 E2E_DIR = TESTS_DIR / "e2e"
 
+# Opção --js-coverage: cobertura do JavaScript pelo Chrome (plano de testes, fase 1).
+pytest_plugins = ["tests.js_coverage"]
+
 FAKE_IMAGE_URL = re.compile(
     r"^https://([a-d]\.)?basemaps\.cartocdn\.com/|^https://openweathermap\.org/img/wn/"
 )

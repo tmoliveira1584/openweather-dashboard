@@ -10,6 +10,12 @@ __pycache__/
 .pytest_cache/
 .ruff_cache/
 
+# Cobertura de código (coverage.py e o plugin --js-coverage)
+.coverage
+.coverage.*
+htmlcov/
+coverage-js/
+
 # Playwright (traces, vídeos e capturas de testes que falharam)
 test-results/
 

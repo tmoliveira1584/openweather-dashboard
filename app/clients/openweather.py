@@ -75,10 +75,8 @@ def _join_pages(pages: list[Response | None]) -> list[Any]:
     return joined
 
 
-def _alert_validity(detail: Any) -> Any:
+def _alert_validity(detail: Response) -> Response:
     """Só `id`, `start` e `end` do detalhe. Um alerta sem detalhe (404) chega só com `id`."""
-    if not isinstance(detail, dict):
-        return detail
     return {key: detail[key] for key in ALERT_FIELDS if key in detail}
 
 

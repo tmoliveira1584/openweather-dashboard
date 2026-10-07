@@ -159,6 +159,55 @@ def test_adr_013_404_on_alert_detail_keeps_alert_without_validity(fake_provider)
     assert all(alert.keys() == {"id"} for alert in bundle["alerts"])
 
 
+def test_adr_013_hourly_records_without_dt_are_kept_without_dedup():
+    """ADR-013: só o `dt` repetido entre as páginas sai; registro sem `dt` passa adiante."""
+    first = {"data": [{"dt": 1, "temp": 20}, {"temp": 21}]}
+    second = {"data": [{"dt": 1, "temp": 22}, {"temp": 21}, {"dt": 2, "temp": 23}]}
+
+    bundle = merge_onecall({"data": [{}]}, None, [first, second], None, None)
+
+    assert bundle["hourly"] == [
+        {"dt": 1, "temp": 20},
+        {"temp": 21},
+        {"temp": 21},
+        {"dt": 2, "temp": 23},
+    ]
+
+
+def test_adr_013_current_without_timezone_offset_leaves_it_out_of_bundle():
+    """ADR-013, seção 6.2: sem `timezone_offset` nos dados atuais, o pacote fica sem ele."""
+    bundle = merge_onecall({"data": [{"dt": 1, "temp": 20}]}, None, [None, None], None, None)
+
+    assert bundle == {"current": {"dt": 1, "temp": 20}}
+
+
+def test_adr_013_blank_or_non_text_alert_ids_are_ignored(fake_provider, load_json):
+    """ADR-013: só IDs de alerta em texto e não vazios geram a segunda rodada."""
+    current = load_json("onecall4/uberlandia/current.json")
+    valid_id = current["data"][0]["alerts"][0]
+    current["data"][0]["alerts"] = ["", "   ", 7, None, valid_id]
+    fake_provider.overrides["current"] = httpx.Response(200, json=current)
+
+    bundle = run(fake_provider, "weather", *UBERLANDIA)
+
+    requested = [
+        r.url.path.rsplit("/", 1)[1]
+        for r in fake_provider.requests
+        if fake_provider.endpoint(r) == "alert"
+    ]
+    assert valid_id in requested
+    assert all(alert_id.strip() and alert_id not in ("7", "None") for alert_id in requested)
+    assert len(bundle["alerts"]) == len(requested)
+
+
+def test_rn_012_unexpected_error_is_not_hidden_as_provider_error(fake_provider):
+    """Seção 6.4: só falhas conhecidas do provedor viram código; um erro inesperado sobe."""
+    fake_provider.overrides["1day"] = RuntimeError("defeito no código")
+
+    with pytest.raises(RuntimeError, match="defeito no código"):
+        run(fake_provider, "weather", *UBERLANDIA)
+
+
 # --- Erros (seção 6.4) ---------------------------------------------------------------------
 
 ERRORS = [

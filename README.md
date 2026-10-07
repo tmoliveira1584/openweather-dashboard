@@ -94,6 +94,7 @@ openweather-dashboard/
 │   ├── arquitetura.md           # Stack, decisões (ADR), contratos, convenções, testes e fatias
 │   ├── tasks.md                 # Tarefas por fatia, decisões, limitações e progresso
 │   ├── plano-testes.md          # Plano da etapa de Testes: fases, critérios e defeitos
+│   ├── relatorio-testes.md      # Resultado de cada fase da etapa de Testes
 │   ├── prompts-costar.md        # Histórico de prompts por etapa do SDLC
 │   ├── capturas/                # Capturas de tela do dashboard
 │   └── referencia/referencia_visual.png  # Print de referência visual do layout
@@ -101,7 +102,7 @@ openweather-dashboard/
 ├── environment.yml              # Ambiente conda: Python 3.13.5 + pip
 ├── requirements.txt             # Dependências de execução, com versões exatas
 ├── requirements-dev.txt         # Dependências de teste e qualidade, com versões exatas
-├── pyproject.toml               # Configuração do pytest e do ruff
+├── pyproject.toml               # Configuração do pytest, do ruff e do coverage
 ├── CLAUDE.md                    # Contexto e regras para o Claude Code
 └── README.md                    # Este arquivo
 ```
@@ -175,6 +176,15 @@ pytest -m live                            # fumaça com o provedor real (usa a c
 ruff check . && ruff format --check .     # lint e formatação
 ```
 
+Para medir a cobertura de código (fase 1 do [plano de testes](docs/plano-testes.md)):
+
+```bash
+coverage run -m pytest --js-coverage      # suíte completa, medindo o Python e o JavaScript
+coverage report                           # Python (app/), por arquivo, com as linhas sem execução
+```
+
+A cobertura do JavaScript aparece no fim da execução e fica em `coverage-js/report.txt`. Ela é medida pelo próprio Chrome, sem dependência nova.
+
 Os testes de unidade, de API e de ponta a ponta não usam a internet nem a cota: o provedor, as tiles do mapa e o relógio do navegador são simulados. O `pytest -m live` faz cerca de 11 chamadas reais e só roda quando pedido assim: em qualquer outra execução, esses testes ficam de fora ou pulados.
 
 **Resultado da suíte (2026-10-06, versão `v0.1.0`):**
@@ -188,7 +198,7 @@ Os testes de unidade, de API e de ponta a ponta não usam a internet nem a cota:
 
 Só o Google Chrome é testado. Edge, Firefox e Safari não foram verificados (limitação L-01).
 
-A etapa de Testes, que mede e reforça essa suíte, segue o [plano de testes](docs/plano-testes.md).
+A etapa de Testes, que mede e reforça essa suíte, segue o [plano de testes](docs/plano-testes.md). O resultado de cada fase fica no [relatório de testes](docs/relatorio-testes.md).
 
 ## Exemplos de uso
 
@@ -236,6 +246,7 @@ O projeto mostra como a IA Generativa pode ajudar em cada etapa do SDLC:
 - **[Arquitetura](docs/arquitetura.md):** decisões registradas (ADR), contratos, convenções, guardrails, estratégia de testes e plano de implementação em fatias, para que o código gerado pela IA seja correto e replicável.
 - **[Tarefas](docs/tasks.md):** cada fatia quebrada em tarefas com checkbox, a fatia em que cada um dos 217 IDs (RF, RN, RNF, CA e princípios) é fechado e o bloco "Onde paramos", que diz a cada nova sessão de onde continuar. Cada tarefa é marcada assim que é concluída, e a fatia inteira vai para um único commit, junto com o código.
 - **[Plano de testes](docs/plano-testes.md):** a etapa de Testes, depois da implementação, em fases conduzidas pela IA: cobertura de código, revisão dos testes, testes exploratórios automatizados, teste de mutação, registro de defeitos e relatório final, com o próprio bloco "Onde paramos".
+- **[Relatório de testes](docs/relatorio-testes.md):** o resultado de cada fase da etapa de Testes, registrado no fim dela: números de antes e depois, o que foi feito, o que se aprendeu e um parecer sobre a fase.
 
 ## Como contribuir
 

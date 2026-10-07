@@ -411,6 +411,45 @@ def test_rf_036_keyboard_wins_over_the_resting_cursor(page: Page, weather_api):
     expect(tooltip(page)).to_have_text("12:00 · 25°")
 
 
+def test_rf_036_leaving_the_curve_returns_the_tip_to_the_focused_point(page: Page, weather_api):
+    """RF-036, RNF-017: com um ponto focado, o cursor sobre outro ponto mostra a hora dele.
+    Quando o cursor sai da curva, a dica volta para o ponto focado em vez de sumir."""
+    open_with(page, weather_api)
+    points(page).first.focus()
+    page.keyboard.press("ArrowRight")
+    expect(tooltip(page)).to_have_text("17:00 · 21° · 0,42 mm/h")
+
+    points(page).nth(20).hover()
+    expect(tooltip(page)).to_have_text("12:00 · 25°")
+    page.locator(".hourly .panel-title").hover()
+
+    expect(points(page).nth(1)).to_be_focused()
+    expect(tooltip(page)).to_have_text("17:00 · 21° · 0,42 mm/h")
+
+
+def test_rf_036_pointer_event_without_movement_keeps_the_focused_point(page: Page, weather_api):
+    """RF-036, RNF-017: um `pointermove` sem mudança de posição, como o que a rolagem pelo
+    teclado gera sob o cursor parado, não tira a dica do ponto focado. Um movimento real,
+    mesmo de 1 px, volta a dica para o ponto sob o cursor."""
+    open_with(page, weather_api)
+
+    def move(index: int, x: int, y: int) -> None:
+        points(page).nth(index).dispatch_event(
+            "pointermove", {"bubbles": True, "clientX": x, "clientY": y}
+        )
+
+    move(1, 50, 50)
+    expect(tooltip(page)).to_have_text("17:00 · 21° · 0,42 mm/h")
+    points(page).first.focus()
+    page.keyboard.press("End")
+    expect(tooltip(page)).to_have_text("15:00 · 28°")
+
+    move(20, 50, 50)
+    expect(tooltip(page)).to_have_text("15:00 · 28°")
+    move(20, 51, 50)
+    expect(tooltip(page)).to_have_text("12:00 · 25°")
+
+
 # ---------- Indisponibilidade (T-9.4) ----------
 
 

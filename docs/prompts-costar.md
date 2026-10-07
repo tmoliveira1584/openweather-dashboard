@@ -753,3 +753,35 @@
 - **[T] Tom:** Objetivo
 - **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
 - **[R] Resposta:** Informe os hashes enviados e confirme a sincronização.
+
+## 2026-10-07 — Etapa: Testes
+
+- **[C] Contexto:** Criei o plano de testes e estou começando a executá-lo. O plano traz o passo a passo: onde paramos, as fases da etapa e como registrar cada entrega.
+- **[O] Objetivo:**
+  1. Leia os documentos do projeto, identifique de onde paramos e entenda o que precisa ser feito na próxima fase.
+  2. Resuma para mim o que será feito e aguarde o meu retorno antes de começar.
+  3. Execute a fase inteira.
+- **[S] Estilo:** Didático e resumido
+- **[T] Tom:** Objetivo
+- **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
+- **[R] Resposta:** Mostre os resultados de maneira simples e didática, com um parecer sobre o sucesso ou não da fase. Proponha a mensagem de commit e aguarde a minha validação antes de commitar.
+
+## 2026-10-07 — Etapa: Testes
+
+- **[C] Contexto:** Concluí a fase 1 do plano de testes e quero acompanhar de forma didática o que cada fase entrega.
+- **[O] Objetivo:**
+  1. Crie um documento de resultados da etapa de Testes e registre nele o resultado da fase 1, no mesmo formato da apresentação que você me fez: o que foi feito, os números de antes e depois, o que se aprendeu, as verificações e um parecer sobre a fase.
+  2. Faça desse documento parte da rotina: ao fim de cada fase, acrescente a seção dela.
+- **[S] Estilo:** Didático e resumido
+- **[T] Tom:** Objetivo
+- **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
+- **[R] Resposta:** Informe onde o documento ficou e como ele entra na rotina das fases.
+
+## 2026-10-07 — Etapa: Testes
+
+- **[C] Contexto:** Concluí a fase 1 do plano de testes e registrei o resultado dela no relatório de testes.
+- **[O] Objetivo:** Faça o commit da fase 1 com a mensagem `test(testes): medir a cobertura e fechar as lacunas da fase 1`.
+- **[S] Estilo:** Técnico e organizado
+- **[T] Tom:** Objetivo
+- **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
+- **[R] Resposta:** Informe o hash do commit e os arquivos incluídos.
