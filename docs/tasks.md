@@ -12,7 +12,7 @@ Lista de tarefas que leva a aplicação de zero a 100% dos requisitos, uma fatia
 | Item | Valor |
 |---|---|
 | Fatia atual | — (MVP concluído) |
-| Próxima tarefa | — (todas as tarefas concluídas) |
+| Próxima tarefa | — (todas as tarefas concluídas; a etapa de Testes segue em [plano-testes.md](plano-testes.md)) |
 | Concluídas, ainda sem commit | — |
 | Último commit de implementação | Fatia 13, commit `chore(release): fechar o MVP com rastreabilidade e versão 0.1.0` de 2026-10-06, com a tag `v0.1.0`. Fatia 12: `1f50a31`. Fatia 11: `91cedba`. Fatia 10: `7f6443a`. Fatia 9: `4069f2f`. Fatia 8: `a329d20`. Fatia 7: `320a0b8`. Fatia 6c: `38d51e0`. Fatia 6b: `30b078a`. Fatia 6a: `f442956`. Fatia 5: `ecc8bf0`. Fatia 4: `4ee7d59`. Fatia 3: `8f56a1a`. Fatia 2: `8fb0ce7`. Fatia 1: `b5ff9c1`. Fatia 0: `880fa41` |
 | IDs fechados | 217 de 217 (100%) |

@@ -732,3 +732,15 @@
 - **[T] Tom:** Objetivo
 - **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
 - **[R] Resposta:** Informe os hashes enviados e confirme a sincronização.
+
+## 2026-10-07 — Etapa: Testes
+
+- **[C] Contexto:** Concluí a implementação do MVP e publiquei a versão v0.1.0. Estou começando a etapa de Testes do SDLC, com foco em aprender o uso da IA nela, sem testes manuais e aceitando as limitações do projeto, como testar só no Chrome.
+- **[O] Objetivo:**
+  1. Crie um plano de testes nos documentos do projeto, com o objetivo, o escopo, o ponto de partida dos testes que já existem, as fases da etapa (cobertura, revisão dos testes, testes exploratórios, mutação, registro de defeitos e relatório final), os critérios de entrada e saída, as limitações aceitas e um bloco de onde paramos.
+  2. Detalhe em cada fase como os testes já construídos são usados.
+  3. Referencie o plano nos demais documentos do projeto.
+- **[S] Estilo:** Didático e resumido
+- **[T] Tom:** Objetivo
+- **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
+- **[R] Resposta:** Apresente o plano criado e proponha a mensagem de commit. Aguarde a minha validação antes de commitar.

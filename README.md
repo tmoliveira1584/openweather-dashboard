@@ -93,6 +93,7 @@ openweather-dashboard/
 │   ├── spec.md                  # Especificação por feature (RF, RN, RNF, CA)
 │   ├── arquitetura.md           # Stack, decisões (ADR), contratos, convenções, testes e fatias
 │   ├── tasks.md                 # Tarefas por fatia, decisões, limitações e progresso
+│   ├── plano-testes.md          # Plano da etapa de Testes: fases, critérios e defeitos
 │   ├── prompts-costar.md        # Histórico de prompts por etapa do SDLC
 │   ├── capturas/                # Capturas de tela do dashboard
 │   └── referencia/referencia_visual.png  # Print de referência visual do layout
@@ -187,6 +188,8 @@ Os testes de unidade, de API e de ponta a ponta não usam a internet nem a cota:
 
 Só o Google Chrome é testado. Edge, Firefox e Safari não foram verificados (limitação L-01).
 
+A etapa de Testes, que mede e reforça essa suíte, segue o [plano de testes](docs/plano-testes.md).
+
 ## Exemplos de uso
 
 ![Dashboard em 1280 px](docs/capturas/dashboard-1280.png)
@@ -232,6 +235,7 @@ O projeto mostra como a IA Generativa pode ajudar em cada etapa do SDLC:
   - [spec](docs/spec.md): requisitos em notação EARS e critérios de aceite Dado/Quando/Então
 - **[Arquitetura](docs/arquitetura.md):** decisões registradas (ADR), contratos, convenções, guardrails, estratégia de testes e plano de implementação em fatias, para que o código gerado pela IA seja correto e replicável.
 - **[Tarefas](docs/tasks.md):** cada fatia quebrada em tarefas com checkbox, a fatia em que cada um dos 217 IDs (RF, RN, RNF, CA e princípios) é fechado e o bloco "Onde paramos", que diz a cada nova sessão de onde continuar. Cada tarefa é marcada assim que é concluída, e a fatia inteira vai para um único commit, junto com o código.
+- **[Plano de testes](docs/plano-testes.md):** a etapa de Testes, depois da implementação, em fases conduzidas pela IA: cobertura de código, revisão dos testes, testes exploratórios automatizados, teste de mutação, registro de defeitos e relatório final, com o próprio bloco "Onde paramos".
 
 ## Como contribuir
 

@@ -932,6 +932,8 @@ Atende RF-039, RF-040, RN-041, RN-042, CA-027, CA-028.
 
 ## 9. Estratégia de testes e definição de pronto
 
+Esta seção é a estratégia de testes da implementação. A etapa de Testes, que mede e reforça estes testes depois da versão `v0.1.0`, está em [plano-testes.md](plano-testes.md).
+
 ### 9.1 Níveis
 
 | Nível | Ferramenta | O que cobre | Pasta |
