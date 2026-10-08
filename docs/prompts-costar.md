@@ -969,3 +969,12 @@
 - **[T] Tom:** Objetivo
 - **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
 - **[R] Resposta:** Mostre onde a seção entrou e resuma o que ela diz.
+
+## 2026-10-08 — Etapa: Documentação
+
+- **[C] Contexto:** Adicionei ao README as limitações de reprodutibilidade e fiz o commit localmente.
+- **[O] Objetivo:** Envie os commits ao GitHub e confirme a sincronização entre local e remoto.
+- **[S] Estilo:** Técnico e organizado
+- **[T] Tom:** Objetivo
+- **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
+- **[R] Resposta:** Informe os hashes enviados e confirme a sincronização.
