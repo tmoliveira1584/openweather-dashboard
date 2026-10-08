@@ -4,7 +4,7 @@ Dashboard web de página única que consome a API do [OpenWeatherMap](https://op
 
 MVP acadêmico da pós-graduação, desenvolvido com apoio de IA Generativa em todas as etapas do SDLC.
 
-> **Status:** ✅ MVP implementado e testado, versão `v0.1.1`. As 7 features do [spec](docs/spec.md) estão prontas, e os 217 IDs rastreáveis (58 RF, 59 RN, 29 RNF, 44 CA e os princípios P-001 a P-027) estão cobertos por testes automatizados. O andamento fatia a fatia está em [docs/tasks.md](docs/tasks.md), e a etapa de Testes, no [relatório de testes](docs/relatorio-testes.md).
+> **Status:** ✅ MVP implementado, testado e documentado, versão final `v1.0.0`. As 7 features do [spec](docs/spec.md) estão prontas, e os 217 IDs rastreáveis (58 RF, 59 RN, 29 RNF, 44 CA e os princípios P-001 a P-027) estão cobertos por testes automatizados. O andamento fatia a fatia está em [docs/tasks.md](docs/tasks.md), e a etapa de Testes, no [relatório de testes](docs/relatorio-testes.md).
 
 ---
 
@@ -379,6 +379,7 @@ As versões seguem [Versionamento Semântico](https://semver.org/lang/pt-BR/) (`
 | *Não lançada* | 2026-10-04 | Arquitetura | Documento de arquitetura, manifestos de dependências com versões exatas, `.env.example` e print de referência |
 | `v0.1.0` | 2026-10-06 | Implementação | Primeira versão funcional do MVP: as 7 features de [docs/spec.md](docs/spec.md), implementadas em 16 fatias (0 a 13, com a 6 dividida em 6a, 6b e 6c), com os 217 IDs rastreados a testes |
 | `v0.1.1` | 2026-10-08 | Testes | Etapa de Testes com a IA ([relatório](docs/relatorio-testes.md)): cobertura de 100%, revisão dos testes (31 achados corrigidos), teste exploratório e teste de mutação. Corrige a hora da previsão hora a hora em fusos com meia hora ou 45 minutos, como "00:45" no Nepal (DEF-01) |
+| `v1.0.0` | 2026-10-08 | Documentação | Versão final do MVP. Revisão da documentação do código (docstrings, contratos de entrada e saída e mensagens de erro) e do README: o problema que o projeto resolve, o uso da IA em cada etapa do SDLC, a revisão humana, os riscos mitigados e as limitações de reprodutibilidade. Sem mudança de comportamento em relação à `v0.1.1` |
 
 ## Créditos
 

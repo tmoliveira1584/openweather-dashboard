@@ -978,3 +978,14 @@
 - **[T] Tom:** Objetivo
 - **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
 - **[R] Resposta:** Informe os hashes enviados e confirme a sincronização.
+
+## 2026-10-08 — Etapa: Documentação
+
+- **[C] Contexto:** Concluí a etapa de Documentação, que fecha o MVP. A tabela de releases do README ainda não tem essa etapa.
+- **[O] Objetivo:**
+  1. Atualize o README com a etapa de Documentação na tabela de releases, como a versão final `v1.0.0`.
+  2. Faça o commit e crie nele a tag `v1.0.0`.
+- **[S] Estilo:** Didático e resumido
+- **[T] Tom:** Objetivo
+- **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
+- **[R] Resposta:** Informe o que mudou no README, o hash do commit e a tag criada.
