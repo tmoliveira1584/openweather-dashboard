@@ -912,3 +912,15 @@
 - **[T] Tom:** Objetivo
 - **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
 - **[R] Resposta:** Informe os hashes e a tag enviados e confirme a sincronização.
+
+## 2026-10-08 — Etapa: Documentação
+
+- **[C] Contexto:** Concluí a etapa de Testes e agora quero confirmar que a documentação do código segue estes critérios: docstring em funções e classes públicas, comentários apenas em trechos não óbvios, contratos de entrada e saída explícitos e mensagens de erro claras.
+- **[O] Objetivo:**
+  1. Revise o código do backend e do frontend com esses critérios e aponte as lacunas.
+  2. Corrija as lacunas só na documentação do código, sem mudar o comportamento.
+  3. Proponha a mensagem de commit e aguarde minha validação antes de commitar.
+- **[S] Estilo:** Didático e resumido
+- **[T] Tom:** Objetivo
+- **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
+- **[R] Resposta:** Apresente uma tabela com a situação de cada critério e liste o que foi corrigido.

@@ -25,6 +25,7 @@ class InvalidRequestError(Exception):
 
 
 def get_client(request: Request) -> OpenWeatherClient:
+    """Cliente do provedor criado no `lifespan` da aplicação, ou o que os testes injetam."""
     return request.app.state.client
 
 

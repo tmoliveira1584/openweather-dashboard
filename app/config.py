@@ -16,6 +16,8 @@ class ConfigError(RuntimeError):
 
 @dataclass(frozen=True)
 class Settings:
+    """Configurações já validadas por `load_settings`."""
+
     # repr=False: a chave não aparece em logs nem em rastros de erro (P-001).
     openweather_api_key: str = field(repr=False)
 

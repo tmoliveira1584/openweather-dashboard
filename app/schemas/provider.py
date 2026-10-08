@@ -41,6 +41,8 @@ type Items[T] = Maybe[list[Maybe[T]]]
 
 
 class ProviderModel(BaseModel):
+    """Base dos modelos do provedor: os campos que não estão no modelo são ignorados."""
+
     model_config = ConfigDict(extra="ignore")
 
 
@@ -93,11 +95,15 @@ class Hour(ProviderModel):
 
 
 class DayTemp(ProviderModel):
+    """Máxima e mínima do dia, em °C (RN-029, RN-030)."""
+
     max: Number = None
     min: Number = None
 
 
 class DayFeelsLike(ProviderModel):
+    """Sensação térmica diurna, em °C (RN-030)."""
+
     day: Number = None
 
 

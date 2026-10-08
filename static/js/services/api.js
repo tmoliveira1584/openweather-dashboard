@@ -11,6 +11,11 @@ import { roundCoord } from './cache.js';
 // responder (RN-012, arquitetura, seção 7.4).
 export const REQUEST_GUARD_MS = 17_000;
 
+/**
+ * @template T
+ * @typedef {{ ok: true, data: T } | { ok: false, error: string }} ApiResult
+ */
+
 const KNOWN_ERRORS = new Set([
   'invalid_request',
   'provider_unauthorized',
@@ -27,6 +32,7 @@ const inFlight = new Map();
  * Consulta de clima da coordenada, arredondada a 2 casas como a chave do cache (RN-010, P-008).
  * @param {number} lat
  * @param {number} lon
+ * @returns {Promise<ApiResult<object>>} `data` é o `WeatherView` (seção 6.3)
  */
 export function fetchWeather(lat, lon) {
   return request(`/api/weather?lat=${roundCoord(lat)}&lon=${roundCoord(lon)}`);
@@ -35,6 +41,7 @@ export function fetchWeather(lat, lon) {
 /**
  * Busca de cidades. O termo vai como texto, codificado na query string (RN-004, P-003).
  * @param {string} q
+ * @returns {Promise<ApiResult<object>>} `data` é o `CitySearchResult` (seção 6.3)
  */
 export function searchCities(q) {
   return request(`/api/geo/search?q=${encodeURIComponent(q)}`);
@@ -44,6 +51,7 @@ export function searchCities(q) {
  * Nome da cidade da localização (RF-002, RN-009).
  * @param {number} lat
  * @param {number} lon
+ * @returns {Promise<ApiResult<object>>} `data` é o `ReverseResult` (seção 6.3)
  */
 export function reverseGeocode(lat, lon) {
   return request(
