@@ -12,11 +12,11 @@ Plano da etapa de Testes do SDLC, que começa depois da implementação e da ver
 
 | Item | Valor |
 |---|---|
-| Fase atual | 2 — Revisão dos testes pela IA (concluída) · próxima: 3 — Testes exploratórios automatizados |
-| Próxima tarefa | TS-3.1 |
+| Fase atual | 3 — Testes exploratórios automatizados (concluída) · próxima: 4 — Teste de mutação |
+| Próxima tarefa | TS-4.1 |
 | Concluídas, ainda sem commit | — |
-| Último commit da etapa | Fase 2: `test(testes): revisar os testes com a IA e corrigir os achados da fase 2` |
-| Defeitos registrados | 0 |
+| Último commit da etapa | Fase 3: `fix(testes): explorar fusos exóticos e corrigir a hora no fuso +05:45` |
+| Defeitos registrados | 1 (DEF-01, corrigido) |
 
 ## 1. Objetivo
 
@@ -60,7 +60,7 @@ Resultado de 2026-10-06, na versão `v0.1.0` (detalhes no README, seção "Rodar
 
 **Saída (para encerrar a etapa)**
 - Cobertura de linhas de pelo menos **90% no Python** e **85% no JavaScript**, com cada trecho abaixo disso coberto por um teste novo ou justificado no relatório.
-- Escore de mutação de pelo menos **80%** em `app/domain/` e `static/js/logic/`, com cada mutante sobrevivente coberto por um teste novo ou justificado como equivalente.
+- Escore de mutação de pelo menos **80%** no módulo escolhido para a fase 4 (escopo reduzido pela DT-06; a meta original valia para todo `app/domain/` e `static/js/logic/`), com cada mutante sobrevivente coberto por um teste novo ou justificado como equivalente.
 - Todos os achados confirmados da revisão dos testes corrigidos.
 - Nenhum defeito do produto em aberto sem decisão registrada.
 - Relatório final publicado e suíte comum verde.
@@ -100,16 +100,22 @@ Cada fase tem objetivo, uso dos testes existentes, tarefas, entregável e crité
 
 ### Fase 3 — Testes exploratórios automatizados
 
+> **Escopo reduzido (DT-06):** só a categoria de fusos exóticos, com +14:00 (Kiribati) e +05:45 (Nepal). As outras categorias ficaram fora, com o motivo no relatório.
+
 - **Objetivo:** buscar falhas fora do que o spec descreve, com cenários propostos pela IA.
 - **Uso dos testes existentes:** os testes novos entram nos arquivos atuais, com os mesmos auxiliares (`weather_api.py`, `geo_api.py`, `tiles.py`, `clock.py`, `visibility.py` e `FakeProvider`).
 - **Tarefas:**
-  - [ ] **TS-3.1** Pedir à IA cenários "e se…" por categoria: entradas incomuns (acentos, cidades homônimas, termos enormes), dados extremos ou malformados do provedor, fusos exóticos (ex.: +05:45 e +14:00), falhas de rede no meio da consulta e sequências rápidas de ações.
-  - [ ] **TS-3.2** Escolher os cenários com mais risco e transformar cada um em teste automatizado.
-  - [ ] **TS-3.3** Cada teste que falhar vira um defeito na fase 5, com a correção e o teste como prova.
+  - [x] **TS-3.1** Pedir à IA cenários "e se…" por categoria: entradas incomuns (acentos, cidades homônimas, termos enormes), dados extremos ou malformados do provedor, fusos exóticos (ex.: +05:45 e +14:00), falhas de rede no meio da consulta e sequências rápidas de ações.
+  - [x] **TS-3.2** Escolher os cenários com mais risco e transformar cada um em teste automatizado.
+  - [x] **TS-3.3** Cada teste que falhar vira um defeito na fase 5, com a correção e o teste como prova.
 - **Entregável:** cenários avaliados e os testes novos.
 - **Conclusão:** cenários escolhidos automatizados e defeitos encontrados registrados.
 
+- **Resultado:** [relatorio-testes.md](relatorio-testes.md#fase-3--testes-exploratórios-automatizados-2026-10-08).
+
 ### Fase 4 — Teste de mutação
+
+> **Escopo reduzido (DT-06):** o script roda sobre um único módulo de `app/domain/`. O JavaScript fica fora, com o motivo no relatório.
 
 - **Objetivo:** provar que os testes detectam defeitos, introduzindo pequenas alterações no código (mutantes) e conferindo se algum teste falha.
 - **Uso dos testes existentes:** a suíte atual é o "detector" avaliado. Para cada mutante, ela roda de novo.
@@ -137,6 +143,12 @@ Cada fase tem objetivo, uso dos testes existentes, tarefas, entregável e crité
 - **Entregável:** relatório final e README atualizado.
 - **Conclusão:** critérios de saída da seção 4 atendidos.
 
+### Defeitos
+
+| ID | Data | Fase | Descrição | Causa | Classificação | Correção ou decisão | Teste de prova | Status |
+|---|---|---|---|---|---|---|---|---|
+| DEF-01 | 2026-10-08 | 3 | Num fuso com 45 ou 30 minutos (Nepal +05:45, Índia +05:30), a previsão hora a hora mostra "00:00" para a hora que começa às 00:45 locais (P-015) | `hour_label` montava `HH:00` e descartava os minutos do fuso: o spec (RN-035) só previa fusos de hora cheia | Produto | `hour_label` passa a mostrar o início da hora no fuso da cidade (`HH:MM`), igual a `HH:00` nos fusos de hora cheia. RN-035 e arquitetura (seção 7.5) atualizadas | `test_p_015_exotic_timezone_…[nepal_+05_45]` e `test_rn_035_hour_label` (casos +05:45, +05:30 e −03:30): falhavam antes e passam depois | Corrigido |
+
 ## 6. Limitações aceitas
 
 | ID | Limitação | Efeito nos testes |
@@ -154,3 +166,4 @@ Cada fase tem objetivo, uso dos testes existentes, tarefas, entregável e crité
 | DT-03 | 2026-10-07 | Cobertura do Python com `coverage==7.16.2`, só para desenvolvimento ([ADR-014](arquitetura.md#adr-014--cobertura-do-python-com-coveragepy)). Cobertura do JavaScript pelo V8 do Chrome via CDP, sem dependência nova, com as linhas parciais como medida complementar de ramos. As metas da seção 4 foram mantidas |
 | DT-04 | 2026-10-07 | O resultado de cada fase é registrado no [relatorio-testes.md](relatorio-testes.md), numa seção didática por fase, criada no fim da fase e incluída no commit dela. A fase 6 consolida esse documento em vez de escrevê-lo do zero |
 | DT-05 | 2026-10-07 | O `/code-review` revisa um diff, não uma pasta. Rodado sobre o último commit de `tests/`, não achou defeitos. A revisão da suíte inteira (TS-2.1) foi feita por 5 agentes de IA em paralelo, um por nível (unidade, API, lógica JS e ponta a ponta em duas partes), só com leitura e com a ordem de confirmar cada achado no código do produto. Cada correção de asserção é provada por um mutante manual que passava com o teste antigo e falha com o novo |
+| DT-06 | 2026-10-08 | As fases 3 e 4 foram reduzidas a um exemplo cada, pelo custo de tokens e de tempo num MVP acadêmico, em que o objetivo é aprender a técnica e não esgotá-la. Fase 3: só o cenário de fusos exóticos (+14:00 e +05:45). Fase 4: o script de mutação roda sobre um único módulo Python de `app/domain/`, e a meta de 80% vale para ele. O relatório registra o que ficou de fora e por quê. O commit da fase 3 usa o tipo `fix`, e não `test` (DT-02), porque inclui a correção do DEF-01 no produto |

@@ -565,7 +565,7 @@ O usuário quer saber como a temperatura e a chance de chuva vão variar nas pr�
 | ID | Regra |
 |---|---|
 | RN-034 | A primeira hora da janela é a que contém o momento atual da cidade. Horas que já passaram são descartadas. Se houver menos de 24 horas disponíveis, exibem-se só as disponíveis. |
-| RN-035 | A hora aparece no formato "HH:00", no fuso da cidade (ex.: "08:00", "13:00"). A primeira hora de um novo dia mostra também o dia da semana abreviado (ex.: "00:00 Sex"). |
+| RN-035 | A hora aparece no formato "HH:00", no fuso da cidade (ex.: "08:00", "13:00"). Num fuso com meia hora ou 45 minutos, as horas da previsão começam nesses minutos, e o horário os mostra (ex.: "00:45" no Nepal, UTC+05:45; DEF-01, P-015). A primeira hora de um novo dia mostra também o dia da semana abreviado (ex.: "00:00 Sex"). |
 | RN-036 | Chance de precipitação = fração de 0 a 1 do provedor × 100, arredondada ao inteiro, com "%" (ex.: 0,21 → "21%"). |
 | RN-037 | Etiqueta de chuva = volume de chuva previsto para a hora, em mm/h, com 2 casas decimais (ex.: "0,21 mm/h"). Só aparece quando o valor arredondado é maior que zero. A falta do volume de chuva na resposta significa "sem chuva prevista", não falha. |
 | RN-038 | Quando etiquetas ficariam sobrepostas, fica visível só a de maior volume no grupo. As demais aparecem ao passar o cursor ou o foco (RF-036). |

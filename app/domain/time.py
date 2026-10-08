@@ -21,8 +21,13 @@ def time_label(ts: int, offset: int) -> str:
 
 
 def hour_label(ts: int, offset: int) -> str:
-    """Hora local "HH:00" da previsão hora a hora, como "13:00" (RN-035)."""
-    return f"{local_datetime(ts, offset).hour:02d}:00"
+    """Início da hora da previsão no fuso da cidade, como "13:00" (RN-035, P-015).
+
+    As horas do provedor começam em horas cheias de UTC. Num fuso com meia hora ou 45 minutos,
+    elas começam nesses minutos locais, como "00:45" no Nepal (DEF-01).
+    """
+    moment = local_datetime(ts, offset)
+    return f"{moment.hour:02d}:{moment.minute:02d}"
 
 
 def weekday_label(ts: int, offset: int) -> str:

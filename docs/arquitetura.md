@@ -629,7 +629,7 @@ Modeladas em `app/schemas/view.py`. As chaves JSON são em `snake_case`, iguais 
 
 | Campo | Regra |
 |---|---|
-| `time_label`, `hour_label` | `HH:MM` e `HH:00` no fuso da cidade (RN-015, RN-035) |
+| `time_label`, `hour_label` | `HH:MM` e o início da hora no fuso da cidade: `HH:00`, ou `HH:30`/`HH:45` nos fusos fracionários (RN-015, RN-035, DEF-01) |
 | `daily[].local_date` | Data `AAAA-MM-DD` do `dt` **em UTC, sem somar o fuso**, porque a 4.0 marca cada dia às 00:00 UTC da data que ele representa (ADR-013). Usada pelo frontend para achar "Hoje" (RN-026). `weekday_label` e `date_label` do dia usam essa mesma data, ou seja, as funções de `time.py` recebem `offset = 0` para `daily` |
 | `daily[].weekday_label` | Dom, Seg, Ter, Qua, Qui, Sex ou Sáb (RN-028). O rótulo "Hoje" é decidido pelo frontend |
 | `daily[].date_label` | `"Seg, 05/10"` (RN-030) |

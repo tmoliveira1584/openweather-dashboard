@@ -823,3 +823,24 @@
 - **[T] Tom:** Objetivo
 - **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
 - **[R] Resposta:** Informe os hashes enviados e confirme a sincronização.
+
+## 2026-10-08 — Etapa: Testes
+
+- **[C] Contexto:** Concluí a fase 2 do plano de testes. As fases 3 e 4, como estão no plano, consomem muitos tokens e muito tempo, e decidi simplificá-las: o custo de tokens e de tempo num MVP acadêmico, em que o objetivo é aprender a técnica e não esgotá-la, não compensa a execução completa.
+- **[O] Objetivo:**
+  1. Leia os documentos do projeto, identifique de onde paramos e entenda o que precisa ser feito na próxima fase.
+  2. Reduza a fase 3 a um único cenário exploratório, o de fuso horário exótico, e a fase 4 a um único módulo. Registre a decisão no plano, com essa justificativa, e explique no relatório o que ficou de fora e por quê.
+  3. Execute a fase 3 inteira, sem parar para pedir confirmação a cada tarefa. Só me pergunte se surgir alguma dúvida.
+- **[S] Estilo:** Didático e resumido
+- **[T] Tom:** Objetivo
+- **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
+- **[R] Resposta:** Apresente o resumo da fase de maneira simples e didática, com um parecer sobre o sucesso ou não da fase.
+
+## 2026-10-08 — Etapa: Testes
+
+- **[C] Contexto:** Concluí a fase 3 do plano de testes, com o escopo reduzido ao cenário de fuso horário exótico, e registrei o resultado dela no relatório de testes.
+- **[O] Objetivo:** Faça o commit da fase 3 com a mensagem `fix(testes): explorar fusos exóticos e corrigir a hora no fuso +05:45`.
+- **[S] Estilo:** Técnico e organizado
+- **[T] Tom:** Objetivo
+- **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
+- **[R] Resposta:** Informe o hash do commit e os arquivos incluídos.

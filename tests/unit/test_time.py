@@ -45,9 +45,19 @@ def test_rn_015_time_label_pads_with_zeros():
     assert time_label(1791112680, UBERLANDIA) == "08:18"
 
 
-@pytest.mark.parametrize(("offset", "expected"), [(UBERLANDIA, "16:00"), (TOKYO, "04:00")])
+@pytest.mark.parametrize(
+    ("offset", "expected"),
+    [
+        (UBERLANDIA, "16:00"),
+        (TOKYO, "04:00"),
+        (5 * 3600 + 45 * 60, "00:45"),  # Nepal (DEF-01)
+        (5 * 3600 + 30 * 60, "00:30"),  # Índia
+        (-(3 * 3600 + 30 * 60), "15:30"),  # Terra Nova
+    ],
+)
 def test_rn_035_hour_label(offset, expected):
-    """RN-035: a hora aparece como "HH:00" no fuso da cidade."""
+    """RN-035, P-015: a hora mostra o início dela no fuso da cidade: "HH:00" nos fusos de hora
+    cheia e, nos fusos com meia hora ou 45 minutos, com esses minutos (DEF-01)."""
     assert hour_label(CAPTURE_DT - 41 * 60 - 3, offset) == expected
 
 

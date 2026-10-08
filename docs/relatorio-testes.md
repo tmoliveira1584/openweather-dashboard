@@ -23,9 +23,9 @@ Detalhes no [plano-testes.md](plano-testes.md), seção 3.
 |---|---|---|---|
 | 1 — Cobertura de código | Concluída em 2026-10-07 | 846 (+7) | ✅ Sucesso |
 | 2 — Revisão dos testes pela IA | Concluída em 2026-10-07 | 847 (+1) | ✅ Sucesso |
-| 3 — Testes exploratórios automatizados | Não iniciada | — | — |
+| 3 — Testes exploratórios automatizados | Concluída em 2026-10-08 (escopo reduzido) | 852 (+5) | ✅ Sucesso |
 | 4 — Teste de mutação | Não iniciada | — | — |
-| 5 — Registro de defeitos (contínua) | 0 defeitos | — | — |
+| 5 — Registro de defeitos (contínua) | 1 defeito (DEF-01, corrigido) | — | — |
 | 6 — Relatório final | Não iniciada | — | — |
 
 ---
@@ -156,3 +156,65 @@ Detalhes no [plano-testes.md](plano-testes.md), seção 3.
 ### Parecer
 
 ✅ **Sucesso.** A revisão encontrou 31 pontos fracos reais numa suíte que já tinha 100% de cobertura, e todos foram corrigidos. Dois testes não conferiam nada, e um cenário inteiro do nome de um teste nunca rodava. Os 19 mutantes mostram o ganho: os testes-alvo pegavam 1 defeito plantado e agora pegam os 19. A fase 4 vai repetir essa prova de forma sistemática, com um script e sobre todo o domínio.
+
+---
+
+## Fase 3 — Testes exploratórios automatizados (2026-10-08)
+
+**A ideia:** os testes anteriores conferem o que o spec descreve. O teste exploratório pergunta "e se…?" e procura falhas **fora** do que alguém pensou em especificar.
+
+**Escopo reduzido (DT-06):** o plano previa 5 categorias de cenários. Pelo custo de tokens e de tempo num MVP acadêmico, em que o objetivo é aprender a técnica e não esgotá-la, a fase ficou com uma só: **fusos exóticos**.
+
+### Resultado
+
+| Medida | Valor |
+|---|---|
+| Cenários explorados | 3 fusos: +14:00 (Kiribati), +05:45 (Nepal) e −12:00 |
+| Cenários automatizados | 2 (+14:00 e +05:45) |
+| Defeitos encontrados | **1 (DEF-01), corrigido** |
+| Testes na suíte comum | 847 → **852** (+2 de ponta a ponta, +3 casos de unidade) |
+
+### O que foi feito
+
+1. **Explorar (TS-3.1):** um script montou o view model da captura de Uberlândia com o fuso trocado e listou a hora atual, as horas da previsão, os dias e os minutos. Com +14:00 e −12:00, tudo saiu certo. Com +05:45 (Nepal), a hora atual era 01:26, mas a primeira hora da previsão aparecia como "00:00".
+2. **Automatizar (TS-3.2):** o teste `test_exotic_timezones.py` abre a página com cada fuso e confere todos os blocos: a hora atual, "Hoje" (já terça, enquanto em UTC ainda é segunda), as horas da previsão e o marco "Agora".
+   - **+14:00:** passou de primeira.
+   - **+05:45:** falhou, com "00:00 Ter" no lugar de "00:45 Ter".
+3. **Registrar e corrigir (TS-3.3):** o DEF-01 entrou na seção "Defeitos" do plano (fase 5).
+
+### O defeito DEF-01
+
+| | |
+|---|---|
+| **O que acontecia** | No Nepal (+05:45) e na Índia (+05:30), a previsão das 00:45 aparecia como "00:00": o horário mostrado não era o horário local da previsão |
+| **Por quê** | O provedor entrega as horas em horas cheias de UTC, que nesses fusos caem em :45 ou :30 locais. O `hour_label` montava "HH:00" e descartava os minutos. O spec (RN-035) só tinha previsto fusos de hora cheia |
+| **Regra violada** | P-015: "SEMPRE exibir datas e horas no fuso horário local da cidade". A constituição prevalece sobre o spec |
+| **Correção** | O `hour_label` mostra o início da hora no fuso da cidade (`HH:MM`). Nos fusos de hora cheia, o resultado continua "16:00". RN-035 e arquitetura atualizadas |
+| **Prova** | Os testes novos (de ponta a ponta, +05:45; de unidade, +05:45, +05:30 e −03:30) falhavam antes da correção e passam depois |
+
+### O que ficou de fora e por quê
+
+| Categoria do plano | Por que ficou de fora |
+|---|---|
+| Entradas incomuns (acentos, homônimas, termos enormes) | A suíte já cobre acentos ("Uberlândia", "Tóquio"), homônimas (5 "Santa Maria") e termos inválidos |
+| Dados extremos ou malformados do provedor | A fase 1 já cobriu os tratamentos defensivos do cliente (registro sem `dt`, alerta sem ID, fuso ausente) |
+| Falhas de rede no meio da consulta | Já há testes de queda de rede, de tempo esgotado e de falha numa das 5 chamadas da One Call |
+| Sequências rápidas de ações | Já há testes de respostas fora de ordem, de busca substituída e de troca de escala durante a atualização |
+
+### O que se aprendeu
+
+- **O spec também tem pontos cegos.** Todos os testes seguiam o RN-035 ("HH:00"), e por isso todos passavam. Só uma pergunta de fora do spec ("e num fuso de 45 minutos?") revelou o defeito. Ele afeta, por exemplo, a Índia, com mais de 1 bilhão de pessoas.
+- **Um único cenário bem escolhido rende.** Uma categoria e dois fusos foram suficientes para achar um defeito real do produto, num código com 100% de cobertura e testes revisados na fase 2.
+- **A hierarquia de documentos decide.** O spec dizia "HH:00", mas a constituição (P-015) manda mostrar a hora local, e ela prevalece. Por isso a correção foi no produto e no spec, e não só no teste.
+- **O papel da IA:** escolheu os fusos que estressam a regra (extremo, fracionário e negativo), explorou por script antes de escrever o teste, identificou a causa no código e propôs a correção mínima, compatível com os fusos de hora cheia.
+
+### Verificações
+
+- Suíte comum verde: 852 testes passando, com ruff sem apontamentos.
+- Nos fusos de hora cheia, nada mudou: todos os testes anteriores passam sem alteração.
+- A chave da API não aparece em nenhum arquivo do repositório.
+- Como houve correção no produto, a fase 6 prevê publicar a versão `v0.1.1` (TS-6.3).
+
+### Parecer
+
+✅ **Sucesso, com escopo reduzido.** A fase cumpriu o objetivo com um único cenário: achou um defeito real do produto (DEF-01), fora do que o spec descrevia, e o corrigiu com testes que provam a correção. As outras categorias ficaram fora por custo, e a suíte atual já cobre boa parte delas.
