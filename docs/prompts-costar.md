@@ -882,3 +882,24 @@
 - **[T] Tom:** Objetivo
 - **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
 - **[R] Resposta:** Informe os hashes enviados e confirme a sincronização.
+
+## 2026-10-08 — Etapa: Testes
+
+- **[C] Contexto:** Concluí as fases 1 a 4 do plano de testes, com as fases 3 e 4 em escopo reduzido, e a fase 3 corrigiu um defeito do produto. Falta a fase 6, o relatório final.
+- **[O] Objetivo:**
+  1. Leia os documentos do projeto, identifique de onde paramos e entenda o que precisa ser feito na fase 6.
+  2. Execute a fase 6 inteira, sem parar para pedir confirmação a cada tarefa. Rode uma vez a fumaça com o provedor real e meça de novo a cobertura, para o relatório trazer os números finais.
+  3. Publique a versão v0.1.1, com a tag enviada ao GitHub.
+- **[S] Estilo:** Didático e resumido
+- **[T] Tom:** Objetivo
+- **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
+- **[R] Resposta:** Apresente o resumo da etapa de Testes de maneira simples e didática, com um parecer final sobre ela.
+
+## 2026-10-08 — Etapa: Testes
+
+- **[C] Contexto:** Concluí a fase 6 do plano de testes, que fecha a etapa de Testes, e registrei o resultado final no relatório de testes.
+- **[O] Objetivo:** Faça o commit da fase 6 com a mensagem `docs(testes): consolidar o relatório final e publicar a versão 0.1.1` e crie nele a tag `v0.1.1`.
+- **[S] Estilo:** Técnico e organizado
+- **[T] Tom:** Objetivo
+- **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
+- **[R] Resposta:** Informe o hash do commit, os arquivos incluídos e a tag criada.

@@ -450,6 +450,7 @@ openweather-dashboard/
 │   ├── conftest.py                   # fixtures: carregar JSON, app com cliente simulado, servidor para e2e
 │   ├── fakes.py                      # chave falsa e provedor simulado com as capturas reais (FakeProvider)
 │   ├── js_coverage.py                # opção --js-coverage: cobertura do JavaScript pelo Chrome (ADR-014)
+│   ├── mutation.py                   # teste de mutação de um módulo Python (plano de testes, fase 4)
 │   ├── fixtures/                     # respostas reais por endpoint + pacotes variantes (seção 9.2)
 │   ├── unit/                         # pytest: app/domain
 │   ├── api/                          # pytest + TestClient + httpx.MockTransport

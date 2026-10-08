@@ -12,11 +12,11 @@ Plano da etapa de Testes do SDLC, que começa depois da implementação e da ver
 
 | Item | Valor |
 |---|---|
-| Fase atual | 4 — Teste de mutação (concluída) · próxima: 6 — Relatório final |
-| Próxima tarefa | TS-6.1 |
+| Fase atual | Etapa de Testes concluída (fases 1 a 6) |
+| Próxima tarefa | — |
 | Concluídas, ainda sem commit | — |
-| Último commit da etapa | Fase 4: `test(testes): medir a mutação do módulo de precipitação na fase 4` |
-| Defeitos registrados | 1 (DEF-01, corrigido) |
+| Último commit da etapa | Fase 6: `docs(testes): consolidar o relatório final e publicar a versão 0.1.1` (tag `v0.1.1`) |
+| Defeitos registrados | 2 (DEF-01 corrigido; DEF-02 do provedor, fora do projeto) |
 
 ## 1. Objetivo
 
@@ -139,17 +139,20 @@ Cada fase tem objetivo, uso dos testes existentes, tarefas, entregável e crité
 - **Objetivo:** consolidar os resultados da etapa para a entrega acadêmica.
 - **Uso dos testes existentes:** os resultados da suíte de 2026-10-06 são a linha de base, e o relatório compara com o fim da etapa.
 - **Tarefas:**
-  - [ ] **TS-6.1** Rodar a suíte completa e, uma vez, a fumaça `pytest -m live`.
-  - [ ] **TS-6.2** Consolidar o [relatorio-testes.md](relatorio-testes.md), que já traz uma seção por fase: resumo da etapa, comparação entre a linha de base e o fim, defeitos, limitações e o que a IA fez em cada fase.
-  - [ ] **TS-6.3** Atualizar o README com os novos números e, se houve correção no produto, publicar a versão `v0.1.1` (tag enviada ao GitHub só com confirmação).
+  - [x] **TS-6.1** Rodar a suíte completa e, uma vez, a fumaça `pytest -m live`. → 852 testes, com 100% de cobertura no Python e no JavaScript. Fumaça: 3 de 4 rotas; a de clima falhou pelo provedor (DEF-02).
+  - [x] **TS-6.2** Consolidar o [relatorio-testes.md](relatorio-testes.md), que já traz uma seção por fase: resumo da etapa, comparação entre a linha de base e o fim, defeitos, limitações e o que a IA fez em cada fase.
+  - [x] **TS-6.3** Atualizar o README com os novos números e, se houve correção no produto, publicar a versão `v0.1.1` (tag enviada ao GitHub só com confirmação).
 - **Entregável:** relatório final e README atualizado.
 - **Conclusão:** critérios de saída da seção 4 atendidos.
+
+- **Resultado:** [relatorio-testes.md](relatorio-testes.md#fase-6--relatório-final-2026-10-08).
 
 ### Defeitos
 
 | ID | Data | Fase | Descrição | Causa | Classificação | Correção ou decisão | Teste de prova | Status |
 |---|---|---|---|---|---|---|---|---|
 | DEF-01 | 2026-10-08 | 3 | Num fuso com 45 ou 30 minutos (Nepal +05:45, Índia +05:30), a previsão hora a hora mostra "00:00" para a hora que começa às 00:45 locais (P-015) | `hour_label` montava `HH:00` e descartava os minutos do fuso: o spec (RN-035) só previa fusos de hora cheia | Produto | `hour_label` passa a mostrar o início da hora no fuso da cidade (`HH:MM`), igual a `HH:00` nos fusos de hora cheia. RN-035 e arquitetura (seção 7.5) atualizadas | `test_p_015_exotic_timezone_…[nepal_+05_45]` e `test_rn_035_hour_label` (casos +05:45, +05:30 e −03:30): falhavam antes e passam depois | Corrigido |
+| DEF-02 | 2026-10-08 | 6 | Na fumaça com o provedor real, `/api/weather` devolveu `provider_timeout` duas vezes | O endpoint `onecall/timeline/1day` do OpenWeatherMap não respondeu nem em 60 s, em Uberlândia e em Tóquio, enquanto `current` respondia em 0,5 s. O backend agiu como o spec manda (RN-012, seção 6.4) | Ambiente (provedor) | Sem mudança no código. A falha é do provedor, e o backend a traduziu corretamente. Evolução possível: mostrar os outros blocos quando só a previsão diária falha (README, próximos passos) | Chamadas diretas ao endpoint, fora do backend, com tempo limite de 60 s e 30 s | Fora do projeto |
 
 ## 6. Limitações aceitas
 

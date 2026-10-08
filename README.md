@@ -4,7 +4,7 @@ Dashboard web de página única que consome a API do [OpenWeatherMap](https://op
 
 MVP acadêmico da pós-graduação, desenvolvido com apoio de IA Generativa em todas as etapas do SDLC.
 
-> **Status:** ✅ MVP implementado, versão `v0.1.0`. As 7 features do [spec](docs/spec.md) estão prontas, e os 217 IDs rastreáveis (58 RF, 59 RN, 29 RNF, 44 CA e os princípios P-001 a P-027) estão cobertos por testes automatizados. O andamento fatia a fatia está em [docs/tasks.md](docs/tasks.md).
+> **Status:** ✅ MVP implementado e testado, versão `v0.1.1`. As 7 features do [spec](docs/spec.md) estão prontas, e os 217 IDs rastreáveis (58 RF, 59 RN, 29 RNF, 44 CA e os princípios P-001 a P-027) estão cobertos por testes automatizados. O andamento fatia a fatia está em [docs/tasks.md](docs/tasks.md), e a etapa de Testes, no [relatório de testes](docs/relatorio-testes.md).
 
 ---
 
@@ -185,15 +185,23 @@ coverage report                           # Python (app/), por arquivo, com as l
 
 A cobertura do JavaScript aparece no fim da execução e fica em `coverage-js/report.txt`. Ela é medida pelo próprio Chrome, sem dependência nova.
 
+Para o teste de mutação de um módulo Python (fase 4 do plano de testes):
+
+```bash
+python -m tests.mutation app/domain/precipitation.py tests/unit
+```
+
 Os testes de unidade, de API e de ponta a ponta não usam a internet nem a cota: o provedor, as tiles do mapa e o relógio do navegador são simulados. O `pytest -m live` faz cerca de 11 chamadas reais e só roda quando pedido assim: em qualquer outra execução, esses testes ficam de fora ou pulados.
 
-**Resultado da suíte (2026-10-06, versão `v0.1.0`):**
+**Resultado da suíte (2026-10-08, versão `v0.1.1`, fim da etapa de Testes):**
 
 | Suíte | Ambiente | Resultado |
 |---|---|---|
-| `pytest -m "not e2e"` | Python 3.13.5 | 503 testes passando (os 4 `live` ficam pulados) |
-| `pytest -m e2e` | Google Chrome 154.0.8037.98 (Windows 11), Playwright 1.63.0 | 336 testes passando, incluindo os 44 critérios de aceite |
-| `pytest -m live` | OpenWeatherMap real | 4 testes passando (uma chamada a cada rota) |
+| `pytest -m "not e2e"` | Python 3.13.5 | 512 testes passando (os 4 `live` ficam pulados) |
+| `pytest -m e2e` | Google Chrome 154.0.8037.98 (Windows 11), Playwright 1.63.0 | 340 testes passando, incluindo os 44 critérios de aceite |
+| `pytest -m live` | OpenWeatherMap real | 3 de 4 passando. A rota de clima falhou porque o endpoint `timeline/1day` do provedor não respondia em 2026-10-08 (DEF-02). Em 2026-10-06, os 4 passaram |
+| `coverage run -m pytest --js-coverage` | Suíte comum | 100% das linhas e dos ramos do Python e 100% das linhas do JavaScript |
+| `python -m tests.mutation` | `app/domain/precipitation.py` | 34 de 35 mutantes detectados (97,1%); o sobrevivente é equivalente |
 | `ruff check .` e `ruff format --check .` | Ruff 0.16.10 | Sem apontamentos |
 
 Só o Google Chrome é testado. Edge, Firefox e Safari não foram verificados (limitação L-01).
@@ -271,6 +279,7 @@ O projeto mostra como a IA Generativa pode ajudar em cada etapa do SDLC:
 - **Atualização automática:** os dados são consultados de novo ao voltar à página depois de 10 minutos. Com a página aberta e visível o tempo todo, as janelas de minutos, horas e dias avançam com o relógio, mas não há nova consulta.
 - **Testado só no Google Chrome:** os testes automatizados rodam só no Chrome instalado. Edge, Firefox e Safari não são testados, nem em computador nem em celular (limitação L-01 de [docs/tasks.md](docs/tasks.md)).
 - **Escopo reduzido:** sem favoritos, histórico de buscas, detalhes dos alertas ou preferências lembradas entre visitas.
+- **Falha de uma só previsão derruba a consulta:** se uma das 5 chamadas da One Call esgota o tempo, todos os blocos mostram o erro, como manda o spec (RN-012). Em 2026-10-08, o endpoint da previsão diária do provedor parou de responder, e a consulta inteira falhou (DEF-02 do [plano de testes](docs/plano-testes.md)). Uma evolução possível é mostrar os outros blocos e só a previsão diária como indisponível.
 
 ### Próximos passos no MVP
 
@@ -302,6 +311,7 @@ As versões seguem [Versionamento Semântico](https://semver.org/lang/pt-BR/) (`
 | *Não lançada* | 2026-10-03 | Requisitos | Product brief, constitution e spec do MVP |
 | *Não lançada* | 2026-10-04 | Arquitetura | Documento de arquitetura, manifestos de dependências com versões exatas, `.env.example` e print de referência |
 | `v0.1.0` | 2026-10-06 | Implementação | Primeira versão funcional do MVP: as 7 features de [docs/spec.md](docs/spec.md), implementadas em 16 fatias (0 a 13, com a 6 dividida em 6a, 6b e 6c), com os 217 IDs rastreados a testes |
+| `v0.1.1` | 2026-10-08 | Testes | Etapa de Testes com a IA ([relatório](docs/relatorio-testes.md)): cobertura de 100%, revisão dos testes (31 achados corrigidos), teste exploratório e teste de mutação. Corrige a hora da previsão hora a hora em fusos com meia hora ou 45 minutos, como "00:45" no Nepal (DEF-01) |
 
 ## Créditos
 

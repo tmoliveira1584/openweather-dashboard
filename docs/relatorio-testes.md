@@ -25,8 +25,8 @@ Detalhes no [plano-testes.md](plano-testes.md), seção 3.
 | 2 — Revisão dos testes pela IA | Concluída em 2026-10-07 | 847 (+1) | ✅ Sucesso |
 | 3 — Testes exploratórios automatizados | Concluída em 2026-10-08 (escopo reduzido) | 852 (+5) | ✅ Sucesso |
 | 4 — Teste de mutação | Concluída em 2026-10-08 (escopo reduzido) | 852 (+0) | ✅ Sucesso |
-| 5 — Registro de defeitos (contínua) | 1 defeito (DEF-01, corrigido) | — | — |
-| 6 — Relatório final | Não iniciada | — | — |
+| 5 — Registro de defeitos (contínua) | 2 defeitos: DEF-01 corrigido, DEF-02 do provedor | — | — |
+| 6 — Relatório final | Concluída em 2026-10-08 | 852 | ✅ Sucesso |
 
 ---
 
@@ -41,8 +41,9 @@ Detalhes no [plano-testes.md](plano-testes.md), seção 3.
 | Python, linhas | 99,7% (621 de 623) | **100%** (621 de 621) | 90% |
 | Python, ramos (`if`) incompletos | 5 | **0** | — |
 | JavaScript, linhas | 99,9% (1.597 de 1.598) | **100%** (1.598 de 1.598) | 85% |
-| JavaScript, linhas parciais | 10 | **7** (todas justificadas) | — |
+| JavaScript, linhas parciais | 10 | **8** (todas justificadas)¹ | — |
 
+- ¹ **Correção feita na fase 6:** esta seção dizia 7. A medição final e a tabela de lacunas abaixo mostram 8 linhas parciais, as mesmas antes e depois da etapa.
 - **Linha parcial:** linha que rodou, mas com algum trecho que nunca rodou (o outro lado de um `?:`, de um `??` ou de um `if` de uma linha só). É o equivalente aos ramos do Python.
 - **Por arquivo, antes da fase:** só dois arquivos não estavam em 100% de linhas: `app/clients/openweather.py` (96%) e `static/js/ui/hourly.js` (99,6%). Os outros 14 do Python e 16 do JavaScript já estavam completos.
 
@@ -284,3 +285,96 @@ O `precipitation.py` tem 70 linhas e concentra o que a mutação mais testa: os 
 ### Parecer
 
 ✅ **Sucesso, com escopo reduzido.** O escore de 97,1% passa a meta de 80% com folga, e o único sobrevivente é equivalente e está justificado. O script fica pronto para medir os outros módulos se o projeto evoluir.
+
+---
+
+## Fase 6 — Relatório final (2026-10-08)
+
+**A ideia:** fechar a etapa com os números finais, comparar com o ponto de partida e conferir os critérios de saída do plano.
+
+### Resumo da etapa
+
+A etapa de Testes começou com 839 testes verdes e terminou com 852. Nesse caminho, a IA:
+- **mediu a cobertura** e fechou as últimas lacunas (fase 1);
+- **revisou os testes** e corrigiu 31 pontos fracos (fase 2);
+- **explorou um cenário fora do spec** e achou um defeito real (fase 3);
+- **plantou defeitos no código** para medir a força dos testes (fase 4).
+
+O produto ganhou uma correção (DEF-01), publicada na versão `v0.1.1`.
+
+### Linha de base × fim da etapa
+
+| Medida | Linha de base (v0.1.0, 2026-10-06) | Fim (v0.1.1, 2026-10-08) |
+|---|---|---|
+| Testes na suíte comum | 839 | **852** |
+| Unidade e API (`pytest -m "not e2e"`) | 503 | **512** |
+| Ponta a ponta e lógica JS (`pytest -m e2e`) | 336 | **340** |
+| Cobertura do Python (linhas e ramos) | não medida (na fase 1: 99,7% das linhas e 5 ramos incompletos) | **100% e 0 ramos incompletos** (622 linhas) |
+| Cobertura do JavaScript (linhas) | não medida (na fase 1: 99,9%) | **100%** (1.598 linhas, 8 parciais justificadas) |
+| Escore de mutação (`precipitation.py`) | não medido | **97,1%** (34 de 35; o sobrevivente é equivalente) |
+| Defeitos plantados detectados (fase 2) | 1 de 19 | **19 de 19** |
+| Defeitos do produto conhecidos | 0 | 1 achado e corrigido (DEF-01) |
+| Fumaça com o provedor real | 4 de 4 | 3 de 4 (DEF-02, falha do provedor) |
+
+### Critérios de saída (plano, seção 4)
+
+| Critério | Resultado |
+|---|---|
+| Cobertura ≥ 90% no Python e ≥ 85% no JavaScript | ✅ 100% e 100% |
+| Mutação ≥ 80% no módulo escolhido (DT-06), com cada sobrevivente coberto ou justificado | ✅ 97,1%, e o sobrevivente é equivalente |
+| Achados confirmados da revisão corrigidos | ✅ 31 de 31 |
+| Nenhum defeito do produto em aberto sem decisão registrada | ✅ DEF-01 corrigido. DEF-02 é do provedor, com a decisão registrada |
+| Relatório publicado e suíte comum verde | ✅ Este relatório, e 852 testes verdes |
+
+### Defeitos
+
+| ID | O que foi | Classificação | Decisão |
+|---|---|---|---|
+| DEF-01 | Hora da previsão errada em fusos com 30 ou 45 minutos ("00:00" em vez de "00:45" no Nepal) | Produto | Corrigido na fase 3, com testes de prova, e publicado na `v0.1.1` |
+| DEF-02 | Na fumaça real, `/api/weather` devolveu `provider_timeout` | Ambiente (provedor) | O endpoint `timeline/1day` do OpenWeatherMap não respondeu nem em 60 s, em duas cidades, enquanto os outros respondiam em menos de 1 s. O backend agiu como o spec manda (RN-012). Sem mudança no código |
+
+**O DEF-02 em detalhe:** a fumaça rodou duas vezes, e nas duas o log apontou a mesma chamada: `onecall/timeline/1day provider_timeout`. Duas chamadas diretas ao endpoint, fora do backend, também ficaram sem resposta (60 s em Uberlândia, 30 s em Tóquio). Na mesma hora, `current` respondia em 0,5 s. As outras 3 rotas da fumaça (busca, geocodificação reversa e tile do mapa) passaram. Em 2026-10-06, a mesma fumaça tinha passado inteira. O episódio mostrou uma evolução possível, registrada no README: quando só a previsão diária falha, mostrar os outros blocos em vez de derrubar a consulta inteira.
+
+### Limitações da etapa
+
+| Limitação | Efeito |
+|---|---|
+| Fases 3 e 4 com escopo reduzido (DT-06) | Fase 3: só a categoria de fusos exóticos. Fase 4: só `precipitation.py`, sem o JavaScript. O motivo foi o custo de tokens e de tempo num MVP acadêmico, em que o objetivo é aprender a técnica e não esgotá-la |
+| Só o Chrome (L-01) | Diferenças em outros navegadores não são detectadas |
+| Mapa base simulado (L-02) | A aparência real do mapa não é verificada |
+| Provedor real só na fumaça | A fumaça depende da disponibilidade do provedor no momento, como mostrou o DEF-02 |
+| Sem testes manuais (DT-01) | Toda verificação foi automatizada ou feita pela IA |
+
+### O que a IA fez em cada fase
+
+| Fase | Papel da IA |
+|---|---|
+| 1 — Cobertura | Escolheu a ferramenta (ADR-014), escreveu o plugin de cobertura do Chrome, classificou cada lacuna e escreveu os 7 testes que faltavam |
+| 2 — Revisão | 5 agentes revisaram a suíte em paralelo, um por nível. A IA conferiu os 31 achados no código, corrigiu todos e provou cada correção com 19 defeitos plantados |
+| 3 — Exploratório | Escolheu fusos que estressam a regra, explorou por script, achou o DEF-01 e propôs a correção mínima, compatível com os fusos de hora cheia |
+| 4 — Mutação | Escreveu o script de mutação com `ast`, mediu o módulo e provou a equivalência do sobrevivente |
+| 5 — Defeitos | Registrou o DEF-01 e o DEF-02 com causa, classificação e decisão. No DEF-02, isolou o endpoint culpado sem expor a chave |
+| 6 — Relatório | Rodou a suíte final e a fumaça, consolidou os números e conferiu os critérios de saída. Também achou e corrigiu um erro de contagem da fase 1 |
+
+### O que se aprendeu na etapa
+
+- **Cada técnica responde a uma pergunta diferente.**
+  - **Cobertura:** "o código rodou?".
+  - **Revisão:** "alguém conferiu o resultado?".
+  - **Exploratório:** "e o que ninguém especificou?".
+  - **Mutação:** "os testes pegam um defeito?".
+
+  A suíte tinha 100% de cobertura e mesmo assim deixava passar 18 de 19 defeitos plantados e um defeito real do produto.
+- **A IA acelera, mas precisa de prova.** Em vários momentos, a afirmação da IA estava errada: o formato "0 mm/h", o mutante `7.5 → 8.5` que já era pego e a contagem de linhas parciais. Os defeitos plantados e as conferências automáticas foram o que separou o fato do palpite.
+- **Escopo reduzido com justificativa é uma decisão de engenharia.** Um exemplo bem escolhido por técnica foi suficiente para aprender e para achar um defeito real.
+
+### Verificações
+
+- Suíte comum verde: 852 testes passando (512 + 340), com ruff sem apontamentos.
+- Cobertura medida no fim: 100% no Python (linhas e ramos) e 100% das linhas no JavaScript.
+- A chave da API não aparece em nenhum arquivo do repositório nem na saída da fumaça.
+- README atualizado com os números finais e a versão `v0.1.1`.
+
+### Parecer final da etapa
+
+✅ **Sucesso.** Todos os critérios de saída foram atendidos, com as reduções de escopo registradas na DT-06. A etapa deixou uma suíte mais forte (31 pontos fracos corrigidos), um produto mais correto (DEF-01) e ferramentas reutilizáveis: o plugin de cobertura do JavaScript e o script de mutação. A única falha em aberto (DEF-02) é do provedor e está documentada, com uma evolução possível para o produto.
