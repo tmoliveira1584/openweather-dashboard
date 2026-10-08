@@ -933,3 +933,19 @@
 - **[T] Tom:** Objetivo
 - **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
 - **[R] Resposta:** Informe os hashes enviados e confirme a sincronização.
+
+## 2026-10-08 — Etapa: Documentação
+
+- **[C] Contexto:** Estou fechando a documentação do projeto e quero que o README contemple, no mínimo: o que o projeto resolve, como instalar e executar, como rodar testes, quais limites existem e como a IA foi usada no processo.
+- **[O] Objetivo:**
+  1. Revise o README com esses itens e complete o que faltar.
+  2. Na parte de IA, responda:
+     - onde a IA acelerou o desenvolvimento, em todo o ciclo do SDLC;
+     - onde a revisão humana foi decisiva: ao final de cada etapa, eu revisei a sua saída e os artefatos gerados;
+     - quais prompts foram usados, apontando para o registro;
+     - quais riscos foram mitigados, com um argumento que inclua a amplitude dos testes.
+  3. Proponha a mensagem de commit e aguarde minha validação antes de commitar.
+- **[S] Estilo:** Didático e resumido
+- **[T] Tom:** Objetivo
+- **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
+- **[R] Resposta:** Apresente uma tabela com a situação de cada item antes e depois e um resumo do que mudou no README.
