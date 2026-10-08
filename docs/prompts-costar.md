@@ -989,3 +989,12 @@
 - **[T] Tom:** Objetivo
 - **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
 - **[R] Resposta:** Informe o que mudou no README, o hash do commit e a tag criada.
+
+## 2026-10-08 — Etapa: Documentação
+
+- **[C] Contexto:** Concluí a etapa de Documentação, fiz o commit dela localmente e criei a tag `v1.0.0`.
+- **[O] Objetivo:** Envie os commits e a tag `v1.0.0` ao GitHub e confirme a sincronização entre local e remoto.
+- **[S] Estilo:** Técnico e organizado
+- **[T] Tom:** Objetivo
+- **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
+- **[R] Resposta:** Informe os hashes e a tag enviados e confirme a sincronização.
