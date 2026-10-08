@@ -958,3 +958,14 @@
 - **[T] Tom:** Objetivo
 - **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
 - **[R] Resposta:** Informe os hashes enviados e confirme a sincronização.
+
+## 2026-10-08 — Etapa: Documentação
+
+- **[C] Contexto:** Avaliei a reprodutibilidade do projeto numa máquina limpa e ainda não fiz esse teste. Quero que o README deixe claras as limitações dessa verificação.
+- **[O] Objetivo:**
+  1. Adicione ao README uma seção sobre as limitações dos testes de reprodutibilidade: o que o repositório garante, o que não foi verificado e como reduzir cada risco.
+  2. Proponha a mensagem de commit e aguarde minha validação antes de commitar.
+- **[S] Estilo:** Didático e resumido
+- **[T] Tom:** Objetivo
+- **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
+- **[R] Resposta:** Mostre onde a seção entrou e resuma o que ela diz.

@@ -215,7 +215,7 @@ Os testes de unidade, de API e de ponta a ponta não usam a internet nem a cota:
 | `python -m tests.mutation` | `app/domain/precipitation.py` | 34 de 35 mutantes detectados (97,1%); o sobrevivente é equivalente |
 | `ruff check .` e `ruff format --check .` | Ruff 0.16.10 | Sem apontamentos |
 
-Só o Google Chrome é testado. Edge, Firefox e Safari não foram verificados (limitação L-01).
+Só o Google Chrome é testado. Edge, Firefox e Safari não foram verificados (limitação L-01). O que a suíte garante, ou não, sobre rodar o projeto em outra máquina está em [Reprodutibilidade](#reprodutibilidade).
 
 A etapa de Testes, que mede e reforça essa suíte, segue o [plano de testes](docs/plano-testes.md). O resultado de cada fase fica no [relatório de testes](docs/relatorio-testes.md).
 
@@ -333,6 +333,20 @@ Usar IA para escrever código traz riscos próprios: inventar requisitos, gerar 
 - **Testado só no Google Chrome:** os testes automatizados rodam só no Chrome instalado. Edge, Firefox e Safari não são testados, nem em computador nem em celular (limitação L-01 de [docs/tasks.md](docs/tasks.md)).
 - **Escopo reduzido:** sem favoritos, histórico de buscas, detalhes dos alertas ou preferências lembradas entre visitas.
 - **Falha de uma só previsão derruba a consulta:** se uma das 5 chamadas da One Call esgota o tempo, todos os blocos mostram o erro, como manda o spec (RN-012). Em 2026-10-08, o endpoint da previsão diária do provedor parou de responder, e a consulta inteira falhou (DEF-02 do [plano de testes](docs/plano-testes.md)). Uma evolução possível é mostrar os outros blocos e só a previsão diária como indisponível.
+
+### Reprodutibilidade
+
+**O que o repositório garante:** o Python 3.13.5 e todas as dependências, diretas e indiretas, têm versão exata em [environment.yml](environment.yml), [requirements.txt](requirements.txt) e [requirements-dev.txt](requirements-dev.txt). O Leaflet está versionado no projeto, com SHA-256 conferido. Os testes não usam a internet, a cota nem a chave real. A única coisa que a pessoa traz é a própria API key.
+
+**O que não foi verificado:**
+
+| Limitação | Risco | Como reduzir |
+|---|---|---|
+| Sem teste em máquina limpa | Um passo ou um arquivo faltando no README só aparece em outra máquina | Clonar o repositório num ambiente novo e seguir o README ao pé da letra |
+| Só no Windows 11 | Comandos e caminhos podem mudar no Linux e no macOS (ex.: `copy` × `cp`) | Rodar a suíte em Linux, por exemplo numa CI |
+| Versão do Chrome não fixada | Os testes de ponta a ponta usam o Chrome instalado, verificado só na versão 154 | Registrar a versão usada ou fixar um navegador do Playwright |
+| Fuso da máquina não variado | O código usa o fuso da cidade (P-015), mas a suíte nunca rodou numa máquina com outro fuso | Rodar os testes de ponta a ponta com o navegador em outro fuso (`timezone_id` do Playwright) |
+| Sem conda, só "Python 3.13" | Outra versão de correção do Python pode se comportar diferente | Usar exatamente o Python 3.13.5 |
 
 ### Próximos passos no MVP
 
