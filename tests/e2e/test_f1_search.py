@@ -243,6 +243,7 @@ def test_rf_007_single_city_is_selected_without_list(page: Page, weather_api, ge
     expect(search_box(page)).to_have_value("")
     expect(page.get_by_role("listbox")).to_be_hidden()
     assert "open" not in page.evaluate("window.searchStatuses")
+    expect(page.locator(".current")).to_have_attribute("data-block-state", "ready")
     assert "lat=35.68&lon=139.76" in weather_api.urls[-1]
 
 
@@ -501,6 +502,7 @@ def test_ca_007_choosing_curitiba_again_after_5_minutes_uses_the_cache(
     expect(page.locator(".city-name")).to_have_text("Curitiba, BR")
     run_search(page, "Tóquio")  # cidade única: selecionada direto (RF-007)
     expect(page.locator(".city-name")).to_have_text("Tóquio, JP")
+    expect(page.locator(".current")).to_have_attribute("data-block-state", "ready")
     assert len(weather_api.urls) == 3
 
     page.clock.run_for(5 * 60_000)
@@ -510,6 +512,7 @@ def test_ca_007_choosing_curitiba_again_after_5_minutes_uses_the_cache(
     expect(page.locator(".city-name")).to_have_text("Curitiba, BR")
     expect(page.locator(".current")).to_have_attribute("data-block-state", "ready")
     assert set(page.evaluate("window.weatherStatuses")) == {"ready"}
+    page.wait_for_timeout(300)  # uma consulta em segundo plano já teria chegado à rota
     assert len(weather_api.urls) == 3
 
 
@@ -530,6 +533,7 @@ def test_rnf_003_one_weather_query_per_city_and_one_geocoding_per_search(
     expect(page.locator(".city-name")).to_have_text("Curitiba, BR")
     expect(page.locator(".current")).to_have_attribute("data-block-state", "ready")
 
+    page.wait_for_timeout(300)  # uma consulta em segundo plano já teria chegado à rota
     assert geo_api.terms == ["Santa Maria", "Curitiba", "Santa Maria", "Curitiba"]
     assert len(weather_api.urls) == 3
 

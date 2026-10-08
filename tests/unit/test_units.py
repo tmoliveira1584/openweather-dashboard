@@ -26,17 +26,6 @@ def test_rn_055_converts_from_original_value():
     assert format_temp(20.4, "f") == "69°"
 
 
-def test_rn_055_alternating_scale_has_no_accumulated_error():
-    """RN-055, P-014, CA-042 e caso de borda (7): 10 alternâncias e a volta a °C mostram "20°"."""
-    scale = "c"
-    for _ in range(10):
-        scale = "f" if scale == "c" else "c"
-        assert format_temp(20.4, scale) == {"c": "20°", "f": "69°"}[scale]
-
-    assert scale == "c"
-    assert format_temp(20.4, scale) == "20°"
-
-
 @pytest.mark.parametrize(
     ("celsius", "expected"), [(-40, "-40°"), (-17.8, "0°"), (-17.7, "0°"), (-18.1, "-1°")]
 )

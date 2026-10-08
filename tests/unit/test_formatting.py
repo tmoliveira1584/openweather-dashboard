@@ -31,12 +31,12 @@ def test_rn_025_decimal_comma_without_thousands_separator(value, decimals, expec
 
 
 @pytest.mark.parametrize(
-    ("value", "decimals"),
-    [(-0.3, 0), (-0.04, 0), (-0.0, 0), (-0.004, 2), (-0.04, 1)],
+    ("value", "decimals", "expected"),
+    [(-0.3, 0, "0"), (-0.04, 0, "0"), (-0.0, 0, "0"), (-0.004, 2, "0,00"), (-0.04, 1, "0,0")],
 )
-def test_rn_025_value_rounding_to_zero_never_shows_minus_zero(value, decimals):
-    """RN-025: um valor que arredonda para zero nunca aparece como "-0"."""
-    assert not format_number(value, decimals).startswith("-")
+def test_rn_025_value_rounding_to_zero_never_shows_minus_zero(value, decimals, expected):
+    """RN-025: um valor que arredonda para zero nunca aparece como "-0" e mantém as casas."""
+    assert format_number(value, decimals) == expected
 
 
 @pytest.mark.parametrize(

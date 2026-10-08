@@ -19,6 +19,15 @@ TILE = "/api/tiles/precipitation/6/23/35.png"
 INVALID = {"error": "invalid_request"}
 
 
+def forwarded_coords(fake_provider) -> set[tuple[str, str]]:
+    """Coordenadas que a rota repassou ao provedor (os detalhes de alerta não as levam)."""
+    return {
+        (r.url.params["lat"], r.url.params["lon"])
+        for r in fake_provider.requests
+        if fake_provider.endpoint(r) != "alert"
+    }
+
+
 @pytest.fixture
 def api(make_mock_app, fake_provider):
     with TestClient(make_mock_app(fake_provider)) as client:
@@ -42,6 +51,7 @@ def test_rn_059_weather_returns_view_model(api, fake_provider, load_json):
     assert view["timezone_offset"] == -10800
     assert view["current"]["alerts_label"] == "3 alertas"
     assert len(view["daily"]) == 10 and len(view["hourly"]) == 40 and len(view["minutely"]) == 60
+    assert forwarded_coords(fake_provider) == {("-18.92", "-48.28")}
 
 
 def test_rn_059_weather_matches_view_model_of_the_bundle(make_mock_app, fake_provider):
@@ -62,9 +72,13 @@ def test_rn_059_weather_matches_view_model_of_the_bundle(make_mock_app, fake_pro
 
 
 @pytest.mark.parametrize("coords", ["lat=90&lon=180", "lat=-90&lon=-180", "lat=0&lon=0"])
-def test_rn_059_weather_accepts_coordinate_limits(api, coords):
+def test_rn_059_weather_accepts_coordinate_limits(api, fake_provider, coords):
     """Seção 6.1: latitude em [-90, 90] e longitude em [-180, 180], com os limites."""
     assert api.get(f"/api/weather?{coords}").status_code == 200
+    lat, lon = (pair.split("=")[1] for pair in coords.split("&"))
+    assert {(float(a), float(b)) for a, b in forwarded_coords(fake_provider)} == {
+        (float(lat), float(lon))
+    }
 
 
 @pytest.mark.parametrize(
@@ -155,9 +169,11 @@ def test_rn_004_search_ignores_items_that_are_not_cities(api, fake_provider):
 # --- /api/geo/reverse ----------------------------------------------------------------------
 
 
-def test_rn_009_reverse_returns_city(api):
+def test_rn_009_reverse_returns_city(api, fake_provider):
     """RN-009: a geocodificação reversa devolve a cidade com os rótulos."""
     response = api.get(REVERSE)
+
+    assert forwarded_coords(fake_provider) == {("-18.92", "-48.28")}
 
     assert response.status_code == 200
     assert_no_store(response)
@@ -175,9 +191,12 @@ def test_rn_009_reverse_without_city_returns_null(api, fake_provider):
 
 
 @pytest.mark.parametrize("zxy", ["6/23/35", "0/0/0", "18/262143/262143"])
-def test_adr_006_tile_is_passed_through_as_png(api, zxy):
-    """Seção 6.1: a tile de chuva é repassada como PNG."""
+def test_adr_006_tile_is_passed_through_as_png(api, fake_provider, zxy):
+    """Seção 6.1: a tile de chuva é repassada como PNG, com z/x/y na ordem pedida."""
     response = api.get(f"/api/tiles/precipitation/{zxy}.png")
+
+    [request] = fake_provider.requests
+    assert request.url.path == f"/map/precipitation_new/{zxy}.png"
 
     assert response.status_code == 200
     assert response.headers["content-type"] == "image/png"

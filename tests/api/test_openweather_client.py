@@ -247,7 +247,7 @@ def test_rn_012_weather_errors_follow_section_6_4(fake_provider, endpoint, failu
         ({"current": 500, "1min": 429, "1day": httpx.ReadTimeout("x")}, "provider_rate_limited"),
         ({"current": httpx.ConnectError("x"), "1day": httpx.ReadTimeout("x")}, "provider_timeout"),
         ({"current": 500, "1h_p1": httpx.ConnectError("x")}, "network_unavailable"),
-        ({"current": 404, "1min": 503}, "provider_unavailable"),
+        ({"current": 404, "1min": httpx.ConnectError("x")}, "network_unavailable"),
     ],
 )
 def test_rn_012_most_actionable_error_wins(fake_provider, failures, code):

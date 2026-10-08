@@ -239,3 +239,22 @@ def test_p_009_search_works_while_location_is_pending_and_chosen_city_prevails(
     expect(notice(page)).to_be_hidden()
     assert geo_api.reverse_coords == []
     assert [SEARCHED_TOKYO_QUERY in url for url in weather_api.urls] == [True]
+
+
+def test_p_009_deadline_after_a_search_does_not_bring_the_default_city(
+    page: Page, weather_api, geo_api
+):
+    """P-009, RN-001: com a localização sem resposta, o usuário busca uma cidade. Quando o
+    prazo de 10 s vence, a cidade escolhida continua: a cidade padrão não entra e o aviso de
+    localização não aparece."""
+    FakeGeolocation(page)  # nunca responde
+    open_paused(page)
+
+    search_and_choose(page, "Tóquio")
+    expect(page.locator(".current")).to_have_attribute("data-block-state", "ready")
+    page.clock.run_for(10_000)
+    page.wait_for_timeout(300)
+
+    expect(city_name(page)).to_have_text("Tóquio, JP")
+    expect(notice(page)).to_be_hidden()
+    assert [SEARCHED_TOKYO_QUERY in url for url in weather_api.urls] == [True]

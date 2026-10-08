@@ -8,7 +8,6 @@ centrado na cidade, o marcador fica no centro do mapa.
 
 import math
 import re
-import time
 
 import pytest
 from playwright.sync_api import Page, expect
@@ -69,6 +68,22 @@ def wait_zoom(page: Page, zoom: int) -> None:
             return
         page.wait_for_timeout(30)
     raise AssertionError(f"esperava o zoom {zoom}, ficou {map_zoom(page)}")
+
+
+def wait_map_still(page: Page, moved_from: tuple[float, float] | None = None):
+    """Espera o mapa parar: sem animação e com o marcador no mesmo lugar por 3 leituras.
+    Com `moved_from`, espera antes o marcador sair dessa posição. Devolve a posição final."""
+    last, steady = None, 0
+    for _ in range(150):
+        animating = page.locator("#map .leaflet-zoom-anim, #map .leaflet-pan-anim").count()
+        offset = marker_offset(page)
+        moved = moved_from is None or offset != pytest.approx(moved_from, abs=0.5)
+        steady = steady + 1 if moved and not animating and offset == last else 0
+        last = offset
+        if steady == 3:
+            return offset
+        page.wait_for_timeout(30)
+    raise AssertionError(f"o mapa não parou: marcador em {last}")
 
 
 def marker_offset(page: Page) -> tuple[float, float]:
@@ -344,14 +359,14 @@ def test_ca_037_dragging_and_zooming_neither_queries_weather_nor_changes_city(
     )
 
 
-def test_rn_051_scale_and_weather_do_not_move_the_map(page: Page, tiles):
+def test_rn_051_scale_change_does_not_move_the_map(page: Page, tiles):
     """RN-051, P-011: trocar a escala não mexe no mapa arrastado nem no zoom."""
     open_map(page)
     drag_map(page, -200, 60)
     before = marker_offset(page)
 
     page.get_by_role("button", name="°F").click()
-    expect(page.locator(".current-temp")).to_have_text(re.compile("°"))
+    expect(page.locator(".current-temp")).to_have_text("69°")
     page.wait_for_timeout(200)
 
     assert marker_offset(page) == pytest.approx(before, abs=0.5)
@@ -373,7 +388,9 @@ def test_ca_035_rain_layer_failure_keeps_base_map_and_marker(page: Page, tiles):
     expect(banner).to_have_attribute("role", "status")
     expect(marker(page)).to_be_visible()
     expect(marker_label(page)).to_have_text("Uberlândia")
-    assert page.locator("#map .leaflet-layer").first.locator("img.leaflet-tile-loaded").count() > 0
+    expect(
+        page.locator("#map .leaflet-layer").first.locator("img.leaflet-tile-loaded")
+    ).not_to_have_count(0)
     expect(page.locator("#map .map-unavailable")).to_be_hidden()
     expect(page.locator("#map .map-attribution")).to_be_visible()
 
@@ -497,10 +514,10 @@ def test_rf_049_keyboard_moves_and_zooms_the_map(page: Page, tiles):
     expect(the_map(page)).to_have_attribute("tabindex", "0")
 
     the_map(page).focus()
+    start = marker_offset(page)
     page.keyboard.press("ArrowRight")
-    page.wait_for_timeout(400)
-    dx, dy = marker_offset(page)
-    assert dx < -40 and abs(dy) <= 1.5
+    dx, dy = wait_map_still(page, moved_from=start)
+    assert dx == pytest.approx(-80, abs=2) and abs(dy) <= 1.5  # passo do teclado: 80 px
 
     page.keyboard.press("Equal")
     wait_zoom(page, 7)
@@ -535,6 +552,15 @@ def test_rn_052_one_finger_scrolls_page_and_shows_hint(page: Page, tiles):
     box = the_map(page).bounding_box()
     x, y = box["x"] + box["width"] * 0.6, box["y"] + box["height"] * 0.7
     cdp = page.context.new_cdp_session(page)
+    # Registra, no tempo da página, quando a dica aparece e quando some.
+    page.evaluate(
+        """() => {
+            const hint = document.querySelector('#map .map-hint');
+            window.hintTimes = [];
+            new MutationObserver(() => window.hintTimes.push([hint.hidden, performance.now()]))
+                .observe(hint, { attributes: true, attributeFilter: ['hidden'] });
+        }"""
+    )
 
     touch(cdp, "touchStart", [(x, y)])
     for step in range(1, 11):
@@ -543,13 +569,15 @@ def test_rn_052_one_finger_scrolls_page_and_shows_hint(page: Page, tiles):
     hint = page.locator("#map .map-hint")
     expect(hint).to_have_text("Use dois dedos para mover o mapa.")
     expect(hint).to_be_visible()
-    shown = time.monotonic()
 
     page.wait_for_timeout(300)
     assert page.evaluate("() => scrollY") > before_scroll, "a página não rolou"
     assert marker_offset(page) == pytest.approx(before, abs=1), "um dedo moveu o mapa"
     expect(hint).to_be_hidden(timeout=3000)
-    assert time.monotonic() - shown >= 1.0
+    times = page.evaluate("window.hintTimes")
+    assert [hidden for hidden, _ in times] == [False, True]
+    # 1,5 s depois do último movimento; os movimentos do toque duram poucos ms.
+    assert 1_450 <= times[1][1] - times[0][1] <= 1_800
 
 
 @pytest.mark.browser_context_args(has_touch=True, is_mobile=True)
@@ -557,9 +585,9 @@ def test_rn_052_two_fingers_move_the_map(page: Page, tiles):
     """RN-052, RF-049: numa tela de toque, dois dedos movem o mapa, sem a dica."""
     open_map(page, 390, 700)
     the_map(page).scroll_into_view_if_needed()
-    page.wait_for_timeout(300)
     box = the_map(page).bounding_box()
     x, y = box["x"] + box["width"] / 2, box["y"] + box["height"] / 2
+    start = marker_offset(page)
     cdp = page.context.new_cdp_session(page)
 
     touch(cdp, "touchStart", [(x - 40, y)])
@@ -568,9 +596,8 @@ def test_rn_052_two_fingers_move_the_map(page: Page, tiles):
         dx, dy = -8 * step, 4 * step
         touch(cdp, "touchMove", [(x - 40 + dx, y + dy), (x + 40 + dx, y + dy)])
     touch(cdp, "touchEnd", [])
-    page.wait_for_timeout(500)
 
-    dx, dy = marker_offset(page)
+    dx, dy = wait_map_still(page, moved_from=start)
     assert dx == pytest.approx(-80, abs=8) and dy == pytest.approx(40, abs=8)
     expect(page.locator("#map .map-hint")).to_be_hidden()
 

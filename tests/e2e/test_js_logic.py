@@ -94,10 +94,17 @@ def test_p_022_block_state_texts_come_from_the_spec(logic_page: Page):
 
 def test_p_022_messages_catalog_is_frozen(logic_page: Page):
     """Guardrail 10: o catálogo é a única fonte dos textos fixos e não pode ser alterado."""
-    assert evaluate(
-        logic_page,
-        "messages.js",
-        "return Object.isFrozen(m.MESSAGES) && Object.isFrozen(m.MESSAGES.errors);",
+    assert (
+        evaluate(
+            logic_page,
+            "messages.js",
+            """
+        const frozen = (o) => Object.isFrozen(o)
+            && Object.values(o).every((v) => !v || typeof v !== 'object' || frozen(v));
+        return frozen(m.MESSAGES);
+        """,
+        )
+        is True
     )
 
 
@@ -375,6 +382,15 @@ def test_network_unavailable_when_browser_is_offline(logic_page: Page):
     assert result == {"ok": False, "error": "network_unavailable"}
 
 
+def wait_for_held(page: Page, held: list, count: int) -> None:
+    """Espera até `count` pedidos retidos (o `fetch` chega à rota depois do `evaluate`)."""
+    for _ in range(250):
+        if len(held) >= count:
+            return
+        page.wait_for_timeout(20)
+    raise AssertionError(f"esperava {count} pedidos retidos, chegaram {len(held)}")
+
+
 def test_rf_015_identical_requests_in_progress_share_one_fetch(logic_page: Page):
     """RF-015, seção 7.4: pedidos idênticos em andamento recebem a mesma promessa; depois
     que ela termina, um pedido novo vai ao backend."""
@@ -390,8 +406,7 @@ def test_rf_015_identical_requests_in_progress_share_one_fetch(logic_page: Page)
         window.same = window.first === window.second;
         """,
     )
-    logic_page.wait_for_timeout(200)
-    assert len(held) == 1
+    wait_for_held(logic_page, held, 1)
     held[0].fulfill(json={"ok": 1})
     assert logic_page.evaluate("async () => [window.same, await window.second]") == [
         True,
@@ -399,7 +414,7 @@ def test_rf_015_identical_requests_in_progress_share_one_fetch(logic_page: Page)
     ]
 
     evaluate(logic_page, "services/api.js", "window.third = m.fetchWeather(-18.92, -48.28);")
-    logic_page.wait_for_timeout(200)
+    wait_for_held(logic_page, held, 2)
     assert len(held) == 2
     held[1].fulfill(json={"ok": 2})
 
@@ -412,8 +427,7 @@ def test_rn_012_request_guard_gives_up_after_17s_as_timeout(page: Page):
     page.route(API_URL, lambda route: held.append(route))
 
     evaluate(page, "services/api.js", "window.result = m.fetchWeather(-18.92, -48.28);")
-    page.wait_for_timeout(200)
-    assert len(held) == 1
+    wait_for_held(page, held, 1)
     page.clock.run_for(16_999)
     assert page.evaluate("Promise.race([window.result, 'pendente'])") == "pendente"
     page.clock.run_for(1)
@@ -481,8 +495,11 @@ def test_rf_004_selected_city_gets_one_weather_query(logic_page: Page, weather_a
     """RF-004, RF-005, RF-031: a cidade escolhida entra no estado com status `loading`, aba
     "Hoje" e uma única consulta; a resposta vira `weather` com status `ready`."""
     watch(logic_page)
+    logic_page.evaluate("() => window.state.setState({ selectedDay: '2026-10-08' })")
+    before = logic_page.evaluate("Date.now()")
     select(logic_page, UBERLANDIA)
     state = settle(logic_page)
+    after = logic_page.evaluate("Date.now()")
 
     assert state["statuses"] == ["loading", "ready"]
     assert state["city"] == UBERLANDIA
@@ -490,7 +507,7 @@ def test_rf_004_selected_city_gets_one_weather_query(logic_page: Page, weather_a
     assert state["selectedDay"] is None
     assert state["weather"] == weather_api.views["uberlandia"]
     assert state["weatherError"] is None
-    assert isinstance(state["fetchedAt"], int | float)
+    assert before <= state["fetchedAt"] <= after  # milissegundos, no recebimento
     assert len(weather_api.urls) == 1
 
 
@@ -511,6 +528,7 @@ def test_rn_010_city_in_cache_shows_at_once_without_query(logic_page: Page, weat
     assert state["weatherStatus"] == "ready"
     assert state["city"] == nearby
     assert state["selectionId"] == 2
+    assert state["weather"] == weather_api.views["uberlandia"]
     assert state["fetchedAt"] == first["fetchedAt"]
 
 
@@ -1262,6 +1280,10 @@ def test_rnf_016_alt_text_with_fewer_hours_ties_and_missing_values(logic_page: P
     assert alt_text(logic_page, window) == (
         "Nas próximas 4 horas, mínima de 20° às 10:00 e máxima de 25° às 12:00"
     )
+    tie_on_max = [hour("10:00", 25), hour("11:00", 20), hour("12:00", 25)]
+    assert alt_text(logic_page, tie_on_max) == (
+        "Nas próximas 3 horas, mínima de 20° às 11:00 e máxima de 25° às 10:00"
+    )
     assert alt_text(logic_page, [hour("10:00", None)]) is None
     assert alt_text(logic_page, []) is None
 
@@ -1274,6 +1296,10 @@ def test_rnf_016_alt_text_for_steady_temperature(logic_page: Page):
     )
     assert alt_text(logic_page, [hour("23:00", 22)]) == (
         "Na próxima hora, temperatura estável em 22°"
+    )
+    # D-23: valores brutos diferentes que aparecem iguais (22°) também são estáveis.
+    assert alt_text(logic_page, [hour("10:00", 21.6), hour("11:00", 22.4)]) == (
+        "Nas próximas 2 horas, temperatura estável em 22°"
     )
 
 

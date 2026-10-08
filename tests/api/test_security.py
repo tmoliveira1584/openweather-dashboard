@@ -93,10 +93,19 @@ def test_rnf_005_responses_set_no_cookie_and_are_not_stored(
         assert response.headers["cache-control"] == "no-store"
 
 
-def test_p_001_http_libraries_do_not_log_urls_even_in_debug(make_mock_app, fake_provider, caplog):
-    """P-001: httpx e httpcore ficam em WARNING; em INFO, registrariam a URL com a chave."""
+def test_p_001_http_libraries_do_not_log_urls_even_in_debug(
+    make_mock_app, fake_provider, caplog, monkeypatch
+):
+    """P-001: httpx e httpcore ficam em WARNING; em INFO, registrariam a URL com a chave.
+
+    Os níveis voltam ao padrão antes do teste: quem os ajusta tem de ser o `create_app`, e não
+    um teste que rodou antes."""
+    for name in ("httpx", "httpcore"):
+        monkeypatch.setattr(logging.getLogger(name), "level", logging.NOTSET)
+
     call_every_route(make_mock_app, fake_provider, caplog)
 
+    assert logging.getLogger("httpx").level == logging.WARNING
     assert not [r for r in caplog.records if r.name.startswith(("httpx", "httpcore"))]
 
 
@@ -114,7 +123,10 @@ def test_guardrail_13_pagination_links_never_reach_response_nor_log(
         assert "data/4.0/onecall" not in text
         assert '"next"' not in text and '"prev"' not in text
         assert FAKE_KEY not in text
-    assert all("next" not in r.url.params for r in fake_provider.requests)
+    # Nenhum link seguido: só as 5 chamadas da One Call e os 3 detalhes de alerta.
+    weather_calls = [r for r in fake_provider.requests if "onecall" in r.url.path]
+    assert len(weather_calls) == 8
+    assert all("lat" in r.url.params or "/alert/" in r.url.path for r in weather_calls)
 
 
 def test_p_001_provider_error_log_has_only_endpoint_code_and_status(

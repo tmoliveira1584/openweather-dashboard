@@ -137,6 +137,17 @@ def test_rnf_009_text_over_each_illustration_has_contrast_4_5(page: Page, weathe
     """RNF-009: com a camada escura sobre a ilustração, o texto branco tem contraste de pelo
     menos 4,5:1 com todos os pixels do card, em qualquer grupo."""
     open_with(page, weather_api, current_view(code=GROUP_CODES[group]))
+    # A medida só vale com a ilustração pintada, e não com a cor de reserva do fundo.
+    src = f"/img/conditions/{group}.svg"
+    page.evaluate(
+        """async (src) => {
+            const image = new Image();
+            image.src = src;
+            await image.decode();
+            await new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done)));
+        }""",
+        src,
+    )
 
     color = page.locator(".current-temp").evaluate("(n) => getComputedStyle(n).color")
     assert color == "rgb(255, 255, 255)"

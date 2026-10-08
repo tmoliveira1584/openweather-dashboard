@@ -98,14 +98,14 @@ def test_rn_016_view_matches_architecture_example(load_json):
     assert view == expected
 
 
-@pytest.mark.parametrize("city", ["uberlandia", "tokyo"])
-def test_p_013_real_captures_build_complete_view(request, city):
+@pytest.mark.parametrize(("city", "time"), [("uberlandia", "16:41"), ("tokyo", "04:41")])
+def test_p_013_real_captures_build_complete_view(request, city, time):
     """As capturas reais geram os 4 blocos, com todos os dias, horas e minutos recebidos."""
     raw = request.getfixturevalue(city)
 
     view = build(raw)
 
-    assert view["current"]["time_label"] != MISSING
+    assert view["current"]["time_label"] == time
     assert len(view["daily"]) == len(raw["daily"]) == 10
     assert len(view["hourly"]) == 40
     assert len(view["minutely"]) == 60
@@ -315,9 +315,24 @@ def test_rn_041_minutes_get_band_and_tooltip(load_json):
         None,
         None,
     ]
-    assert [m["intensity"] for m in minutes[-3:]] == [12, None, None]
-    assert minutes[1]["tooltip"] == f"{minutes[1]['time_label']} — 0,30 mm/h"
-    assert minutes[-1]["tooltip"] == f"{minutes[-1]['time_label']} — —"
+    # 0 mm/h continua 0, e não "sem dado" (RN-047); -1 é dado inválido.
+    assert [m["intensity"] for m in minutes] == [
+        0,
+        0.3,
+        0.5,
+        1.0,
+        2.5,
+        5.0,
+        7.5,
+        8.0,
+        12,
+        None,
+        None,
+    ]
+    # Horários esperados calculados à mão: dt da variante em UTC-3.
+    assert minutes[0]["tooltip"] == "16:42 — 0,00 mm/h"
+    assert minutes[1]["tooltip"] == "16:43 — 0,30 mm/h"
+    assert minutes[-1]["tooltip"] == "16:52 — —"
 
 
 # --- Blocos ausentes -----------------------------------------------------------------------

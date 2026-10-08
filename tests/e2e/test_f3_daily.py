@@ -322,34 +322,15 @@ def test_ca_020_choosing_another_city_selects_today(page: Page, weather_api, geo
     assert state is None
 
 
-UPDATE_WEATHER_JS = """async () => {
-    const { getState, setState } = await import('/js/state.js');
-    setState({ weather: structuredClone(getState().weather) });
-}"""
-
-
-def test_rf_031_updated_data_keeps_the_selected_day(page: Page, weather_api):
-    """RF-031, seção 7.4 (feature 3, categoria 8): dados atualizados da mesma cidade mantêm
-    o dia selecionado, se ele ainda existir."""
-    open_with(page, weather_api)
-    tab(page, "Qui").click()
-
-    page.evaluate(UPDATE_WEATHER_JS)
-
-    expect_selected(page, "Qui")
-    expect(page.locator(".current-time")).to_have_text("Qui, 08/10")
-
-
 def test_rn_026_selected_day_gone_by_midnight_returns_to_today(page: Page, weather_api):
     """RN-026, seção 7.4 (feature 3, categoria 8): com "Ter" selecionada, os dados em cache
-    atravessam duas meias-noites da cidade. Na atualização seguinte, terça virou passado:
-    "Hoje" passa a ser a quarta e a seleção volta para ela. Dos 10 dias da captura, ainda
-    sobram 8, de quarta a quarta."""
+    atravessam duas meias-noites da cidade. No tique seguinte do relógio, terça virou
+    passado: "Hoje" passa a ser a quarta e a seleção volta para ela. Dos 10 dias da captura,
+    ainda sobram 8, de quarta a quarta."""
     open_with(page, weather_api)
     tab(page, "Ter").click()
 
     page.clock.fast_forward("48:00:00")
-    page.evaluate(UPDATE_WEATHER_JS)
 
     expect(page.locator(".day-tab-label")).to_have_text(
         ["Hoje", "Qui", "Sex", "Sáb", "Dom", "Seg", "Ter", "Qua"]

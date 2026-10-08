@@ -51,14 +51,15 @@ def test_rn_035_hour_label(offset, expected):
     assert hour_label(CAPTURE_DT - 41 * 60 - 3, offset) == expected
 
 
-def test_rn_035_midnight_of_new_day_has_weekday(load_json):
-    """RN-035: a primeira hora do novo dia em Uberlândia é "00:00" de terça."""
-    hourly = load_json("onecall4/uberlandia/1h_p1.json")
-    midnight = next(
-        h["dt"] for h in hourly["data"] if hour_label(h["dt"], hourly["timezone_offset"]) == "00:00"
-    )
+def test_rn_035_midnight_of_new_day_has_weekday():
+    """RN-035: a primeira hora do novo dia em Uberlândia é "00:00" de terça; uma hora antes,
+    ainda é segunda no fuso da cidade, embora já seja terça em UTC."""
+    midnight = 1791255600  # 2026-10-06 03:00 UTC
 
-    assert weekday_label(midnight, hourly["timezone_offset"]) == "Ter"
+    assert hour_label(midnight, UBERLANDIA) == "00:00"
+    assert weekday_label(midnight, UBERLANDIA) == "Ter"
+    assert hour_label(midnight - 3600, UBERLANDIA) == "23:00"
+    assert weekday_label(midnight - 3600, UBERLANDIA) == "Seg"
 
 
 @pytest.mark.parametrize(

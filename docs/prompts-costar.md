@@ -794,3 +794,23 @@
 - **[T] Tom:** Objetivo
 - **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
 - **[R] Resposta:** Informe os hashes enviados e confirme a sincronização.
+
+## 2026-10-07 — Etapa: Testes
+
+- **[C] Contexto:** Concluí a fase 1 do plano de testes e estou seguindo com a etapa de Testes. O plano traz o passo a passo: onde paramos, as fases da etapa e como registrar cada entrega.
+- **[O] Objetivo:**
+  1. Leia os documentos do projeto, identifique de onde paramos e entenda o que precisa ser feito na próxima fase.
+  2. Execute a fase inteira, sem parar para pedir confirmação a cada tarefa. Só me pergunte se surgir alguma dúvida.
+- **[S] Estilo:** Didático e resumido
+- **[T] Tom:** Objetivo
+- **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
+- **[R] Resposta:** Apresente o resumo da fase de maneira simples e didática, com um parecer sobre o sucesso ou não da fase.
+
+## 2026-10-07 — Etapa: Testes
+
+- **[C] Contexto:** Concluí a fase 2 do plano de testes e registrei o resultado dela no relatório de testes.
+- **[O] Objetivo:** Faça o commit da fase 2 com a mensagem `test(testes): revisar os testes com a IA e corrigir os achados da fase 2`.
+- **[S] Estilo:** Técnico e organizado
+- **[T] Tom:** Objetivo
+- **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
+- **[R] Resposta:** Informe o hash do commit e os arquivos incluídos.

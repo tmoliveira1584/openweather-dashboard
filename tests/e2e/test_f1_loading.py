@@ -113,8 +113,11 @@ def test_rn_012_no_answer_in_17s_shows_slow_service_message(page: Page, weather_
     lentidão, com a mensagem do spec e "Tentar novamente"."""
     weather_api.hold = True
     open_paused(page)
+    expect_all(page, "loading")  # a trava começa com a consulta, não com a página
 
-    page.clock.run_for(17_000)
+    page.clock.run_for(16_999)
+    expect(page.get_by_text("O serviço de clima demorou para responder.")).to_have_count(0)
+    page.clock.run_for(1)
 
     expect_all(page, "error")
     expect(page.get_by_text("O serviço de clima demorou para responder.")).to_have_count(
@@ -185,6 +188,7 @@ def test_rn_010_city_in_cache_appears_without_query_or_loading(page: Page, weath
 
     assert select_city(page, UBERLANDIA) == "ready"
     assert block_states(page) == dict.fromkeys(BLOCKS, "ready")
+    page.wait_for_timeout(300)  # uma consulta em segundo plano já teria chegado à rota
     assert len(weather_api.urls) == 1
 
 

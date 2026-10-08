@@ -12,10 +12,10 @@ Plano da etapa de Testes do SDLC, que começa depois da implementação e da ver
 
 | Item | Valor |
 |---|---|
-| Fase atual | 1 — Cobertura de código (concluída) · próxima: 2 — Revisão dos testes pela IA |
-| Próxima tarefa | TS-2.1 |
+| Fase atual | 2 — Revisão dos testes pela IA (concluída) · próxima: 3 — Testes exploratórios automatizados |
+| Próxima tarefa | TS-3.1 |
 | Concluídas, ainda sem commit | — |
-| Último commit da etapa | Fase 1: `test(testes): medir a cobertura e fechar as lacunas da fase 1` |
+| Último commit da etapa | Fase 2: `test(testes): revisar os testes com a IA e corrigir os achados da fase 2` |
 | Defeitos registrados | 0 |
 
 ## 1. Objetivo
@@ -90,11 +90,13 @@ Cada fase tem objetivo, uso dos testes existentes, tarefas, entregável e crité
 - **Objetivo:** encontrar testes frágeis, asserções fracas e testes que passariam mesmo com o código errado.
 - **Uso dos testes existentes:** os testes atuais são o alvo da revisão.
 - **Tarefas:**
-  - [ ] **TS-2.1** Revisar `tests/` com o `/code-review`, por nível (unidade, API, lógica JS e ponta a ponta).
-  - [ ] **TS-2.2** Conferir cada achado e descartar os falsos positivos com o motivo.
-  - [ ] **TS-2.3** Corrigir os achados confirmados: esperas por tempo fixo, asserções genéricas, dependência de ordem e duplicações.
+  - [x] **TS-2.1** Revisar `tests/` com o `/code-review`, por nível (unidade, API, lógica JS e ponta a ponta). → O `/code-review` cobre só o diff. A suíte inteira foi revisada por 5 agentes em paralelo (DT-05).
+  - [x] **TS-2.2** Conferir cada achado e descartar os falsos positivos com o motivo. → 31 achados, todos confirmados no código. Os candidatos que os próprios revisores descartaram ficaram registrados com o motivo.
+  - [x] **TS-2.3** Corrigir os achados confirmados: esperas por tempo fixo, asserções genéricas, dependência de ordem e duplicações. → 31 corrigidos. 19 mutantes manuais provam as correções.
 - **Entregável:** lista de achados com a decisão de cada um, e as correções.
 - **Conclusão:** nenhum achado confirmado em aberto, e a suíte verde.
+
+- **Resultado:** [relatorio-testes.md](relatorio-testes.md#fase-2--revisão-dos-testes-pela-ia-2026-10-07).
 
 ### Fase 3 — Testes exploratórios automatizados
 
@@ -151,3 +153,4 @@ Cada fase tem objetivo, uso dos testes existentes, tarefas, entregável e crité
 | DT-02 | 2026-10-07 | Um commit por fase, no fim dela, com o tipo `test` ou `docs` e o escopo `testes`. Os prompts da etapa são registrados no [prompts-costar.md](prompts-costar.md) com a etapa "Testes" |
 | DT-03 | 2026-10-07 | Cobertura do Python com `coverage==7.16.2`, só para desenvolvimento ([ADR-014](arquitetura.md#adr-014--cobertura-do-python-com-coveragepy)). Cobertura do JavaScript pelo V8 do Chrome via CDP, sem dependência nova, com as linhas parciais como medida complementar de ramos. As metas da seção 4 foram mantidas |
 | DT-04 | 2026-10-07 | O resultado de cada fase é registrado no [relatorio-testes.md](relatorio-testes.md), numa seção didática por fase, criada no fim da fase e incluída no commit dela. A fase 6 consolida esse documento em vez de escrevê-lo do zero |
+| DT-05 | 2026-10-07 | O `/code-review` revisa um diff, não uma pasta. Rodado sobre o último commit de `tests/`, não achou defeitos. A revisão da suíte inteira (TS-2.1) foi feita por 5 agentes de IA em paralelo, um por nível (unidade, API, lógica JS e ponta a ponta em duas partes), só com leitura e com a ordem de confirmar cada achado no código do produto. Cada correção de asserção é provada por um mutante manual que passava com o teste antigo e falha com o novo |

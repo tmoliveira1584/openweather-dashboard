@@ -146,9 +146,10 @@ def test_rnf_026_new_scale_in_all_blocks_within_100ms(page: Page, weather_api, w
         assert shown["indicators"][5] == indicators["dew_point"][scale]
 
 
-def test_rnf_029_all_blocks_always_use_the_same_scale(page: Page, weather_api):
+def test_rnf_029_all_blocks_always_use_the_same_scale(page: Page, weather_api, weather_views):
     """RNF-029, RN-056: em °F, nenhum bloco mostra °C nem m/s; de volta a °C, nenhum mostra
-    °F nem mph. O seletor é o único lugar com as duas escalas."""
+    °F nem mph. O seletor é o único lugar com as duas escalas. Os pontos da curva e o texto
+    alternativo dela, que o RNF-026 não lê, também seguem a escala ativa."""
     page.goto("/")
     expect_all_ready(page, timeout=5_000)
     blocks_text = """() => [...document.querySelectorAll('.dashboard')]
@@ -159,3 +160,14 @@ def test_rnf_029_all_blocks_always_use_the_same_scale(page: Page, weather_api):
         text = page.evaluate(blocks_text)
         for unit in absent:
             assert unit not in text, f"{unit} visível com {scale} ativo"
+        key = "f" if scale == "°F" else "c"
+        hours = weather_views["uberlandia"]["hourly"][:24]
+        labels = page.locator(".hourly-point").evaluate_all(
+            "(nodes) => nodes.map((n) => n.getAttribute('aria-label'))"
+        )
+        assert [label.split(" · ")[1] for label in labels] == [h["temp"][key] for h in hours]
+        low, high = ("65°", "83°") if key == "f" else ("18°", "29°")
+        expect(page.locator(".hourly-curve")).to_have_attribute(
+            "aria-label",
+            f"Nas próximas 24 horas, mínima de {low} às 06:00 e máxima de {high} às 14:00",
+        )

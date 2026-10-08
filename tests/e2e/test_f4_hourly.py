@@ -169,9 +169,14 @@ def test_rnf_010_icon_failure_keeps_pop_and_temperature(page: Page, weather_api)
     alternativo com a descrição, e o percentual e a temperatura continuam visíveis."""
     page.route("**/img/wn/**", lambda route: route.abort())
     open_with(page, weather_api)
+    page.wait_for_function(
+        "() => { const i = document.querySelector('.hour-icon');"
+        " return i.complete && i.naturalWidth === 0; }"
+    )
 
     first = cards(page).first
     expect(first.locator(".hour-icon")).to_have_attribute("alt", "Chuva leve")
+    expect(first.locator(".hour-icon")).to_be_visible()
     expect(first.locator(".hour-pop")).to_be_visible()
     expect(first.locator(".hour-temp")).to_be_visible()
 
@@ -257,7 +262,9 @@ def test_ca_026_equal_temperatures_draw_a_straight_line_in_the_center(page: Page
     chart = page.locator(".hourly-chart").bounding_box()
     dot = points(page).nth(5).locator(".hourly-dot").bounding_box()
     assert dot["y"] + dot["height"] / 2 == pytest.approx(chart["y"] + chart["height"] / 2, abs=1)
-    expect(page.get_by_role("img", name="Nas próximas 24 horas, temperatura estável em 22°"))
+    expect(
+        page.get_by_role("img", name="Nas próximas 24 horas, temperatura estável em 22°")
+    ).to_have_count(1)
 
 
 def test_ca_024_single_rain_label_at_its_hour(page: Page, weather_api):
@@ -472,32 +479,12 @@ def test_ca_025_without_hourly_forecast_only_the_message_appears(
     expect(page.locator(".current-temp")).to_have_text("21°")
 
 
-UPDATE_WEATHER_JS = """async () => {
-    const { getState, setState } = await import('/js/state.js');
-    setState({ weather: structuredClone(getState().weather) });
-}"""
-
-
-def test_rn_034_new_hour_drops_the_hour_gone_from_cached_data(page: Page, weather_api):
-    """RN-034, feature 4 (categoria 8): com os dados em cache, depois que uma nova hora
-    começou, a janela começa na hora atual, e a hora que passou sai."""
-    open_with(page, weather_api)
-
-    page.clock.fast_forward("01:00:00")
-    page.evaluate(UPDATE_WEATHER_JS)
-
-    expect(page.locator(".hour-label").first).to_have_text("17:00")
-    expect(cards(page)).to_have_count(24)
-    assert len(weather_api.urls) == 1
-
-
 def test_rf_038_all_hours_gone_shows_the_unavailable_message(page: Page, weather_api):
     """RF-038, RN-034: se todas as horas recebidas já passaram, o bloco mostra a mensagem de
     indisponibilidade, como sem a previsão hora a hora."""
     open_with(page, weather_api)
 
-    page.clock.fast_forward("40:00:00")
-    page.evaluate(UPDATE_WEATHER_JS)
+    page.clock.fast_forward("40:00:00")  # o relógio da página redesenha, sem nova consulta
 
     block = page.locator(".hourly")
     expect(block).to_have_attribute("data-block-state", "unavailable")
@@ -536,7 +523,9 @@ def test_rf_055_scale_change_converts_every_temperature_on_screen(page: Page, we
     expect(page.locator(".hour-temp").nth(22)).to_have_text("83°")
     expect(page.locator(".current-temp")).to_have_text("69°")
     expect(page.locator(".day-tab-temp").first).to_have_text("72°")
-    expect(page.get_by_role("img", name=re.compile("mínima de 65° às 06:00 e máxima de 83°")))
+    expect(
+        page.get_by_role("img", name=re.compile("mínima de 65° às 06:00 e máxima de 83°"))
+    ).to_have_count(1)
     expect(points(page).first).to_have_attribute("aria-label", "16:00 · 69° · 0,66 mm/h")
     expect(page.locator(".hour-pop").first).to_have_text("100%")
     expect(page.locator(".rain-label").first).to_have_text("0,66 mm/h")
