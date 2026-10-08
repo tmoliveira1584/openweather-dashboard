@@ -853,3 +853,23 @@
 - **[T] Tom:** Objetivo
 - **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
 - **[R] Resposta:** Informe os hashes enviados e confirme a sincronização.
+
+## 2026-10-08 — Etapa: Testes
+
+- **[C] Contexto:** Concluí a fase 3 do plano de testes, com o escopo reduzido. A fase 4 também foi reduzida a um único módulo, pelo custo de tokens e de tempo num MVP acadêmico.
+- **[O] Objetivo:**
+  1. Leia os documentos do projeto, identifique de onde paramos e entenda o que precisa ser feito na próxima fase.
+  2. Execute a fase 4 inteira, sem parar para pedir confirmação a cada tarefa. Só me pergunte se surgir alguma dúvida.
+- **[S] Estilo:** Didático e resumido
+- **[T] Tom:** Objetivo
+- **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
+- **[R] Resposta:** Apresente o resumo da fase de maneira simples e didática, com um parecer sobre o sucesso ou não da fase.
+
+## 2026-10-08 — Etapa: Testes
+
+- **[C] Contexto:** Concluí a fase 4 do plano de testes, com o escopo reduzido a um único módulo, e registrei o resultado dela no relatório de testes.
+- **[O] Objetivo:** Faça o commit da fase 4 com a mensagem `test(testes): medir a mutação do módulo de precipitação na fase 4`.
+- **[S] Estilo:** Técnico e organizado
+- **[T] Tom:** Objetivo
+- **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
+- **[R] Resposta:** Informe o hash do commit e os arquivos incluídos.

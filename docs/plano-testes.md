@@ -12,10 +12,10 @@ Plano da etapa de Testes do SDLC, que começa depois da implementação e da ver
 
 | Item | Valor |
 |---|---|
-| Fase atual | 3 — Testes exploratórios automatizados (concluída) · próxima: 4 — Teste de mutação |
-| Próxima tarefa | TS-4.1 |
+| Fase atual | 4 — Teste de mutação (concluída) · próxima: 6 — Relatório final |
+| Próxima tarefa | TS-6.1 |
 | Concluídas, ainda sem commit | — |
-| Último commit da etapa | Fase 3: `fix(testes): explorar fusos exóticos e corrigir a hora no fuso +05:45` |
+| Último commit da etapa | Fase 4: `test(testes): medir a mutação do módulo de precipitação na fase 4` |
 | Defeitos registrados | 1 (DEF-01, corrigido) |
 
 ## 1. Objetivo
@@ -120,11 +120,13 @@ Cada fase tem objetivo, uso dos testes existentes, tarefas, entregável e crité
 - **Objetivo:** provar que os testes detectam defeitos, introduzindo pequenas alterações no código (mutantes) e conferindo se algum teste falha.
 - **Uso dos testes existentes:** a suíte atual é o "detector" avaliado. Para cada mutante, ela roda de novo.
 - **Tarefas:**
-  - [ ] **TS-4.1** Criar um script próprio de mutação, sem dependência nova. Ele troca operadores (`>=` por `>`, `+` por `-`, `and` por `or`), constantes e retornos, um de cada vez, roda os testes do módulo e restaura o arquivo.
-  - [ ] **TS-4.2** Rodar sobre `app/domain/` (testes de unidade) e `static/js/logic/` (testes de lógica JS) e calcular o escore: mutantes detectados ÷ mutantes gerados.
-  - [ ] **TS-4.3** Analisar os sobreviventes: escrever um teste para cada um que revele uma falha da suíte, ou justificá-lo como equivalente (a mudança não altera o comportamento).
+  - [x] **TS-4.1** Criar um script próprio de mutação, sem dependência nova. Ele troca operadores (`>=` por `>`, `+` por `-`, `and` por `or`), constantes e retornos, um de cada vez, roda os testes do módulo e restaura o arquivo.
+  - [x] **TS-4.2** Rodar sobre `app/domain/` (testes de unidade) e `static/js/logic/` (testes de lógica JS) e calcular o escore: mutantes detectados ÷ mutantes gerados. → Pela DT-06, só `app/domain/precipitation.py`: 34 de 35 (97,1%).
+  - [x] **TS-4.3** Analisar os sobreviventes: escrever um teste para cada um que revele uma falha da suíte, ou justificá-lo como equivalente (a mudança não altera o comportamento).
 - **Entregável:** script, escore antes e depois e a lista de sobreviventes com a decisão de cada um.
 - **Conclusão:** meta de mutação da seção 4 atingida ou com desvios justificados.
+
+- **Resultado:** [relatorio-testes.md](relatorio-testes.md#fase-4--teste-de-mutação-2026-10-08). Script: `tests/mutation.py` (`python -m tests.mutation app/domain/precipitation.py tests/unit`).
 
 ### Fase 5 — Registro de defeitos (contínua)
 

@@ -24,7 +24,7 @@ Detalhes no [plano-testes.md](plano-testes.md), seção 3.
 | 1 — Cobertura de código | Concluída em 2026-10-07 | 846 (+7) | ✅ Sucesso |
 | 2 — Revisão dos testes pela IA | Concluída em 2026-10-07 | 847 (+1) | ✅ Sucesso |
 | 3 — Testes exploratórios automatizados | Concluída em 2026-10-08 (escopo reduzido) | 852 (+5) | ✅ Sucesso |
-| 4 — Teste de mutação | Não iniciada | — | — |
+| 4 — Teste de mutação | Concluída em 2026-10-08 (escopo reduzido) | 852 (+0) | ✅ Sucesso |
 | 5 — Registro de defeitos (contínua) | 1 defeito (DEF-01, corrigido) | — | — |
 | 6 — Relatório final | Não iniciada | — | — |
 
@@ -218,3 +218,69 @@ Detalhes no [plano-testes.md](plano-testes.md), seção 3.
 ### Parecer
 
 ✅ **Sucesso, com escopo reduzido.** A fase cumpriu o objetivo com um único cenário: achou um defeito real do produto (DEF-01), fora do que o spec descrevia, e o corrigiu com testes que provam a correção. As outras categorias ficaram fora por custo, e a suíte atual já cobre boa parte delas.
+
+---
+
+## Fase 4 — Teste de mutação (2026-10-08)
+
+**A ideia:** o teste de mutação testa os testes. O script planta um defeito pequeno no código (um **mutante**), roda os testes e confere se algum falha. Se falhar, o mutante foi **detectado**. Se todos passarem, ele **sobreviveu**, e isso indica um ponto que nenhum teste confere.
+
+**Escopo reduzido (DT-06):** só o módulo `app/domain/precipitation.py`, pelo custo de tokens e de tempo num MVP acadêmico, em que o objetivo é aprender a técnica e não esgotá-la.
+
+### Resultado
+
+| Medida | Valor | Meta |
+|---|---|---|
+| Mutantes gerados | 35 | — |
+| Detectados | 34 | — |
+| **Escore de mutação** | **97,1%** | 80% |
+| Sobreviventes | 1, equivalente (não muda o comportamento) | Cada um coberto ou justificado |
+| Testes novos | 0 (nenhum sobrevivente revelou falha da suíte) | — |
+
+### O que foi feito
+
+1. **Criar o script (TS-4.1):** `tests/mutation.py`, sem dependência nova. Ele lê o módulo pela árvore sintática do Python (`ast`) e gera um mutante por ponto:
+   - **Comparação:** `<` ↔ `<=`, `>` ↔ `>=`, `==` ↔ `!=`, `is` ↔ `is not`.
+   - **Aritmética:** `+` ↔ `-`, `*` ↔ `/`.
+   - **Lógica:** `and` ↔ `or`, e `not x` vira `x`.
+   - **Constante:** número + 1 e texto vazio.
+   - **Retorno:** o valor devolvido vira `None`.
+
+   Para cada mutante, o script grava o módulo alterado, roda os testes de unidade e restaura o original, mesmo com erro.
+2. **Rodar e medir (TS-4.2):** `python -m tests.mutation app/domain/precipitation.py tests/unit`. São 35 mutantes, cerca de 2 s cada, cerca de 1 min ao todo.
+3. **Analisar o sobrevivente (TS-4.3):** ver abaixo.
+
+### Por que este módulo
+
+O `precipitation.py` tem 70 linhas e concentra o que a mutação mais testa: os limites das faixas de intensidade (RN-041), o arredondamento do volume (RN-037), o percentual (RN-036) e os valores ausentes ou negativos (RN-047). O `time.py` acabou de ser corrigido na fase 3, e a mutação vale mais num módulo que ainda não foi mexido.
+
+### O sobrevivente
+
+| Mutante | Onde | Decisão |
+|---|---|---|
+| `Decimal(text.replace(",", "."))` → `Decimal(text.replace(",", ""))` | `rain_label`, linha 47 | **Equivalente.** O código só confere se o volume arredondado é maior que zero. Tirar a vírgula ("0,21" → "021") multiplica o número por 100 sem mudar o sinal. Conferido com 200 mil valores aleatórios e os casos de borda (0,004, 0,005, negativos): o resultado é sempre o mesmo. Nenhum teste pode matar esse mutante |
+
+### O que ficou de fora e por quê
+
+| Fora | Por quê |
+|---|---|
+| Os outros 7 módulos de `app/domain/` | Custo (DT-06). O script já roda em qualquer um deles: basta trocar o caminho |
+| `static/js/logic/` | Cada mutante do JS roda os testes de lógica no Chrome (cerca de 80 s). Com centenas de mutantes, seriam horas. A fase 2 já fez 10 mutantes manuais no JS, e todos foram detectados |
+| Partes literais de f-strings (como " mm/h") | O script só muta as expressões dentro delas. Os textos fixos já são conferidos por igualdade exata nos testes |
+
+### O que se aprendeu
+
+- **A fase 2 aparece no escore.** O limite 2,51 entrou nos testes na fase 2. Com o arquivo de teste anterior, o mutante `2.5 → 3.5` sobrevive (conferido), e o escore cairia para 94,3%. O `7.5 → 8.5` já era pego pelo caso 8,0. Uma revisão bem feita sobe o escore de mutação.
+- **Nem todo sobrevivente é falha do teste.** O mutante equivalente mostra que 100% nem sempre é possível. Por isso a análise de cada sobrevivente é parte da técnica, e não só o número.
+- **Mutação mede o que a cobertura não mede.** A cobertura diz que a linha 47 roda. A mutação diz que cada operador e cada constante dela é conferido por algum teste.
+- **O papel da IA:** escreveu o script com `ast`, escolheu o módulo, rodou a medição e provou a equivalência do sobrevivente com uma conferência automática.
+
+### Verificações
+
+- Suíte comum verde: 852 testes (o script não é um teste, e o pytest não o coleta). O ruff não aponta nada.
+- O módulo foi restaurado depois de cada mutante: o `git status` não mostra mudança em `app/`.
+- Nenhum defeito novo do produto: a fase 5 continua com 1 registro (DEF-01, corrigido).
+
+### Parecer
+
+✅ **Sucesso, com escopo reduzido.** O escore de 97,1% passa a meta de 80% com folga, e o único sobrevivente é equivalente e está justificado. O script fica pronto para medir os outros módulos se o projeto evoluir.
