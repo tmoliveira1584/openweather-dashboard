@@ -1,5 +1,12 @@
 # Prompts CO-STAR
 
+**Como foi construído:** construi um comando (.claude\comands\costar.md) que recebe o meu prompt e registra formatado neste arquivo. As seguintes regras foram respeitadas:
+
+* Todos os prompts foram escritos por mim usando, no mínimo, contexto, objetivo e resposta;
+* Estilo, tom e público só foram escritos quando eu desejada algo diferente do padrão;
+* O comando é responsável por formatar, melhorar o texto, trazer detalhes mais técnicos e oferecer a versão alterada para a minha revisão;
+* Prompts de solicitação de commit e sincronização com o Git não foram escritos no formato CO-STAR e o comando fez o trabalho de formatação.
+
 ## 2026-09-29 — Etapa: Setup
 
 - **[C] Contexto:** Estou iniciando do zero um MVP para a pós-graduação: uma aplicação web frontend que consome a API do OpenWeatherMap e exibe temperatura, umidade e previsão por cidade, com campo de busca. A pasta openweather-dashboard ainda está vazia. Vou definir a stack na etapa de arquitetura.
@@ -16,7 +23,7 @@
 ## 2026-09-29 — Etapa: Setup
 
 - **[C] Contexto:** A estrutura inicial do MVP está criada (git init, .gitignore, CLAUDE.md, docs/ e o comando /costar), mas ainda não há nenhum commit. O CLAUDE.md não define um padrão para as mensagens de commit.
-- **[O] Objetivo:** Acrescente ao CLAUDE.md uma instrução para que todo commit siga Conventional Commits e para que, quando não for possível definir com segurança o tipo, o escopo ou se há breaking change, você proponha a mensagem e peça minha validação antes de commitar.
+- **[O] Objetivo:** Acrescente ao CLAUDE.md a regra de que todo commit segue Conventional Commits. Quando você não tiver certeza do tipo, do escopo ou de haver breaking change, proponha a mensagem e peça minha validação antes de commitar.
 - **[S] Estilo:** Didático e organizado
 - **[T] Tom:** Objetivo
 - **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
@@ -33,7 +40,7 @@
   5. Limitações e próximos passos (o que foi implementado e o que poderia evoluir)
   6. Créditos e licença
   7. Release
-  8. Outras seções consideradas padrão em um README
+  8. Outras seções que costumam aparecer em um README
 - **[S] Estilo:** Didático e organizado
 - **[T] Tom:** Objetivo
 - **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
@@ -65,16 +72,16 @@
 
 ## 2026-09-30 — Etapa: Setup
 
-- **[C] Contexto:** O commit `0caa502` (registro dos prompts do primeiro commit e da sincronização) foi feito localmente, e a branch `main` está um commit à frente de `origin/main`.
+- **[C] Contexto:** O commit para registro dos prompts do primeiro commit e da sincronização foi feito localmente, e a branch `main` está um commit à frente de `origin/main`.
 - **[O] Objetivo:** Envie o commit ao GitHub com `git push` e confirme que local e remoto ficaram sincronizados.
 - **[S] Estilo:** Didático e organizado
 - **[T] Tom:** Objetivo
 - **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
-- **[R] Resposta:** Confirme o push e o estado de sincronização e liste as pendências que ainda estão em aberto.
+- **[R] Resposta:** Confirme o push e o estado de sincronização e liste o que ainda está pendente.
 
 ## 2026-09-30 — Etapa: Setup
 
-- **[C] Contexto:** O repositório remoto já existe no GitHub, mas o passo "Clonar o repositório" do README ainda mostra `<url-do-repositorio>` marcado como "⚠️ A definir".
+- **[C] Contexto:** O repositório remoto já existe no GitHub, mas o passo "Clonar o repositório" do README ainda mostra `<url-do-repositorio>` marcado como "A definir".
 - **[O] Objetivo:** Troque o marcador do comando `git clone` no README pelo endereço real https://github.com/tmoliveira1584/openweather-dashboard.git e remova o aviso de pendência.
 - **[S] Estilo:** Didático e organizado
 - **[T] Tom:** Objetivo
@@ -95,8 +102,8 @@
 ## 2026-10-03 — Etapa: Requisitos
 
 - **[C] Contexto:**
-  - **Produto:** o MVP está na fase de requisitos. É uma página única que reproduz o layout de um print de referência e consome a OpenWeatherMap One Call API 3.0 (clima atual, previsão por minuto, por hora, por dia e alertas), a Geocoding API (busca direta e reversa), o serviço de ícones e a camada de precipitação do mapa.
-  - **API:** escolhi a 3.0 em vez da 4.0 por simplicidade: uma única chamada por cidade, sem paginação e com melhor aproveitamento da cota gratuita. O fornecedor recomenda a 4.0 para novas integrações, e isso deve ficar registrado como risco.
+  - **Produto:** o MVP está na fase de requisitos. É uma página única que reproduz o layout do print de referência e consome a OpenWeatherMap One Call API 3.0 (clima atual, previsão por minuto, por hora, por dia e alertas), a Geocoding API (busca direta e reversa), o serviço de ícones e a camada de precipitação do mapa.
+  - **API:** escolhi a 3.0 em vez da 4.0 porque ela resolve tudo numa chamada por cidade, não tem paginação e aproveita melhor a cota gratuita. O fornecedor recomenda a 4.0 para novas integrações, e isso deve ficar registrado como risco.
   - **Cidade inicial:** vem da localização do navegador. Se a permissão for negada, o recurso não existir ou não houver resposta em 10 s, usa Uberlândia (lat -18.9186, lon -48.2772) e mostra um aviso.
   - **Idioma:** interface toda em pt-BR, com horário em 24h.
   - **Mapeamento tela → dados:**
@@ -118,7 +125,7 @@
 - **[O] Objetivo:**
   1. Crie `docs/product-brief.md` com: explicação do produto, razão de existir, atores, diagrama Mermaid do fluxo de uso, glossário geral e disclaimer de finalidade didática.
   2. Crie `docs/constitution.md` com princípios permanentes e transversais (P-001, P-002…), cada um em uma linha, no imperativo, no formato SEMPRE/NUNCA e sem justificativa longa.
-  3. Crie `docs/spec.md` com uma seção por feature, sem código de feature: Localização inicial e busca de cidade; Condições atuais; Previsão diária; Previsão hora a hora; Previsão por minuto; Mapa de precipitação; Alternância de unidades.
+  3. Crie `docs/spec.md` com uma seção por feature: Localização inicial e busca de cidade; Condições atuais; Previsão diária; Previsão hora a hora; Previsão por minuto; Mapa de precipitação; Alternância de unidades.
      - Cada feature deve conter: Problema; Atores (Ator, Descrição, O que pode fazer, O que não pode fazer); Escopo (incluso / não incluso); Histórias de usuário ("Como <ator>, quero <ação>, para <resultado>"); Requisitos funcionais em notação EARS; Regras de negócio (a lógica por trás dos RFs); Comportamento em erro e casos de borda (Cenário, Comportamento esperado, Mensagem ao usuário); Requisitos não-funcionais (ID, Categoria, Requisito); Dependências e premissas; Critérios de aceite em Given/When/Then (3 a 8 por feature); Glossário específico.
      - Numere RF, RN, RNF e CA em sequência no documento inteiro.
   4. Monte a tabela de erros com um roteiro próprio do produto (só leitura, sem login, dependente de API externa): entrada inválida; localização do navegador; credencial e cota; serviço externo indisponível, lento ou sem conexão; resposta incompleta; valores-limite; ações repetidas e concorrentes; cache e tempo; recursos visuais; volume e tela. Não encaixe à força cenários que não se aplicam.
@@ -145,9 +152,9 @@
 ## 2026-10-04 — Etapa: Arquitetura
 
 - **[C] Contexto:**
-  - A etapa de requisitos está concluída e commitada (`a63e0c3`): product brief, constitution (P-001 a P-027) e spec com 7 features (RF-001 a RF-058, RN-001 a RN-059, RNF-001 a RNF-029, CA-001 a CA-044).
+  - A etapa de requisitos está concluída e commitada: product brief, constitution (P-001 a P-027) e spec com 7 features (RF-001 a RF-058, RN-001 a RN-059, RNF-001 a RNF-029, CA-001 a CA-044).
   - Agora entramos na fase de arquitetura. Hoje `docs/arquitetura.md` tem só o título, e o provedor de mapa base continua pendente.
-  - Não tenho experiência com definição de arquitetura de software. Meu objetivo é aprender a usar IA no ciclo do SDLC, não me tornar arquiteto.
+  - Não tenho experiência com arquitetura de software. Quero aprender a usar IA no SDLC e não pretendo me aprofundar nesse tema de engenharia.
   - A aplicação vai rodar só localmente, sem instalar nenhum software novo. Na minha máquina já estão instalados Node.js 22 com npm 10, Git, VS Code e Google Chrome. O Python não está instalado.
 - **[O] Objetivo:**
   1. Proponha uma arquitetura eficiente, mas simples de entender e de implementar, que rode localmente apenas com o que já está instalado
@@ -168,10 +175,10 @@
   - **Frontend:** HTML, CSS e JavaScript puro, sem build, com Leaflet 1.9.4 copiado para o projeto, mapa base CARTO Voyager e gráficos em SVG próprio. O cache fica no navegador (P-007).
   - **Testes:** pytest e pytest-playwright, usando o Chrome instalado.
   - **Convenções:** identificadores em inglês, interface e comentários em pt-BR.
-  - **Print de referência:** está em `docs/referencia/referencia_visual.png`. Ele é referência visual, e o spec prevalece em textos e formatos.
+  - **Print de referência:** está em `docs/referencia/referencia_visual.png`. Ele serve só como referência visual. Em textos e formatos, vale o spec.
   - **Situação atual:** hoje `docs/arquitetura.md` tem só o título, e o README e o CLAUDE.md ainda mostram a stack como "a definir".
 - **[O] Objetivo:**
-  1. Escreva `docs/arquitetura.md` com essa arquitetura, incluindo as seções que garantem:
+  1. Escreva `docs/arquitetura.md` com essa arquitetura e inclua seções que cubram:
      - **Replicação:** versões, decisões registradas, guardrails e relógio injetável
      - **Geração correta de código, sem lacunas:** contratos, modelo de dados, view model, estado, regras de dependência, mensagens e erros, decisões de detalhe e tokens visuais
      - **Geração eficiente:** fatias de implementação, definição de pronto, estratégia de testes, convenções e guia rápido
@@ -192,7 +199,7 @@
      - a consulta ao cache e a chamada do backend ao OpenWeatherMap com a chave, que devolve o view model
      - o descarte de respostas antigas, o desenho dos blocos e o carregamento das tiles do mapa
      - as interações do usuário: escala, aba, busca e retorno à página
-  2. Substitua o diagrama da seção 2.2 por esse diagrama, para mantermos uma única fonte do fluxo técnico
+  2. Substitua o diagrama da seção 2.2 por esse, para que o fluxo técnico fique documentado num lugar só
   3. Acrescente uma legenda de leitura e a regra de que o diagrama muda junto com contratos e fluxos
 - **[S] Estilo:** Técnico e organizado
 - **[T] Tom:** Objetivo
@@ -216,18 +223,6 @@
 
 ## 2026-10-04 — Etapa: Documentação
 
-- **[C] Contexto:** Os registros de `docs/prompts-costar.md` estão escritos do ponto de vista do assistente, com construções como "validado pelo usuário" e "pedi na conversa". O objetivo do registro é guardar o que eu solicito. A reescrita em CO-STAR serve só para acelerar o meu trabalho: eu descrevo o necessário e o prompt é documentado de forma completa, mas na minha voz, como se eu tivesse escrito.
-- **[O] Objetivo:**
-  1. Revise todos os registros de `docs/prompts-costar.md` para a primeira pessoa, com ordens diretas no objetivo e na resposta
-  2. Transforme o que aconteceu na conversa em pedidos naturais e independentes (ex.: "Crie um diagrama…" em vez de "Pedi na conversa um diagrama…"), para que um prompt flua naturalmente para o outro
-  3. Inclua essa regra em `.claude/commands/costar.md`, para que todo registro futuro já siga esse padrão
-- **[S] Estilo:** Técnico e organizado
-- **[T] Tom:** Objetivo
-- **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
-- **[R] Resposta:** Informe apenas que as alterações foram feitas, para eu validar.
-
-## 2026-10-04 — Etapa: Documentação
-
 - **[C] Contexto:** Há alterações locais em `docs/prompts-costar.md` (registros reescritos na minha voz) e em `.claude/commands/costar.md` (regra de escrita dos registros). A branch `main` local está sincronizada com `origin/main`. O CLAUDE.md exige Conventional Commits.
 - **[O] Objetivo:**
   1. Faça um commit com essas alterações, usando a mensagem `docs(prompts): reescrever registros na voz do autor e ajustar /costar`
@@ -239,7 +234,7 @@
 
 ## 2026-10-04 — Etapa: Implementação
 
-- **[C] Contexto:** Concluí os requisitos (product brief, constitution e spec) e a arquitetura, e estou entrando na fase de implementação. A seção 10 de `docs/arquitetura.md` define 14 fatias, mas cita os IDs por faixa e deixa o detalhamento em tarefas para um `docs/tasks.md` futuro. Quero que qualquer sessão futura de geração de código saiba exatamente de onde continuar. Os testes vão rodar só no Google Chrome instalado: não vou testar em outros navegadores.
+- **[C] Contexto:** Concluí os requisitos (product brief, constitution e spec) e a arquitetura, e estou entrando na fase de implementação. A seção 10 de `docs/arquitetura.md` define 14 fatias, mas cita os IDs por faixa e deixa o detalhamento em tarefas para um `docs/tasks.md` futuro. Quero que qualquer sessão futura de geração de código saiba exatamente de onde continuar. Os testes vão rodar só no Google Chrome que já está instalado.
 - **[O] Objetivo:**
   1. Avalie todos os documentos do projeto e aponte o que falta para que o plano de implementação cubra 100% dos requisitos
   2. Crie o `docs/tasks.md`, versionado no Git (fora do `.gitignore`, porque é um artefato do processo), com:
@@ -248,13 +243,13 @@
      - uma tabela de progresso por fatia
      - a regra de marcar a tarefa no mesmo commit do código que a conclui
   3. Divida a fatia 6 em 6a (estado, cache e chamadas ao backend), 6b (cabeçalho, busca e seletor de escala) e 6c (localização inicial e cidade padrão)
-  4. Atribua cada um dos 217 IDs (RF, RN, RNF e CA do spec, mais P-001 a P-027) a uma única fatia, a que o fecha, e confira por script que nenhum fica de fora ou repetido
+  4. Atribua cada um dos 217 IDs (RF, RN, RNF e CA do spec, mais P-001 a P-027) à única fatia que o fecha e confira por script que nenhum ficou de fora ou repetido
   5. Registre como limitação L-01 que os testes são feitos só no Chrome, no `docs/tasks.md`, na arquitetura e no README, mantendo o RNF-006 no spec como meta
   6. Faça o CLAUDE.md, a arquitetura (seções 1, 9.4, 10 e 13), o README e o `docs/requisitos.md` apontarem para o `docs/tasks.md`
 - **[S] Estilo:** Técnico e organizado
 - **[T] Tom:** Objetivo
 - **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
-- **[R] Resposta:** Resuma o trabalho: arquivos criados e alterados, estrutura do `docs/tasks.md` e decisões registradas. Proponha a mensagem de commit e aguarde a minha validação antes de commitar.
+- **[R] Resposta:** Resuma os arquivos criados e alterados, a estrutura do `docs/tasks.md` e as decisões registradas. Proponha a mensagem de commit e aguarde a minha validação antes de commitar.
 
 ## 2026-10-04 — Etapa: Implementação
 
@@ -273,52 +268,37 @@
 ## 2026-10-05 — Etapa: Implementação
 
 - **[C] Contexto:**
-  - Concluí o setup, os requisitos, a arquitetura e o planejamento. Agora vou começar a implementação do MVP pela fatia 0 (Setup) de `docs/tasks.md`. O bloco "Onde paramos" mostra a fatia 0 ainda não iniciada, com a próxima tarefa T-0.1 e 0 de 217 IDs fechados.
-  - A fatia 0 vai da tarefa T-0.1 até a T-0.9. Ela segue as seções 1, 5.1, 7.6, 9.1, 9.2 e 11 de `docs/arquitetura.md` e fecha o P-002.
-  - Por enquanto o repositório só tem a documentação, o `environment.yml`, o `requirements.txt`, o `requirements-dev.txt` e o `.env.example`. Ainda não existe código nem `.env`.
-  - A T-0.8 precisa do `.env` com a minha chave e da assinatura "One Call by Call" ativa. Ela gasta cerca de 6 consultas da cota.
+  - Concluí o setup, os requisitos, a arquitetura e o planejamento. Agora vou começar a implementação do MVP.
+  - Ainda não criei o `.env` com a minha chave.
 - **[O] Objetivo:**
-  1. Leia o CLAUDE.md, o bloco "Onde paramos" e as seções da arquitetura citadas na fatia 0
-  2. Implemente as tarefas T-0.1 a T-0.8 na ordem, uma de cada vez. Antes de cada uma, explique o que vai fazer, por quê e quais alternativas existem, e espere a minha confirmação
-  3. Escreva os testes primeiro e o código depois. Os testes seguem o padrão `test_<id>_<comportamento>` da seção 9.3, como o teste de configuração da T-0.3 (P-002)
-  4. Antes da T-0.8, confirme que o `.env` existe, sem ler nem exibir a chave. Se ele não existir, pare e me avise. Nunca escreva a chave em código, fixtures, logs ou commits (P-001), e confira isso com `git grep`
-  5. Na T-0.9, cumpra a definição de pronto da seção 9.4: rode `pytest -m "not e2e"`, `pytest -m e2e` e o ruff, confira os guardrails da seção 8.4 e verifique que a aplicação sobe com `uvicorn`
-  6. Marque T-0.1 a T-0.9 com `[x]` e atualize "Onde paramos" e "Progresso" em `docs/tasks.md`, no mesmo commit do código
-  7. Proponha a mensagem de commit, com o P-002 no corpo. Sugestão: `build: configurar ambiente, app mínimo e fixtures reais`. Espere a minha validação antes de commitar e antes de enviar ao GitHub
+  1. Leia o CLAUDE.md e o `docs/tasks.md`, veja onde paramos e implemente a próxima fatia, uma tarefa por vez
+  2. Antes de cada tarefa, explique a decisão e espere a minha confirmação
+  3. Quando precisar do `.env`, pare e me avise. Não leia nem exiba a chave
+  4. No fim da fatia, proponha a mensagem de commit e espere a minha validação antes de commitar
 - **[S] Estilo:** Didático e organizado, uma tarefa por vez
 - **[T] Tom:** Objetivo
 - **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
-- **[R] Resposta:** Para cada tarefa, apresente a decisão antes de codificar. Depois, liste os arquivos criados, os comandos executados e o resultado dos testes. No fim da fatia, mostre o checklist da definição de pronto, os IDs fechados e a mensagem de commit proposta.
+- **[R] Resposta:** Para cada tarefa, apresente a decisão antes de codificar e depois mostre o que foi feito e o resultado dos testes. No fim da fatia, mostre o checklist da definição de pronto e a mensagem de commit proposta.
 
 ## 2026-10-05 — Etapa: Arquitetura
 
 - **[C] Contexto:**
-  - Estou na T-0.8 da fatia 0, a captura das fixtures reais. As tarefas T-0.1 a T-0.7 estão concluídas e ainda sem commit.
-  - Todo o projeto foi especificado para a One Call API 3.0, mas ela foi descontinuada pelo fornecedor e não aparece mais para novas assinaturas. Assinei o plano "One Call by Call" da One Call API 4.0, que é um produto separado, e minha chave recebe 401 na 3.0.
-  - A arquitetura já registrava a 3.0 como descontinuada, mas a tratava como "risco aceito" sem verificar se ainda era possível assiná-la.
-  - A 4.0 separa os dados em endpoints próprios (atual, por minuto, por hora, diária e detalhe de alerta). Ela também pagina as previsões, devolve os alertas como IDs e traz a chave dentro dos links `next`/`prev`.
+  - Estou na captura das fixtures reais da fatia 0.
+  - Especifiquei o projeto para a One Call API 3.0, mas ela foi descontinuada e não aceita mais novas assinaturas. Assinei o plano "One Call by Call" da One Call API 4.0, e a minha chave recebe 401 na 3.0.
 - **[O] Objetivo:**
-  1. Leia a documentação oficial da One Call API 4.0 e o guia de migração da 3.0 para a 4.0
-  2. Migre o projeto para a 4.0, varrendo todas as fases afetadas pela decisão errada: spec, arquitetura, `requisitos.md`, README, CLAUDE.md, `.env.example` e `tasks.md`
-  3. Registre a decisão num ADR novo, explicando o contexto, a decisão, as consequências e as alternativas descartadas. A decisão deve cobrir:
-     - as chamadas por consulta de clima e a paginação;
-     - a política de falha parcial;
-     - a contagem de alertas;
-     - o tratamento dos links com a chave;
-     - o impacto na cota.
-  4. Ajuste no spec as regras que dependiam do formato da 3.0, como consulta única, alertas por dia, visibilidade da previsão diária, minutos da próxima hora e limite de dias. Mantenha os IDs existentes
-  5. Reescreva as tarefas afetadas em todas as fatias e registre a decisão na tabela "Decisões e limitações" do `tasks.md`, sem mudar as tarefas já concluídas
-  6. Atualize o README das fixtures e o teste de guarda para as capturas da 4.0, sem guardar a chave nem os links de paginação
-  7. Não abra nem altere o `.env`, nem o histórico de prompts
-  8. Liste os pontos que a documentação da 4.0 não esclarece, para conferir na captura da T-0.8
+  1. Leia a documentação oficial da One Call API 4.0 e o guia de migração da 3.0
+  2. Migre o projeto para a 4.0 e atualize toda a documentação afetada, registrando a decisão num ADR novo
+  3. Mantenha os IDs existentes e não altere as tarefas já concluídas
+  4. Não abra nem altere o `.env`
+  5. Liste o que a documentação da 4.0 não esclarece, para eu conferir na captura
 - **[S] Estilo:** Técnico e organizado
 - **[T] Tom:** Objetivo
 - **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
-- **[R] Resposta:** Resuma o desenho adotado para a 4.0 e o que mudou em cada documento. Destaque as mudanças no spec que dependem da minha validação e o que ficou de fora. Liste os pontos a conferir na T-0.8 e aguarde a minha confirmação antes de rodar a captura.
+- **[R] Resposta:** Resuma o desenho adotado para a 4.0 e o que mudou em cada documento. Destaque o que depende da minha validação e espere a minha confirmação antes de rodar a captura.
 
 ## 2026-10-05 — Etapa: Implementação
 
-- **[C] Contexto:** Concluí a fatia 0 e fiz dois commits locais: `a794730` (`docs: migrar especificação e arquitetura para a One Call API 4.0`) e `880fa41` (`build: configurar ambiente, app mínimo e fixtures reais`). A branch `main` local está 2 commits à frente de `origin/main`. O CLAUDE.md exige Conventional Commits.
+- **[C] Contexto:** Concluí a fatia 0 e fiz dois commits locais: `(`docs: migrar especificação e arquitetura para a One Call API 4.0`) e (build: configurar ambiente, app mínimo e fixtures reais`). A branch `main` local está 2 commits à frente de `origin/main`. O CLAUDE.md exige Conventional Commits.
 - **[O] Objetivo:** Envie os commits ao GitHub com `git push` e confirme a sincronização entre local e remoto.
 - **[S] Estilo:** Técnico e organizado
 - **[T] Tom:** Objetivo
@@ -330,7 +310,7 @@
 - **[C] Contexto:** Concluí a fatia 0 e estou seguindo com a implementação do MVP. O passo a passo está nos documentos do projeto.
 - **[O] Objetivo:**
   1. Leia os documentos do projeto, identifique de onde paramos e continue a partir daí.
-  2. Implemente a fatia 1 inteira, sem parar para pedir confirmação a cada tarefa. Só me pergunte se surgir alguma dúvida.
+  2. Implemente a fatia 1 inteira e me questione se surgir alguma dúvida.
 - **[S] Estilo:** Didático e resumido
 - **[T] Tom:** Objetivo
 - **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
@@ -347,10 +327,10 @@
 
 ## 2026-10-05 — Etapa: Implementação
 
-- **[C] Contexto:** Concluí as fatias 0 e 1 e estou seguindo com a implementação do MVP. Os documentos do projeto trazem o passo a passo: onde paramos, o que construir em cada fatia e como registrar cada entrega.
+- **[C] Contexto:** Concluí as fatias 0 e 1 e estou seguindo com a implementação do MVP. Os documentos do projeto mostram onde paramos, o que construir em cada fatia e como registrar cada entrega.
 - **[O] Objetivo:**
   1. Leia os documentos do projeto, identifique de onde paramos e continue a partir daí.
-  2. Implemente a fatia 2 inteira, sem parar para pedir confirmação a cada tarefa. Só me pergunte se surgir alguma dúvida.
+  2. Implemente a fatia 2 inteira e me questione se surgir alguma dúvida.
 - **[S] Estilo:** Didático e resumido
 - **[T] Tom:** Objetivo
 - **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
@@ -367,10 +347,10 @@
 
 ## 2026-10-05 — Etapa: Implementação
 
-- **[C] Contexto:** Concluí as fatias 0, 1 e 2 e estou seguindo com a implementação do MVP. Os documentos do projeto trazem o passo a passo: onde paramos, o que construir em cada fatia e como registrar cada entrega.
+- **[C] Contexto:** Concluí as fatias 0, 1 e 2 e estou seguindo com a implementação do MVP. Os documentos do projeto mostram onde paramos, o que construir em cada fatia e como registrar cada entrega.
 - **[O] Objetivo:**
   1. Leia os documentos do projeto, identifique de onde paramos e continue a partir daí.
-  2. Implemente a fatia 3 inteira, sem parar para pedir confirmação a cada tarefa. Só me pergunte se surgir alguma dúvida.
+  2. Implemente a fatia 3 inteira e me questione se surgir alguma dúvida.
 - **[S] Estilo:** Didático e resumido
 - **[T] Tom:** Objetivo
 - **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
@@ -387,10 +367,10 @@
 
 ## 2026-10-06 — Etapa: Implementação
 
-- **[C] Contexto:** Concluí as fatias 0 a 3 e estou seguindo com a implementação do MVP. Os documentos do projeto trazem o passo a passo: onde paramos, o que construir em cada fatia e como registrar cada entrega.
+- **[C] Contexto:** Concluí as fatias 0 a 3 e estou seguindo com a implementação do MVP. Os documentos do projeto mostram onde paramos, o que construir em cada fatia e como registrar cada entrega.
 - **[O] Objetivo:**
   1. Leia os documentos do projeto, identifique de onde paramos e continue a partir daí.
-  2. Implemente a fatia 4 inteira, sem parar para pedir confirmação a cada tarefa. Só me pergunte se surgir alguma dúvida.
+  2. Implemente a fatia 4 inteira e me questione se surgir alguma dúvida.
 - **[S] Estilo:** Didático e resumido
 - **[T] Tom:** Objetivo
 - **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
@@ -416,10 +396,10 @@
 
 ## 2026-10-06 — Etapa: Implementação
 
-- **[C] Contexto:** Concluí as fatias 0 a 4 e estou seguindo com a implementação do MVP. Os documentos do projeto trazem o passo a passo: onde paramos, o que construir em cada fatia e como registrar cada entrega.
+- **[C] Contexto:** Concluí as fatias 0 a 4 e estou seguindo com a implementação do MVP. Os documentos do projeto mostram onde paramos, o que construir em cada fatia e como registrar cada entrega.
 - **[O] Objetivo:**
   1. Leia os documentos do projeto, identifique de onde paramos e continue a partir daí.
-  2. Implemente a fatia 5 inteira, sem parar para pedir confirmação a cada tarefa. Só me pergunte se surgir alguma dúvida.
+  2. Implemente a fatia 5 inteira e me questione se surgir alguma dúvida.
 - **[S] Estilo:** Didático e resumido
 - **[T] Tom:** Objetivo
 - **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
@@ -445,10 +425,10 @@
 
 ## 2026-10-06 — Etapa: Implementação
 
-- **[C] Contexto:** Concluí as fatias 0 a 5 e estou seguindo com a implementação do MVP. Os documentos do projeto trazem o passo a passo: onde paramos, o que construir em cada fatia e como registrar cada entrega.
+- **[C] Contexto:** Concluí as fatias 0 a 5 e estou seguindo com a implementação do MVP. Os documentos do projeto mostram onde paramos, o que construir em cada fatia e como registrar cada entrega.
 - **[O] Objetivo:**
   1. Leia os documentos do projeto, identifique de onde paramos e continue a partir daí.
-  2. Implemente a fatia 6a inteira, sem parar para pedir confirmação a cada tarefa. Só me pergunte se surgir alguma dúvida.
+  2. Implemente a fatia 6a inteira e me questione se surgir alguma dúvida.
 - **[S] Estilo:** Didático e resumido
 - **[T] Tom:** Objetivo
 - **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
@@ -474,10 +454,10 @@
 
 ## 2026-10-06 — Etapa: Implementação
 
-- **[C] Contexto:** Concluí as fatias 0 a 6a e estou seguindo com a implementação do MVP. Os documentos do projeto trazem o passo a passo: onde paramos, o que construir em cada fatia e como registrar cada entrega.
+- **[C] Contexto:** Concluí as fatias 0 a 6a e estou seguindo com a implementação do MVP. Os documentos do projeto mostram onde paramos, o que construir em cada fatia e como registrar cada entrega.
 - **[O] Objetivo:**
   1. Leia os documentos do projeto, identifique de onde paramos e continue a partir daí.
-  2. Implemente a fatia 6b inteira, sem parar para pedir confirmação a cada tarefa. Só me pergunte se surgir alguma dúvida.
+  2. Implemente a fatia 6b inteira e me questione se surgir alguma dúvida.
 - **[S] Estilo:** Didático e resumido
 - **[T] Tom:** Objetivo
 - **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
@@ -503,10 +483,10 @@
 
 ## 2026-10-06 — Etapa: Implementação
 
-- **[C] Contexto:** Concluí as fatias 0 a 6b e estou seguindo com a implementação do MVP. Os documentos do projeto trazem o passo a passo: onde paramos, o que construir em cada fatia e como registrar cada entrega.
+- **[C] Contexto:** Concluí as fatias 0 a 6b e estou seguindo com a implementação do MVP. Os documentos do projeto mostram onde paramos, o que construir em cada fatia e como registrar cada entrega.
 - **[O] Objetivo:**
   1. Leia os documentos do projeto, identifique de onde paramos e continue a partir daí.
-  2. Implemente a fatia 6c inteira, sem parar para pedir confirmação a cada tarefa. Só me pergunte se surgir alguma dúvida.
+  2. Implemente a fatia 6c inteira e me questione se surgir alguma dúvida.
 - **[S] Estilo:** Didático e resumido
 - **[T] Tom:** Objetivo
 - **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
@@ -532,10 +512,10 @@
 
 ## 2026-10-06 — Etapa: Implementação
 
-- **[C] Contexto:** Concluí as fatias 0 a 6c e estou seguindo com a implementação do MVP. Os documentos do projeto trazem o passo a passo: onde paramos, o que construir em cada fatia e como registrar cada entrega.
+- **[C] Contexto:** Concluí as fatias 0 a 6c e estou seguindo com a implementação do MVP. Os documentos do projeto mostram onde paramos, o que construir em cada fatia e como registrar cada entrega.
 - **[O] Objetivo:**
   1. Leia os documentos do projeto, identifique de onde paramos e continue a partir daí.
-  2. Implemente a fatia 7 inteira, sem parar para pedir confirmação a cada tarefa. Só me pergunte se surgir alguma dúvida.
+  2. Implemente a fatia 7 inteira e me questione se surgir alguma dúvida.
 - **[S] Estilo:** Didático e resumido
 - **[T] Tom:** Objetivo
 - **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
@@ -561,10 +541,10 @@
 
 ## 2026-10-06 — Etapa: Implementação
 
-- **[C] Contexto:** Concluí as fatias 0 a 7 e estou seguindo com a implementação do MVP. Os documentos do projeto trazem o passo a passo: onde paramos, o que construir em cada fatia e como registrar cada entrega.
+- **[C] Contexto:** Concluí as fatias 0 a 7 e estou seguindo com a implementação do MVP. Os documentos do projeto mostram onde paramos, o que construir em cada fatia e como registrar cada entrega.
 - **[O] Objetivo:**
   1. Leia os documentos do projeto, identifique de onde paramos e continue a partir daí.
-  2. Implemente a fatia 8 inteira, sem parar para pedir confirmação a cada tarefa. Só me pergunte se surgir alguma dúvida.
+  2. Implemente a fatia 8 inteira e me questione se surgir alguma dúvida.
 - **[S] Estilo:** Didático e resumido
 - **[T] Tom:** Objetivo
 - **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
@@ -590,10 +570,10 @@
 
 ## 2026-10-06 — Etapa: Implementação
 
-- **[C] Contexto:** Concluí as fatias 0 a 8 e estou seguindo com a implementação do MVP. Os documentos do projeto trazem o passo a passo: onde paramos, o que construir em cada fatia e como registrar cada entrega.
+- **[C] Contexto:** Concluí as fatias 0 a 8 e estou seguindo com a implementação do MVP. Os documentos do projeto mostram onde paramos, o que construir em cada fatia e como registrar cada entrega.
 - **[O] Objetivo:**
   1. Leia os documentos do projeto, identifique de onde paramos e continue a partir daí.
-  2. Implemente a fatia 9 inteira, sem parar para pedir confirmação a cada tarefa. Só me pergunte se surgir alguma dúvida.
+  2. Implemente a fatia 9 inteira e me questione se surgir alguma dúvida.
 - **[S] Estilo:** Didático e resumido
 - **[T] Tom:** Objetivo
 - **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
@@ -619,10 +599,10 @@
 
 ## 2026-10-06 — Etapa: Implementação
 
-- **[C] Contexto:** Concluí as fatias 0 a 9 e estou seguindo com a implementação do MVP. Os documentos do projeto trazem o passo a passo: onde paramos, o que construir em cada fatia e como registrar cada entrega.
+- **[C] Contexto:** Concluí as fatias 0 a 9 e estou seguindo com a implementação do MVP. Os documentos do projeto mostram onde paramos, o que construir em cada fatia e como registrar cada entrega.
 - **[O] Objetivo:**
   1. Leia os documentos do projeto, identifique de onde paramos e continue a partir daí.
-  2. Implemente a fatia 10 inteira, sem parar para pedir confirmação a cada tarefa. Só me pergunte se surgir alguma dúvida.
+  2. Implemente a fatia 10 inteira e me questione se surgir alguma dúvida.
 - **[S] Estilo:** Didático e resumido
 - **[T] Tom:** Objetivo
 - **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
@@ -648,10 +628,10 @@
 
 ## 2026-10-06 — Etapa: Implementação
 
-- **[C] Contexto:** Concluí as fatias 0 a 10 e estou seguindo com a implementação do MVP. Os documentos do projeto trazem o passo a passo: onde paramos, o que construir em cada fatia e como registrar cada entrega.
+- **[C] Contexto:** Concluí as fatias 0 a 10 e estou seguindo com a implementação do MVP. Os documentos do projeto mostram onde paramos, o que construir em cada fatia e como registrar cada entrega.
 - **[O] Objetivo:**
   1. Leia os documentos do projeto, identifique de onde paramos e continue a partir daí.
-  2. Implemente a fatia 11 inteira, sem parar para pedir confirmação a cada tarefa. Só me pergunte se surgir alguma dúvida.
+  2. Implemente a fatia 11 inteira e me questione se surgir alguma dúvida.
 - **[S] Estilo:** Didático e resumido
 - **[T] Tom:** Objetivo
 - **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
@@ -677,10 +657,10 @@
 
 ## 2026-10-06 — Etapa: Implementação
 
-- **[C] Contexto:** Concluí as fatias 0 a 11 e estou seguindo com a implementação do MVP. Os documentos do projeto trazem o passo a passo: onde paramos, o que construir em cada fatia e como registrar cada entrega.
+- **[C] Contexto:** Concluí as fatias 0 a 11 e estou seguindo com a implementação do MVP. Os documentos do projeto mostram onde paramos, o que construir em cada fatia e como registrar cada entrega.
 - **[O] Objetivo:**
   1. Leia os documentos do projeto, identifique de onde paramos e continue a partir daí.
-  2. Implemente a fatia 12 inteira, sem parar para pedir confirmação a cada tarefa. Só me pergunte se surgir alguma dúvida.
+  2. Implemente a fatia 12 inteira e me questione se surgir alguma dúvida.
 - **[S] Estilo:** Didático e resumido
 - **[T] Tom:** Objetivo
 - **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
@@ -706,10 +686,10 @@
 
 ## 2026-10-06 — Etapa: Implementação
 
-- **[C] Contexto:** Concluí as fatias 0 a 12 e estou seguindo com a implementação do MVP. Os documentos do projeto trazem o passo a passo: onde paramos, o que construir em cada fatia e como registrar cada entrega.
+- **[C] Contexto:** Concluí as fatias 0 a 12 e estou seguindo com a implementação do MVP. Os documentos do projeto mostram onde paramos, o que construir em cada fatia e como registrar cada entrega.
 - **[O] Objetivo:**
   1. Leia os documentos do projeto, identifique de onde paramos e continue a partir daí.
-  2. Implemente a fatia 13 inteira, sem parar para pedir confirmação a cada tarefa. Só me pergunte se surgir alguma dúvida.
+  2. Implemente a fatia 13 inteira e me questione se surgir alguma dúvida.
 - **[S] Estilo:** Didático e resumido
 - **[T] Tom:** Objetivo
 - **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
@@ -735,7 +715,7 @@
 
 ## 2026-10-07 — Etapa: Testes
 
-- **[C] Contexto:** Concluí a implementação do MVP e publiquei a versão v0.1.0. Estou começando a etapa de Testes do SDLC, com foco em aprender o uso da IA nela, sem testes manuais e aceitando as limitações do projeto, como testar só no Chrome.
+- **[C] Contexto:** Concluí a implementação do MVP e publiquei a versão v0.1.0. Estou começando a etapa de Testes do SDLC. Quero aprender a usar a IA nessa etapa, sem testes manuais e aceitando as limitações do projeto, como testar só no Chrome.
 - **[O] Objetivo:**
   1. Crie um plano de testes nos documentos do projeto, com o objetivo, o escopo, o ponto de partida dos testes que já existem, as fases da etapa (cobertura, revisão dos testes, testes exploratórios, mutação, registro de defeitos e relatório final), os critérios de entrada e saída, as limitações aceitas e um bloco de onde paramos.
   2. Detalhe em cada fase como os testes já construídos são usados.
@@ -756,7 +736,7 @@
 
 ## 2026-10-07 — Etapa: Testes
 
-- **[C] Contexto:** Criei o plano de testes e estou começando a executá-lo. O plano traz o passo a passo: onde paramos, as fases da etapa e como registrar cada entrega.
+- **[C] Contexto:** Criei o plano de testes e estou começando a executá-lo. O plano mostra onde paramos, quais são as fases da etapa e como registrar cada entrega.
 - **[O] Objetivo:**
   1. Leia os documentos do projeto, identifique de onde paramos e entenda o que precisa ser feito na próxima fase.
   2. Resuma para mim o que será feito e aguarde o meu retorno antes de começar.
@@ -764,14 +744,14 @@
 - **[S] Estilo:** Didático e resumido
 - **[T] Tom:** Objetivo
 - **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
-- **[R] Resposta:** Mostre os resultados de maneira simples e didática, com um parecer sobre o sucesso ou não da fase. Proponha a mensagem de commit e aguarde a minha validação antes de commitar.
+- **[R] Resposta:** Mostre os resultados de forma simples e dê um parecer dizendo se a fase deu certo. Proponha a mensagem de commit e aguarde a minha validação antes de commitar.
 
 ## 2026-10-07 — Etapa: Testes
 
 - **[C] Contexto:** Concluí a fase 1 do plano de testes e quero acompanhar de forma didática o que cada fase entrega.
 - **[O] Objetivo:**
   1. Crie um documento de resultados da etapa de Testes e registre nele o resultado da fase 1, no mesmo formato da apresentação que você me fez: o que foi feito, os números de antes e depois, o que se aprendeu, as verificações e um parecer sobre a fase.
-  2. Faça desse documento parte da rotina: ao fim de cada fase, acrescente a seção dela.
+  2. Inclua esse documento na rotina das fases e acrescente a seção de cada uma assim que ela terminar.
 - **[S] Estilo:** Didático e resumido
 - **[T] Tom:** Objetivo
 - **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
@@ -797,14 +777,14 @@
 
 ## 2026-10-07 — Etapa: Testes
 
-- **[C] Contexto:** Concluí a fase 1 do plano de testes e estou seguindo com a etapa de Testes. O plano traz o passo a passo: onde paramos, as fases da etapa e como registrar cada entrega.
+- **[C] Contexto:** Concluí a fase 1 do plano de testes e estou seguindo com a etapa de Testes. O plano mostra onde paramos, quais são as fases da etapa e como registrar cada entrega.
 - **[O] Objetivo:**
   1. Leia os documentos do projeto, identifique de onde paramos e entenda o que precisa ser feito na próxima fase.
   2. Execute a fase inteira, sem parar para pedir confirmação a cada tarefa. Só me pergunte se surgir alguma dúvida.
 - **[S] Estilo:** Didático e resumido
 - **[T] Tom:** Objetivo
 - **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
-- **[R] Resposta:** Apresente o resumo da fase de maneira simples e didática, com um parecer sobre o sucesso ou não da fase.
+- **[R] Resposta:** Resuma a fase de forma simples e dê um parecer dizendo se ela deu certo.
 
 ## 2026-10-07 — Etapa: Testes
 
@@ -826,7 +806,7 @@
 
 ## 2026-10-08 — Etapa: Testes
 
-- **[C] Contexto:** Concluí a fase 2 do plano de testes. As fases 3 e 4, como estão no plano, consomem muitos tokens e muito tempo, e decidi simplificá-las: o custo de tokens e de tempo num MVP acadêmico, em que o objetivo é aprender a técnica e não esgotá-la, não compensa a execução completa.
+- **[C] Contexto:** Concluí a fase 2 do plano de testes. As fases 3 e 4, do jeito que estão no plano, consomem muitos tokens e muito tempo. Como este é um MVP acadêmico e o objetivo é aprender a técnica, a execução completa não compensa, e decidi simplificá-las.
 - **[O] Objetivo:**
   1. Leia os documentos do projeto, identifique de onde paramos e entenda o que precisa ser feito na próxima fase.
   2. Reduza a fase 3 a um único cenário exploratório, o de fuso horário exótico, e a fase 4 a um único módulo. Registre a decisão no plano, com essa justificativa, e explique no relatório o que ficou de fora e por quê.
@@ -834,7 +814,7 @@
 - **[S] Estilo:** Didático e resumido
 - **[T] Tom:** Objetivo
 - **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
-- **[R] Resposta:** Apresente o resumo da fase de maneira simples e didática, com um parecer sobre o sucesso ou não da fase.
+- **[R] Resposta:** Resuma a fase de forma simples e dê um parecer dizendo se ela deu certo.
 
 ## 2026-10-08 — Etapa: Testes
 
@@ -863,7 +843,7 @@
 - **[S] Estilo:** Didático e resumido
 - **[T] Tom:** Objetivo
 - **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
-- **[R] Resposta:** Apresente o resumo da fase de maneira simples e didática, com um parecer sobre o sucesso ou não da fase.
+- **[R] Resposta:** Resuma a fase de forma simples e dê um parecer dizendo se ela deu certo.
 
 ## 2026-10-08 — Etapa: Testes
 
@@ -885,15 +865,15 @@
 
 ## 2026-10-08 — Etapa: Testes
 
-- **[C] Contexto:** Concluí as fases 1 a 4 do plano de testes, com as fases 3 e 4 em escopo reduzido, e a fase 3 corrigiu um defeito do produto. Falta a fase 6, o relatório final.
+- **[C] Contexto:** Concluí as fases 1 a 4 do plano de testes, com as fases 3 e 4 em escopo reduzido. A fase 3 corrigiu um defeito do produto. Falta a fase 6, o relatório final.
 - **[O] Objetivo:**
   1. Leia os documentos do projeto, identifique de onde paramos e entenda o que precisa ser feito na fase 6.
-  2. Execute a fase 6 inteira, sem parar para pedir confirmação a cada tarefa. Rode uma vez a fumaça com o provedor real e meça de novo a cobertura, para o relatório trazer os números finais.
+  2. Execute a fase 6 inteira, sem parar para pedir confirmação a cada tarefa. Rode uma vez o teste de fumaça com o provedor real e meça a cobertura de novo, para que o relatório traga os números finais.
   3. Publique a versão v0.1.1, com a tag enviada ao GitHub.
 - **[S] Estilo:** Didático e resumido
 - **[T] Tom:** Objetivo
 - **[A] Público:** Aluno de pós-graduação aprendendo IA Generativa no SDLC.
-- **[R] Resposta:** Apresente o resumo da etapa de Testes de maneira simples e didática, com um parecer final sobre ela.
+- **[R] Resposta:** Resuma a etapa de Testes de forma simples e feche com um parecer final.
 
 ## 2026-10-08 — Etapa: Testes
 
@@ -936,12 +916,12 @@
 
 ## 2026-10-08 — Etapa: Documentação
 
-- **[C] Contexto:** Estou fechando a documentação do projeto e quero que o README contemple, no mínimo: o que o projeto resolve, como instalar e executar, como rodar testes, quais limites existem e como a IA foi usada no processo.
+- **[C] Contexto:** Estou fechando a documentação do projeto e quero que o README cubra, no mínimo: o que o projeto resolve, como instalar e executar, como rodar testes, quais limites existem e como a IA foi usada no processo.
 - **[O] Objetivo:**
   1. Revise o README com esses itens e complete o que faltar.
   2. Na parte de IA, responda:
-     - onde a IA acelerou o desenvolvimento, em todo o ciclo do SDLC;
-     - onde a revisão humana foi decisiva: ao final de cada etapa, eu revisei a sua saída e os artefatos gerados;
+     - onde a IA acelerou o desenvolvimento, em todas as etapas do SDLC;
+     - onde a revisão humana foi decisiva: ao final de cada etapa, eu revisei as suas respostas e os artefatos gerados;
      - quais prompts foram usados, apontando para o registro;
      - quais riscos foram mitigados, com um argumento que inclua a amplitude dos testes.
   3. Proponha a mensagem de commit e aguarde minha validação antes de commitar.
@@ -961,7 +941,7 @@
 
 ## 2026-10-08 — Etapa: Documentação
 
-- **[C] Contexto:** Avaliei a reprodutibilidade do projeto numa máquina limpa e ainda não fiz esse teste. Quero que o README deixe claras as limitações dessa verificação.
+- **[C] Contexto:** Ainda não testei se o projeto roda do zero numa máquina limpa. Quero que o README deixe claras as limitações que isso traz.
 - **[O] Objetivo:**
   1. Adicione ao README uma seção sobre as limitações dos testes de reprodutibilidade: o que o repositório garante, o que não foi verificado e como reduzir cada risco.
   2. Proponha a mensagem de commit e aguarde minha validação antes de commitar.
@@ -983,7 +963,7 @@
 
 - **[C] Contexto:** Concluí a etapa de Documentação, que fecha o MVP. A tabela de releases do README ainda não tem essa etapa.
 - **[O] Objetivo:**
-  1. Atualize o README com a etapa de Documentação na tabela de releases, como a versão final `v1.0.0`.
+  1. Inclua a etapa de Documentação na tabela de releases do README, como a versão final `v1.0.0`.
   2. Faça o commit e crie nele a tag `v1.0.0`.
 - **[S] Estilo:** Didático e resumido
 - **[T] Tom:** Objetivo
